@@ -1,0 +1,19 @@
+statements:
+  - Effect: Allow
+    Action:
+      - dynamodb:PutItem
+      - dynamodb:Query
+      - dynamodb:GetItem
+      - dynamodb:UpdateItem
+      - dynamodb:BatchWriteItem
+    Resource:
+      - !GetAtt MainTable.Arn
+      - !Sub "${MainTable.Arn}/index/*"
+  - Effect: Allow
+    Action: cognito-idp:AdminDeleteUser
+    Resource: !GetAtt UserPool.Arn
+  - Effect: Allow
+    Action:
+      - s3:PutObject
+      - s3:GetObject
+    Resource: !Sub "${MainBucket.Arn}/*"

@@ -1,0 +1,6 @@
+Resources:
+  MainBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: ${self:service}-${self:provider.stage}-main-bucket

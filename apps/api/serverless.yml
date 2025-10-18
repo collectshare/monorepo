@@ -1,0 +1,60 @@
+org: collectshare
+app: collectshare
+service: collectshare-api
+
+provider:
+  name: aws
+  region: us-east-1
+  architecture: arm64
+  runtime: nodejs22.x
+  profile: pessoal
+  memorySize: 128
+  stage: ${opt:stage, 'dev'}
+  environment: ${file(./sls/config/env.yml)}
+  iam:
+    role: ${file(./sls/config/role.yml)}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - "http://localhost:5173"
+        - "https://app.collectshare.com.br"
+        - "https://dev.collectshare.com.br"
+      allowedHeaders:
+        - "*"
+      allowedMethods:
+        - GET
+        - POST
+        - PATCH
+        - PUT
+        - DELETE
+        - OPTIONS
+    disableDefaultEndpoint: ${env:DISABLE_DEFAULT_APIGW_ENDPOINT, false}
+    authorizers:
+      CognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: !GetAtt UserPool.ProviderURL
+        audience:
+          - !Ref UserPoolClient
+
+package:
+  individually: true
+
+custom:
+  cognito:
+    PoolName: ${self:service}-${self:provider.stage}-UserPool
+
+build:
+  esbuild:
+    configFile: ./esbuild.config.mjs
+
+functions:
+  - ${file(./sls/functions/accounts.yml)}
+  - ${file(./sls/functions/auth.yml)}
+  - ${file(./sls/functions/form.yml)}
+
+resources:
+  - ${file(./sls/resources/UserPool.yml)}
+  - ${file(./sls/resources/MainTable.yml)}
+  - ${file(./sls/resources/MainBucket.yml)}
+  - ${file(./sls/resources/APIGWCustomDomain.yml)}

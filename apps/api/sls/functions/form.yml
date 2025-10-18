@@ -1,0 +1,72 @@
+createForm:
+  handler: src/main/functions/form/createForm.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /forms
+        authorizer:
+          name: CognitoAuthorizer
+
+updateForm:
+  handler: src/main/functions/form/updateFormDetails.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /forms/{formId}
+        authorizer:
+          name: CognitoAuthorizer
+
+listForms:
+  handler: src/main/functions/form/listForms.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /forms
+        authorizer:
+          name: CognitoAuthorizer
+
+getForm:
+  handler: src/main/functions/form/getForm.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /forms/{formId}
+
+submitForm:
+  handler: src/main/functions/form/submitForm.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /forms/{formId}/submissions
+
+getFormSubmissions:
+  handler: src/main/functions/form/getFormSubmissions.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /forms/{formId}/submissions
+        authorizer:
+          name: CognitoAuthorizer
+
+insertQuestionsInForm:
+  handler: src/main/functions/form/insertQuestionsInForm.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /forms/{formId}/questions
+        authorizer:
+          name: CognitoAuthorizer
+
+onFormSubmitted:
+  handler: src/main/functions/form/onFormSubmitted.handler
+  events:
+    - stream:
+        type: dynamodb
+        arn: !GetAtt MainTable.StreamArn
+        batchSize: 10
+        filterPatterns:
+          - eventName: [INSERT]
+            dynamodb:
+              NewImage:
+                type:
+                  S: [FormSubmission]

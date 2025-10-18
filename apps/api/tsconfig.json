@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noImplicitOverride": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@application/*": [
+        "src/application/*"
+      ],
+      "@main/*": [
+        "src/main/*"
+      ],
+      "@infra/*": [
+        "src/infra/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ],
+      "@kernel/*": [
+        "src/kernel/*"
+      ]
+    }
+  }
+}

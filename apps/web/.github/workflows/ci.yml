@@ -1,0 +1,33 @@
+name: CollectshareCI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.x"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - run: npm pkg delete scripts.prepare
+
+      - name: Install packages
+        run: pnpm install --frozen-lockfile
+
+      - name: Typechecking
+        run: pnpm typecheck

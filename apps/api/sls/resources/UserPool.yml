@@ -1,0 +1,62 @@
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: ${self:custom.cognito.PoolName}
+      DeletionProtection: ACTIVE
+      MfaConfiguration: OFF
+      AutoVerifiedAttributes:
+        - email
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      UsernameAttributes:
+        - email
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      Schema:
+        - Name: internalId
+          Required: false
+          Mutable: false
+          AttributeDataType: String
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+      LambdaConfig:
+        PreTokenGenerationConfig:
+          LambdaArn: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:service}-${self:provider.stage}-preTokenGenerationTrigger"
+          LambdaVersion: V2_0
+      EmailConfiguration:
+        EmailSendingAccount: DEVELOPER
+        From: ${env:COGNITO_EMAILS_FROM}
+        ReplyToEmailAddress: ${env:COGNITO_EMAILS_REPLY_TO}
+        SourceArn: ${env:SES_ARN}
+
+  PreTokenGenerationLambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: PreTokenGenerationTriggerLambdaFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:service}-${self:provider.stage}-preTokenGenerationTrigger"
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserPool.Arn
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: ${self:service}-${self:provider.stage}-UserPoolClient
+      UserPoolId: !Ref UserPool
+      GenerateSecret: true
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+      TokenValidityUnits:
+        AccessToken: hours
+      AccessTokenValidity: 12
+      RefreshTokenRotation:
+        Feature: ENABLED
+        RetryGracePeriodSeconds: 0

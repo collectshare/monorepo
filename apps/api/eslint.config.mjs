@@ -7,6 +7,11 @@ export default defineConfig([
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     plugins: { js },
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     extends: ['js/recommended'],
     rules: {
       quotes: ['error', 'single'],

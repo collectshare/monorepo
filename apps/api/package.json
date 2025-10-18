@@ -6,7 +6,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "dev:email": "email dev --dir src/infra/emails/templates",
-    "deploy:dev": "sls deploy --stage dev"
+    "deploy": "sls deploy --stage dev"
   },
   "keywords": [],
   "author": "",

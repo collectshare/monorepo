@@ -20,11 +20,6 @@
     "deploy": {
       "dependsOn": [
         "^build"
-      ]
-    },
-    "deploy:dev": {
-      "dependsOn": [
-        "^build"
       ],
       "cache": false
     },

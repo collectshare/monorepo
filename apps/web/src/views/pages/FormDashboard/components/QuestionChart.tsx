@@ -1,5 +1,5 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
-import { IFormResponse } from '@monorepo/shared/types/IFormResponse';
+import { IFormSubmission } from '@monorepo/shared/types/IFormSubmission';
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
 
 import { Chart } from './Chart';
@@ -7,12 +7,21 @@ import { PieChart } from './PieChart';
 
 interface QuestionChartProps {
   question: IQuestion;
-  responses: IFormResponse[];
+  responses: IFormSubmission[];
+}
+
+interface IAnswer {
+  questionId: string;
+  value: string | string[];
+}
+
+interface IFormResponseWithAnswers extends IFormSubmission {
+  answers: IAnswer[];
 }
 
 export function QuestionChart({ question, responses }: QuestionChartProps) {
-  const data = responses.reduce((acc, response) => {
-    const answer = response.questions.find((a) => a.questionId === question.id);
+  const data = (responses as IFormResponseWithAnswers[]).reduce((acc, response) => {
+    const answer = response.answers.find((a) => a.questionId === question.id);
 
     if (!answer) {
       return acc;

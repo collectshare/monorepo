@@ -3,12 +3,12 @@ import { IFormResponse } from '@monorepo/shared/types/IFormResponse';
 
 import { httpClient } from '../httpClient';
 
-export async function getResponses(formId: string): Promise<IFormResponse[]> {
+export async function getResponses(formId: string): Promise<IFormResponse> {
   if (!formId) {
-    return [];
+    return {} as IFormResponse;
   }
 
-  const { data } = await httpClient.get<IFormResponse[]>(`/forms/${formId}/submissions`);
+  const { data } = await httpClient.get<IFormResponse>(`/forms/${formId}/submissions`);
 
   return data;
 }

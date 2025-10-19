@@ -1,15 +1,8 @@
 
-import { IFormResponse } from '@monorepo/shared/types/IFormResponse';
-import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
 import { formsService } from '@/app/services/formsService';
-
-interface GetResponsesResponse {
-  submissions: IFormResponse[];
-  questions: IQuestion[];
-}
 
 export function useFormDashboardController() {
   const { formId } = useParams<{ formId: string }>();
@@ -20,18 +13,17 @@ export function useFormDashboardController() {
     enabled: !!formId,
   });
 
-  const { data: responsesData, isFetching: isLoadingResponses } =
-    useQuery<GetResponsesResponse>({
-      queryKey: ['form-responses', formId],
-      queryFn: () => formsService.getResponses(formId!),
-      enabled: !!formId,
-    });
+  const { data: responses, isFetching: isLoadingResponses } = useQuery({
+    queryKey: ['form-responses', formId],
+    queryFn: () => formsService.getResponses(formId!),
+    enabled: !!formId,
+  });
 
   return {
     form: form?.form,
-    questions: responsesData?.questions,
+    questions: form?.questions,
     isLoadingForm,
-    responses: responsesData?.submissions ?? [],
+    responses: responses?.submissions ?? [],
     isLoadingResponses,
   };
 }

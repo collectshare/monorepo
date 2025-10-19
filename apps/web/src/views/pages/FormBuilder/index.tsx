@@ -106,7 +106,10 @@ export default function FormBuilder() {
                     {fields.fields.map((field, index) => (
                       <FieldItem
                         key={field.id}
-                        field={field}
+                        field={{
+                          ...field,
+                          options: field.options ?? [],
+                        }}
                         index={index}
                         isDraggingActive={draggingIndex === null ? null : draggingIndex === index}
                         onDragStart={() => handleDragStart(index)}

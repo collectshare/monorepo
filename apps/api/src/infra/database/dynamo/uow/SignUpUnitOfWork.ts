@@ -1,5 +1,5 @@
-import { Account } from '@application/entities/Account';
-import { Profile } from '@application/entities/Profile';
+import { Account } from '@monorepo/shared/entities/Account';
+import { Profile } from '@monorepo/shared/entities/Profile';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { AccountRepository } from '../repositories/AccountRepository';
 import { ProfileRepository } from '../repositories/ProfileRepository';

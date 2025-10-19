@@ -1,4 +1,4 @@
-import { Question } from '@application/entities/Question';
+import { Question } from '@monorepo/shared/entities/Question';
 import {
   PutCommand,
   PutCommandInput,
@@ -13,7 +13,7 @@ import { QuestionItem } from '../items/QuestionItem';
 
 @Injectable()
 export class QuestionRepository {
-  constructor(private readonly config: AppConfig) {}
+  constructor(private readonly config: AppConfig) { }
 
   async findByFormId(formId: string): Promise<Question[]> {
     const command = new QueryCommand({

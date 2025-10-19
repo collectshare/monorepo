@@ -1,4 +1,4 @@
-import { Form } from '@application/entities/Form';
+import { Form } from '@monorepo/shared/entities/Form';
 
 export class FormItem {
   static readonly type = 'Form';

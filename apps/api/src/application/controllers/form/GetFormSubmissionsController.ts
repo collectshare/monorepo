@@ -1,7 +1,7 @@
 import { Controller } from '@application/contracts/Controller';
-import { Answer } from '@application/entities/Answer';
-import { FormSubmission } from '@application/entities/FormSubmission';
-import { Question } from '@application/entities/Question';
+import { Answer } from '@monorepo/shared/entities/Answer';
+import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
+import { Question } from '@monorepo/shared/entities/Question';
 import { GetFormSubmissionsUseCase } from '@application/usecases/form/GetFormSubmissionsUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
 

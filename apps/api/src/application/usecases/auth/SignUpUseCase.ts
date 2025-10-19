@@ -1,5 +1,5 @@
-import { Account } from '@application/entities/Account';
-import { Profile } from '@application/entities/Profile';
+import { Account } from '@monorepo/shared/entities/Account';
+import { Profile } from '@monorepo/shared/entities/Profile';
 import { EmailAlreadyInUse } from '@application/errors/application/EmailAlreadyInUse';
 import { AccountRepository } from '@infra/database/dynamo/repositories/AccountRepository';
 import { SignUpUnitOfWork } from '@infra/database/dynamo/uow/SignUpUnitOfWork';

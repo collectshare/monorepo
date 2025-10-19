@@ -1,4 +1,4 @@
-import { FormSubmission } from '@application/entities/FormSubmission';
+import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
 import { PutCommand, PutCommandInput, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { dynamoClient } from '@infra/clients/dynamoClient';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -7,7 +7,7 @@ import { FormSubmissionItem } from '../items/FormSubmissionItem';
 
 @Injectable()
 export class FormSubmissionRepository {
-  constructor(private readonly config: AppConfig) {}
+  constructor(private readonly config: AppConfig) { }
 
   async findByFormId(formId: string): Promise<FormSubmission[]> {
     const command = new QueryCommand({
@@ -24,7 +24,7 @@ export class FormSubmissionRepository {
     });
 
     const { Items = [] } = await dynamoClient.send(command);
-    
+
     return Items.map(item => FormSubmissionItem.toEntity(item as FormSubmissionItem.ItemType));
   }
 

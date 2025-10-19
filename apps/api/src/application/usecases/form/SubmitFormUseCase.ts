@@ -1,5 +1,5 @@
-import { Answer } from '@application/entities/Answer';
-import { FormSubmission } from '@application/entities/FormSubmission';
+import { Answer } from '@monorepo/shared/entities/Answer';
+import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
 import { ResourceNotFound } from '@application/errors/application/ResourceNotFound';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { SubmitFormUnitOfWork } from '@infra/database/dynamo/uow/SubmitFormUnitOfWork';
@@ -10,7 +10,7 @@ export class SubmitFormUseCase {
   constructor(
     private readonly submitFormUow: SubmitFormUnitOfWork,
     private readonly formRepository: FormRepository,
-  ) {}
+  ) { }
 
   async execute({
     formId,

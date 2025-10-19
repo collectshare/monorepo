@@ -1,4 +1,4 @@
-import { Form } from '@application/entities/Form';
+import { Form } from '@monorepo/shared/entities/Form';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { Injectable } from '@kernel/decorators/Injectable';
 
@@ -38,7 +38,7 @@ export namespace CreateFormUseCase {
     description?: string;
     onePage: boolean;
     tags?: string[];
-    isAnonymous?: boolean;
+    isAnonymous: boolean;
   };
 
   export type Output = {

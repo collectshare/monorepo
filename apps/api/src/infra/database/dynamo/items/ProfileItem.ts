@@ -1,4 +1,4 @@
-import { Profile } from '@application/entities/Profile';
+import { Profile } from '@monorepo/shared/entities/Profile';
 import { AccountItem } from './AccountItem';
 
 export class ProfileItem {

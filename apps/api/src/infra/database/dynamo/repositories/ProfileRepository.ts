@@ -1,6 +1,6 @@
 import { GetCommand, PutCommand, PutCommandInput, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 
-import { Profile } from '@application/entities/Profile';
+import { Profile } from '@monorepo/shared/entities/Profile';
 import { dynamoClient } from '@infra/clients/dynamoClient';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { AppConfig } from '@shared/config/AppConfig';
@@ -8,7 +8,7 @@ import { ProfileItem } from '../items/ProfileItem';
 
 @Injectable()
 export class ProfileRepository {
-  constructor(private readonly config: AppConfig) {}
+  constructor(private readonly config: AppConfig) { }
 
   async findByAccountId(accountId: string): Promise<Profile | null> {
     const command = new GetCommand({

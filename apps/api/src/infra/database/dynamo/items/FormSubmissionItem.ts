@@ -1,4 +1,4 @@
-import { FormSubmission } from '@application/entities/FormSubmission';
+import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
 
 export class FormSubmissionItem {
   static readonly type = 'FormSubmission';

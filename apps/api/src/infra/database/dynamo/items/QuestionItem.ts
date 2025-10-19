@@ -1,4 +1,4 @@
-import { Question, QuestionType } from '@application/entities/Question';
+import { Question, QuestionType } from '@monorepo/shared/entities/Question';
 
 export class QuestionItem {
   static readonly type = 'Question';

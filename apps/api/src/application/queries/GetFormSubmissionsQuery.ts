@@ -1,6 +1,6 @@
-import { Answer } from '@application/entities/Answer';
-import { FormSubmission } from '@application/entities/FormSubmission';
-import { Question } from '@application/entities/Question';
+import { Answer } from '@monorepo/shared/entities/Answer';
+import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
+import { Question } from '@monorepo/shared/entities/Question';
 import { AnswerRepository } from '@infra/database/dynamo/repositories/AnswerRepository';
 import { FormSubmissionRepository } from '@infra/database/dynamo/repositories/FormSubmissionRepository';
 import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
@@ -12,7 +12,7 @@ export class GetFormSubmissionsQuery {
     private readonly submissionRepository: FormSubmissionRepository,
     private readonly answerRepository: AnswerRepository,
     private readonly questionRepository: QuestionRepository,
-  ) {}
+  ) { }
 
   async execute(
     formId: string,

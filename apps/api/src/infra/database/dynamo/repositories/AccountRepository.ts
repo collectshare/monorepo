@@ -1,4 +1,4 @@
-import { Account } from '@application/entities/Account';
+import { Account } from '@monorepo/shared/entities/Account';
 import { PutCommand, PutCommandInput, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { dynamoClient } from '@infra/clients/dynamoClient';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -7,7 +7,7 @@ import { AccountItem } from '../items/AccountItem';
 
 @Injectable()
 export class AccountRepository {
-  constructor(private readonly config: AppConfig) {}
+  constructor(private readonly config: AppConfig) { }
 
   async findById(id: string): Promise<Account | null> {
     const command = new QueryCommand({

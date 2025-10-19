@@ -1,4 +1,4 @@
-import { Form } from '@application/entities/Form';
+import { Form } from '@monorepo/shared/entities/Form';
 import { PutCommand, PutCommandInput, QueryCommand, GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { dynamoClient } from '@infra/clients/dynamoClient';
 import { Injectable } from '@kernel/decorators/Injectable';

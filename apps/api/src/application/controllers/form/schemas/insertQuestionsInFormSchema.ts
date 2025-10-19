@@ -1,4 +1,4 @@
-import { QuestionType } from '@application/entities/Question';
+import { QuestionType } from '@monorepo/shared/entities/Question';
 import { z } from 'zod';
 
 const questionSchema = z.object({

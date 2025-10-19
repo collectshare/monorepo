@@ -1,4 +1,4 @@
-import { Question, QuestionType } from '@application/entities/Question';
+import { Question, QuestionType } from '@monorepo/shared/entities/Question';
 import { NotAllowedError } from '@application/errors/application/NotAllowedError';
 import { ResourceNotFound } from '@application/errors/application/ResourceNotFound';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
@@ -10,7 +10,7 @@ export class InsertQuestionsInFormUseCase {
   constructor(
     private readonly formRepository: FormRepository,
     private readonly questionRepository: QuestionRepository,
-  ) {}
+  ) { }
 
   async execute({
     accountId,

@@ -1,5 +1,5 @@
-import { FormSubmission } from '@application/entities/FormSubmission';
-import { Answer } from '@application/entities/Answer';
+import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
+import { Answer } from '@monorepo/shared/entities/Answer';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { FormSubmissionRepository } from '../repositories/FormSubmissionRepository';
 import { AnswerRepository } from '../repositories/AnswerRepository';

@@ -1,5 +1,5 @@
 import { Controller } from '@application/contracts/Controller';
-import { Form } from '@application/entities/Form';
+import { Form } from '@monorepo/shared/entities/Form';
 import { ListFormsUseCase } from '@application/usecases/form/ListFormsUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
 

@@ -1,4 +1,4 @@
-import { Account } from '@application/entities/Account';
+import { Account } from '@monorepo/shared/entities/Account';
 
 export class AccountItem {
   static readonly type = 'Account';

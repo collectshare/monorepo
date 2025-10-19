@@ -1,4 +1,4 @@
-import { Answer } from '@application/entities/Answer';
+import { Answer } from '@monorepo/shared/entities/Answer';
 import { PutCommand, PutCommandInput, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { dynamoClient } from '@infra/clients/dynamoClient';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -7,7 +7,7 @@ import { AnswerItem } from '../items/AnswerItem';
 
 @Injectable()
 export class AnswerRepository {
-  constructor(private readonly config: AppConfig) {}
+  constructor(private readonly config: AppConfig) { }
 
   async findBySubmissionId(submissionId: string): Promise<Answer[]> {
     const command = new QueryCommand({
@@ -22,7 +22,7 @@ export class AnswerRepository {
     });
 
     const { Items = [] } = await dynamoClient.send(command);
-    
+
     return Items.map(item => AnswerItem.toEntity(item as AnswerItem.ItemType));
   }
 

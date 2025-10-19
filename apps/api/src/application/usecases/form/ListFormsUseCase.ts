@@ -1,4 +1,4 @@
-import { Form } from '@application/entities/Form';
+import { Form } from '@monorepo/shared/entities/Form';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { Injectable } from '@kernel/decorators/Injectable';
 
@@ -6,7 +6,7 @@ import { Injectable } from '@kernel/decorators/Injectable';
 export class ListFormsUseCase {
   constructor(
     private readonly formRepository: FormRepository,
-  ) {}
+  ) { }
 
   async execute({ accountId }: ListFormsUseCase.Input): Promise<ListFormsUseCase.Output> {
     const forms = await this.formRepository.findByAccountId(accountId);

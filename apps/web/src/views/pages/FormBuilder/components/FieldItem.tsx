@@ -1,8 +1,9 @@
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+import { IQuestionInsert } from '@monorepo/shared/types/IQuestion';
 import { Reorder, useDragControls } from 'framer-motion';
 import { CopyIcon, EllipsisIcon, GripVerticalIcon, Trash2Icon } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
-import { IQuestionInsert, QuestionType } from '@/app/entities/IQuestion';
 import { Button } from '@/components/ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 import { Input } from '@/components/ui/Input';

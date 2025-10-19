@@ -1,4 +1,4 @@
-import { QuestionType } from '@/app/entities/IQuestion';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 
 import { httpClient } from '../httpClient';
 

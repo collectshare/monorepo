@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { IQuestion } from '@/app/entities/IQuestion';
+import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';

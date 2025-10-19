@@ -2,7 +2,7 @@ import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { CircleAlertIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 
-import { IFormInsert } from '@/app/entities/IForm';
+import { IFormInsert } from '@monorepo/shared/types/IForm';
 import { useModal } from '@/app/hooks/useModal';
 import { Button } from '@/components/ui/Button';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';

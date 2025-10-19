@@ -1,6 +1,6 @@
 import { id } from 'date-fns/locale';
 
-import { IForm } from '@/app/entities/IForm';
+import { IForm } from '@monorepo/shared/types/IForm';
 
 import { httpClient } from '../httpClient';
 

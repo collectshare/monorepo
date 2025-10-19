@@ -1,6 +1,5 @@
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import z from 'zod';
-
-import { QuestionType } from '@/app/entities/IQuestion';
 
 const textFieldSchema = z.object({
   id: z.string().optional(),
@@ -18,9 +17,9 @@ const optionFieldSchema = z.object({
     QuestionType.DROPDOWN,
   ]),
   options: z.array(
-      z.string({ required_error: 'As opções devem ser preenchidas' })
+    z.string({ required_error: 'As opções devem ser preenchidas' })
       .trim(),
-    )
+  )
     .min(1, 'É necessária pelo menos uma opção para este tipo de pergunta')
     .refine((options) => new Set(options).size === options.length, {
       message: 'As opções devem ser únicas',

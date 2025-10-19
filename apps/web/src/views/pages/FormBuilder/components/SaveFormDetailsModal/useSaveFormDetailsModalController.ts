@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { IFormInsert } from '@/app/entities/IForm';
+import { IFormInsert } from '@monorepo/shared/types/IForm';
 import { useModal } from '@/app/hooks/useModal';
 import { formsService } from '@/app/services/formsService';
 import { SaveFormRequest } from '@/app/services/formsService/save';

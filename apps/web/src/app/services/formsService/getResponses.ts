@@ -1,5 +1,5 @@
 
-import { IFormResponse } from '@/app/entities/IFormResponse';
+import { IFormResponse } from '@monorepo/shared/types/IFormResponse';
 
 import { httpClient } from '../httpClient';
 

@@ -1,3 +1,4 @@
+import { IUserProfile } from '@monorepo/shared/types/IUserProfile';
 import * as Sentry from '@sentry/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { createContext, useCallback, useEffect, useState } from 'react';
@@ -5,7 +6,6 @@ import { toast } from 'react-hot-toast';
 import { clarity } from 'react-microsoft-clarity';
 
 import { localStorageKeys } from '../config/localStorageKeys';
-import type { IUserProfile } from '../entities/IUserProfile';
 import { accountsService } from '../services/accountsService';
 
 interface IAuthContextValue {

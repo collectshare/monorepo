@@ -1,4 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+import { IQuestionInsert } from '@monorepo/shared/types/IQuestion';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -6,7 +8,6 @@ import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import z from 'zod';
 
-import { IQuestionInsert, QuestionType } from '@/app/entities/IQuestion';
 import { formsService } from '@/app/services/formsService';
 import { InsertQuestionsRequest } from '@/app/services/formsService/insertQuestions';
 
@@ -36,23 +37,23 @@ export function useFormBuilderController() {
     enabled: !!params.id,
   });
 
-    useEffect(() => {
-      if (formToEdit) {
-        const fields = formToEdit?.questions.map(question => ({
-          text: question.text,
-          questionType: question.questionType,
-          options: question.options,
-        })).map(field => ({
-          ...field,
-          options: field.options || [],
-        })) || [];
+  useEffect(() => {
+    if (formToEdit) {
+      const fields = formToEdit?.questions.map(question => ({
+        text: question.text,
+        questionType: question.questionType,
+        options: question.options,
+      })).map(field => ({
+        ...field,
+        options: field.options || [],
+      })) || [];
 
-        form.setValue('id', formToEdit.form.id);
-        form.setValue('title', formToEdit.form.title);
-        form.setValue('description', formToEdit.form.description);
-        form.setValue('fields', fields);
-      }
-    }, [formToEdit]);
+      form.setValue('id', formToEdit.form.id);
+      form.setValue('title', formToEdit.form.title);
+      form.setValue('description', formToEdit.form.description);
+      form.setValue('fields', fields);
+    }
+  }, [formToEdit]);
 
   const fields = useFieldArray({
     control: form.control,
@@ -89,7 +90,7 @@ export function useFormBuilderController() {
   }
 
   function handleReorder(newOrder: typeof fields.fields) {
-    if (draggingIndex === null)  {
+    if (draggingIndex === null) {
       return;
     }
 

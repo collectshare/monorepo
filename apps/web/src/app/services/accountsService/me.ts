@@ -1,4 +1,5 @@
-import { type IUserProfile } from '../../entities/IUserProfile';
+import { type IUserProfile } from '@monorepo/shared/types/IUserProfile';
+
 import { httpClient } from '../httpClient';
 
 type MeResponse = IUserProfile;

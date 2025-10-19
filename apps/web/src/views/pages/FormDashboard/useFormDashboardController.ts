@@ -1,9 +1,9 @@
 
+import { IFormResponse } from '@monorepo/shared/types/IFormResponse';
+import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
-import { IFormResponse } from '@/app/entities/IFormResponse';
-import { IQuestion } from '@/app/entities/IQuestion';
 import { formsService } from '@/app/services/formsService';
 
 interface GetResponsesResponse {

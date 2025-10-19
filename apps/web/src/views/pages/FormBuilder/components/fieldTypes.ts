@@ -1,12 +1,12 @@
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { CheckSquareIcon, ChevronsUpDownIcon, CircleDotIcon, TypeIcon } from 'lucide-react';
-
-import { QuestionType } from '@/app/entities/IQuestion';
 
 export const fieldTypes = [
   {
     type: QuestionType.TEXT,
     label: 'Texto',
-    icon: TypeIcon },
+    icon: TypeIcon,
+  },
   {
     type: QuestionType.MULTIPLE_CHOICE,
     label: 'Múltipla escolha',

@@ -3,7 +3,7 @@ import { CalendarIcon, ChartPieIcon, CopyIcon, Edit2, Ellipsis, SettingsIcon, Si
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
-import { IForm } from '@/app/entities/IForm';
+import { IForm } from '@monorepo/shared/types/IForm';
 import { useModal } from '@/app/hooks/useModal';
 import { formatDate } from '@/app/utils/formatDate';
 import { DataTableColumnHeader } from '@/components/DataTable/DataTableColumnHeader';

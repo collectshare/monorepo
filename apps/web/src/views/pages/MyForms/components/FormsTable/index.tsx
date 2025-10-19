@@ -1,6 +1,6 @@
 import { CirclePlusIcon } from 'lucide-react';
 
-import { IForm } from '@/app/entities/IForm';
+import { IForm } from '@monorepo/shared/types/IForm';
 import { useModal } from '@/app/hooks/useModal';
 import { DataTable } from '@/components/DataTable';
 import { DataTableContent } from '@/components/DataTable/DataTableContent';

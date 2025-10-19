@@ -1,11 +1,5 @@
+import { QuestionType } from 'enums/QuestionType';
 import KSUID from 'ksuid';
-
-export enum QuestionType {
-  TEXT = 'TEXT',
-  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
-  CHECKBOX = 'CHECKBOX',
-  DROPDOWN = 'DROPDOWN',
-}
 
 export class Question {
   readonly id: string;

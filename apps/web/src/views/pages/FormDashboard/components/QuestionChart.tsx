@@ -1,5 +1,6 @@
-import { IFormResponse } from '@/app/entities/IFormResponse';
-import { IQuestion, QuestionType } from '@/app/entities/IQuestion';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+import { IFormResponse } from '@monorepo/shared/types/IFormResponse';
+import { IQuestion } from '@monorepo/shared/types/IQuestion';
 
 import { Chart } from './Chart';
 import { PieChart } from './PieChart';
@@ -11,14 +12,14 @@ interface QuestionChartProps {
 
 export function QuestionChart({ question, responses }: QuestionChartProps) {
   const data = responses.reduce((acc, response) => {
-    const answer = response.answers.find((a) => a.questionId === question.id);
+    const answer = response.questions.find((a) => a.questionId === question.id);
 
     if (!answer) {
       return acc;
     }
 
     if (Array.isArray(answer.value)) {
-      answer.value.forEach((value) => {
+      answer.value.forEach((value: string) => {
         const existing = acc.find((item) => item.name === value);
         if (existing) {
           existing.value += 1;

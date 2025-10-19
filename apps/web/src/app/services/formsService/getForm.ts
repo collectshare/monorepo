@@ -1,5 +1,5 @@
-import { IForm } from '@/app/entities/IForm';
-import { IQuestion } from '@/app/entities/IQuestion';
+import { IForm } from '@monorepo/shared/types/IForm';
+import { IQuestion } from '@monorepo/shared/types/IQuestion';
 
 import { httpClient } from '../httpClient';
 

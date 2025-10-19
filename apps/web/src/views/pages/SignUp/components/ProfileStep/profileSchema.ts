@@ -4,8 +4,7 @@ export const profileSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   birthDate: z
     .date({
-      required_error: 'Data de nascimento é obrigatória',
-      invalid_type_error: 'Data de nascimento deve ser uma data válida',
+      message: 'Data de nascimento é obrigatória',
     })
     .max(new Date(), { message: 'Data de nascimento não pode ser uma data futura' })
     .refine(

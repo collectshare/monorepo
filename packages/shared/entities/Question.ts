@@ -1,4 +1,4 @@
-import { QuestionType } from 'enums/QuestionType';
+import { QuestionType } from '../enums/QuestionType';
 import KSUID from 'ksuid';
 
 export class Question {

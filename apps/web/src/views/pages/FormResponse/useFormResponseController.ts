@@ -71,7 +71,7 @@ export function useFormResponseController({
         id: formEntity.form.id,
         answers: Object.entries(formData).map(([questionId, value]) => ({
           questionId,
-          value,
+          value: value as string | string[],
         })),
       });
       toast.success('Formulário enviado com sucesso!');

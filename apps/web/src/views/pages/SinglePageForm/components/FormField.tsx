@@ -1,6 +1,6 @@
+import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -36,7 +36,7 @@ export function FormField({ question }: FormFieldProps) {
                 value={field.value}
                 className="space-y-2"
               >
-                {question.options?.map((option) => (
+                {question.options?.map((option: string) => (
                   <Label
                     key={option}
                     className="flex items-center gap-2 p-3 border rounded-md has-[:checked]:border-primary cursor-pointer"
@@ -57,7 +57,7 @@ export function FormField({ question }: FormFieldProps) {
             defaultValue={[]}
             render={({ field }) => (
               <div className="space-y-2">
-                {question.options?.map((option) => (
+                {question.options?.map((option: string) => (
                   <Label
                     key={option}
                     className="flex items-center gap-2 p-3 border rounded-md has-[:checked]:border-primary cursor-pointer"
@@ -95,7 +95,7 @@ export function FormField({ question }: FormFieldProps) {
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {question.options?.map((option) => (
+                  {question.options?.map((option: string) => (
                     <SelectItem key={option} value={option}>
                       {option}
                     </SelectItem>

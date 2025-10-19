@@ -1,3 +1,3 @@
-import { Answer } from 'entities/Answer';
+import { Answer } from "../entities/Answer";
 
 export type IAnswer = InstanceType<typeof Answer>;

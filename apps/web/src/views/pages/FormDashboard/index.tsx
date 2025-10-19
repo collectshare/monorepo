@@ -1,4 +1,6 @@
 
+import { IQuestion } from '@monorepo/shared/types/IQuestion';
+
 import PageLayout from '../../layouts/PageLayout';
 import { QuestionChart } from './components';
 import { useFormDashboardController } from './useFormDashboardController';
@@ -28,7 +30,7 @@ export default function FormDashboard() {
           </p>
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {questions?.map((question) => (
+            {questions?.map((question: IQuestion) => (
               <QuestionChart
                 key={question.id}
                 question={question}

@@ -10,7 +10,7 @@ export function formatDate(date: string) {
   })).replace(',', '');
 }
 
-export function formatDateWithoutHour(date: string){
+export function formatDateWithoutHour(date: string) {
   return new Date(date).toLocaleString('pt-BR', {
     day: '2-digit',
     month: '2-digit',

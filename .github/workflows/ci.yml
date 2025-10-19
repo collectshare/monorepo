@@ -24,10 +24,11 @@ jobs:
         with:
           version: 9
 
-      - run: npm pkg delete scripts.prepare
-
       - name: Install packages
         run: pnpm install --frozen-lockfile
 
-      - name: Typechecking
-        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build

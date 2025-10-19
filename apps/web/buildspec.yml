@@ -13,11 +13,11 @@ phases:
   build:
     on-failure: ABORT
     commands:
-      - pnpm validate:env
-      - pnpm build
-      - rm -rf dist/**/*.js.map
+      - pnpm --filter @monorepo/web validate:env
+      - pnpm --filter @monorepo/web build
+      - rm -rf apps/web/dist/**/*.js.map
 
   post_build:
     commands:
-      - aws s3 sync --delete ./dist s3://${DEPLOY_BUCKET}
+      - aws s3 sync --delete ./apps/web/dist s3://${DEPLOY_BUCKET}
       - aws cloudfront create-invalidation --distribution-id ${CF_ID} --paths /index.html

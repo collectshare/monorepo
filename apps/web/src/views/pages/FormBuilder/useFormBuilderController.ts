@@ -15,7 +15,7 @@ import { fieldSchema } from './components/schema';
 
 export const formBuilderFormData = z.object({
   id: z.string().optional(),
-  title: z.string({ message: 'O título é obrigatório' }).min(1, 'O título é obrigatório').trim(),
+  title: z.string({ required_error: 'O título é obrigatório' }).min(1, 'O título é obrigatório').trim(),
   description: z.string().trim().optional(),
   fields: z.array(fieldSchema),
 });

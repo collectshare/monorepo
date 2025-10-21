@@ -85,7 +85,7 @@ export default function useSignUpController() {
 
       signin(accessToken, refreshToken);
       sessionStorage.removeItem(localStorageKeys.ON_BOARDING_FORM);
-    } catch(error) {
+    } catch (error) {
       if (error instanceof AxiosError) {
         if (error.status === 401) {
           toast.error('Credenciais inválidas');

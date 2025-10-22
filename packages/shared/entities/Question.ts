@@ -8,7 +8,7 @@ export class Question {
   questionType: QuestionType;
   options: string[] | undefined;
   order: number;
-  isRequired: boolean;
+  isRequired?: boolean;
   readonly createdAt: Date;
 
   constructor(attr: Question.Attributes) {

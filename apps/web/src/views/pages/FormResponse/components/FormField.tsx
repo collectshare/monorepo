@@ -24,7 +24,7 @@ export function FormField({ question }: FormFieldProps) {
   const renderField = () => {
     switch (question.questionType) {
       case 'TEXT':
-        return <Input {...register(question.id)} className="text-center" />;
+        return <Input {...register(question.id)} className="text-center" placeholder="Resposta..." />;
       case 'MULTIPLE_CHOICE':
         return (
           <Controller

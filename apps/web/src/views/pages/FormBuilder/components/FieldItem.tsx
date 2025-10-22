@@ -2,12 +2,18 @@ import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { IQuestionInsert } from '@monorepo/shared/types/IQuestion';
 import { Reorder, useDragControls } from 'framer-motion';
 import { CopyIcon, EllipsisIcon, GripVerticalIcon, Trash2Icon } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { Button } from '@/components/ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/DropdownMenu';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/lib/utils';
 
 import { FormBuilderFormData } from '../useFormBuilderController';
@@ -21,7 +27,7 @@ interface IFieldItemProps {
   onDragStart: () => void;
   onDragEnd: () => void;
   onRemove: () => void;
-  onCloneField: (field: IQuestionInsert) => void
+  onCloneField: (field: IQuestionInsert) => void;
 }
 
 export function FieldItem({
@@ -74,10 +80,7 @@ export function FieldItem({
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <span className="font-semibold">
-                    {
-                      fieldTypes.find((field) => field.type === questionType)
-                        ?.label
-                    }
+                    {fieldTypes.find(field => field.type === questionType)?.label}
                   </span>
                 </div>
                 <DropdownMenu>
@@ -96,20 +99,14 @@ export function FieldItem({
                     <DropdownMenuItem onSelect={() => onCloneField(field)}>
                       <CopyIcon className="size-4" /> Clonar
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={onRemove} className="text-destructive">
+                    <DropdownMenuItem
+                      onSelect={onRemove}
+                      className="text-destructive"
+                    >
                       <Trash2Icon className="size-4" /> Excluir
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                {/* <Button
-                  type="button"
-                  variant="outlineDestructive"
-                  size="icon"
-                  onClick={onRemove}
-                  tabIndex={-1}
-                >
-                  <Trash2Icon className="size-4" />
-                </Button> */}
               </div>
               <Label htmlFor={`fields.${index}.text`}>Nome do campo</Label>
               <Input
@@ -119,6 +116,22 @@ export function FieldItem({
               />
               {showOptions && <FieldOptions fieldIndex={index} />}
             </div>
+          </div>
+          <div className="flex items-center justify-end gap-2 pt-4 border-t">
+            <Controller
+              control={form.control}
+              name={`fields.${index}.isRequired`}
+              render={({ field: { onChange, value } }) => (
+                <div className="flex items-center gap-2">
+                  <Label htmlFor={`fields.${index}.isRequired`}>Obrigatório</Label>
+                  <Switch
+                    id={`fields.${index}.isRequired`}
+                    checked={value}
+                    onCheckedChange={onChange}
+                  />
+                </div>
+              )}
+            />
           </div>
         </div>
       </div>

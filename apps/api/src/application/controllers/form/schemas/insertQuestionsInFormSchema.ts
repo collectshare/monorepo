@@ -1,4 +1,4 @@
-import { QuestionType } from '@monorepo/shared/entities/Question';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { z } from 'zod';
 
 const questionSchema = z.object({
@@ -6,6 +6,7 @@ const questionSchema = z.object({
   questionType: z.nativeEnum(QuestionType),
   order: z.number().int().positive(),
   options: z.array(z.string()).optional(),
+  isRequired: z.boolean().optional(),
 });
 
 export const insertQuestionsInFormSchema = z.object({

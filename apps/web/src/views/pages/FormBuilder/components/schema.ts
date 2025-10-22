@@ -6,6 +6,7 @@ const textFieldSchema = z.object({
   text: z.string({ required_error: 'O nome da pergunta é obrigatório' }).min(1, 'O nome da pergunta é obrigatório'),
   questionType: z.literal(QuestionType.TEXT),
   options: z.array(z.string()).optional(),
+  isRequired: z.boolean().optional(),
 });
 
 const optionFieldSchema = z.object({
@@ -27,6 +28,7 @@ const optionFieldSchema = z.object({
     .refine((options) => options.every((option) => option.length > 0), {
       message: 'Todas as opções devem estar preenchidas',
     }),
+  isRequired: z.boolean().optional(),
 });
 
 export const fieldSchema = z.discriminatedUnion('questionType', [

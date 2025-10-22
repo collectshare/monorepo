@@ -112,7 +112,7 @@ export function FormField({ question }: FormFieldProps) {
 
   return (
     <div className="w-full max-w-md text-center">
-      <Label className="text-2xl font-semibold leading-relaxed">
+      <Label className="text-2xl font-semibold leading-relaxed" isRequired={question.isRequired}>
         {question.text}
       </Label>
       <div className="mt-8 w-full text-left">

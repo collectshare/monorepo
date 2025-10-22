@@ -28,20 +28,32 @@ export function useSinglePageFormController({
   const formSchema = z.object(
     questions.reduce(
       (acc, question) => {
-        let schema;
+        let schema: z.ZodTypeAny;
 
         switch (question.questionType) {
           case 'TEXT':
-            schema = z.string().min(1, 'Este campo é obrigatório');
+            schema = z.string();
+            if (question.isRequired) {
+              schema = schema.min(1, 'Este campo é obrigatório');
+            }
             break;
           case 'MULTIPLE_CHOICE':
-            schema = z.string().min(1, 'Selecione uma opção');
+            schema = z.string();
+            if (question.isRequired) {
+              schema = schema.min(1, 'Selecione uma opção');
+            }
             break;
           case 'CHECKBOX':
-            schema = z.array(z.string()).min(1, 'Selecione ao menos uma opção');
+            schema = z.array(z.string());
+            if (question.isRequired) {
+              schema = schema.min(1, 'Selecione ao menos uma opção');
+            }
             break;
           case 'DROPDOWN':
-            schema = z.string().min(1, 'Selecione uma opção');
+            schema = z.string();
+            if (question.isRequired) {
+              schema = schema.min(1, 'Selecione uma opção');
+            }
             break;
           default:
             schema = z.any();

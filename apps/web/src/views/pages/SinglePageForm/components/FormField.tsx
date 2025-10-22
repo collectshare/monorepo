@@ -114,6 +114,7 @@ export function FormField({ question }: FormFieldProps) {
     <div className="w-full max-w-md text-center">
       <Label className="text-2xl font-semibold leading-relaxed">
         {question.text}
+        {question.isRequired && <span className="text-destructive"> *</span>}
       </Label>
       <div className="mt-8 w-full text-left">
         {renderField()}

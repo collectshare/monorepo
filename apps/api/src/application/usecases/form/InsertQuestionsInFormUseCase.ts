@@ -1,9 +1,10 @@
-import { Question, QuestionType } from '@monorepo/shared/entities/Question';
+import { Question } from '@monorepo/shared/entities/Question';
 import { NotAllowedError } from '@application/errors/application/NotAllowedError';
 import { ResourceNotFound } from '@application/errors/application/ResourceNotFound';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
 import { Injectable } from '@kernel/decorators/Injectable';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 
 @Injectable()
 export class InsertQuestionsInFormUseCase {
@@ -60,6 +61,7 @@ export namespace InsertQuestionsInFormUseCase {
       questionType: QuestionType;
       order: number;
       options?: string[];
+      isRequired?: boolean;
     }>;
   };
 }

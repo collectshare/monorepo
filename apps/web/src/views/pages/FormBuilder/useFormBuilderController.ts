@@ -43,6 +43,7 @@ export function useFormBuilderController() {
         text: question.text,
         questionType: question.questionType,
         options: question.options,
+        isRequired: question.isRequired,
       })).map(field => ({
         ...field,
         options: field.options || [],
@@ -106,9 +107,9 @@ export function useFormBuilderController() {
 
   function addField(questionType: QuestionType) {
     if (questionType === QuestionType.TEXT) {
-      fields.append({ text: 'Novo campo', questionType });
+      fields.append({ text: 'Novo campo', questionType, isRequired: false });
     } else {
-      fields.append({ text: 'Novo campo', questionType, options: [] });
+      fields.append({ text: 'Novo campo', questionType, options: [], isRequired: false });
     }
   }
 
@@ -117,6 +118,7 @@ export function useFormBuilderController() {
       text: field.text,
       questionType: field.questionType,
       options: field.options || [],
+      isRequired: field.isRequired,
     });
   }
 

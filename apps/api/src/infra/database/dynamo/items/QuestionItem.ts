@@ -1,4 +1,5 @@
-import { Question, QuestionType } from '@monorepo/shared/entities/Question';
+import { Question } from '@monorepo/shared/entities/Question';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 
 export class QuestionItem {
   static readonly type = 'Question';
@@ -35,6 +36,7 @@ export class QuestionItem {
       questionType: questionItem.questionType,
       options: questionItem.options,
       order: questionItem.order,
+      isRequired: questionItem.isRequired,
       createdAt: new Date(questionItem.createdAt),
     });
   }
@@ -61,6 +63,7 @@ export namespace QuestionItem {
     questionType: QuestionType;
     options: string[] | undefined;
     order: number;
+    isRequired: boolean;
     createdAt: string;
   };
 

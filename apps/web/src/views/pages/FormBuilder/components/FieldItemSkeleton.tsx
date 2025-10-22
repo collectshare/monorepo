@@ -1,4 +1,4 @@
-import { GripVerticalIcon, Trash2Icon } from 'lucide-react';
+import { EllipsisIcon, GripVerticalIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -24,11 +24,11 @@ export function FieldItemSkeleton() {
               </div>
               <Button
                 type="button"
-                variant="outlineDestructive"
+                variant="ghost"
                 size="icon"
                 disabled
               >
-                <Trash2Icon className="size-4" />
+                <EllipsisIcon className="size-4" />
               </Button>
             </div>
             <Skeleton className="h-4 w-24" />

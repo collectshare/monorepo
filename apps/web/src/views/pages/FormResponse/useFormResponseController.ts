@@ -30,29 +30,37 @@ export function useFormResponseController({
   const formSchema = z.object(
     questions.reduce(
       (acc, question) => {
-        let schema;
-
         switch (question.questionType) {
           case 'TEXT':
-            schema = z.string().min(1, 'Este campo é obrigatório');
+            if (question.isRequired) {
+              acc[question.id] = z.string().nonempty('Este campo é obrigatório');
+            } else {
+              acc[question.id] = z.string().optional().nullable();
+            }
             break;
-          case 'MULTIPLE_CHOICE':
-            schema = z.string().min(1, 'Selecione uma opção');
-            break;
-          case 'CHECKBOX':
-            schema = z.array(z.string()).min(1, 'Selecione ao menos uma opção');
-            break;
-          case 'DROPDOWN':
-            schema = z.string().min(1, 'Selecione uma opção');
-            break;
-          default:
-            schema = z.any();
-        }
 
-        return {
-          ...acc,
-          [question.id]: schema,
-        };
+          case 'MULTIPLE_CHOICE':
+          case 'DROPDOWN':
+            if (question.isRequired) {
+              acc[question.id] = z.string().nonempty('Selecione uma opção');
+            } else {
+              acc[question.id] = z.string().optional().nullable();
+            }
+            break;
+
+          case 'CHECKBOX':
+            if (question.isRequired) {
+              acc[question.id] = z.array(z.string()).nonempty('Selecione ao menos uma opção');
+            } else {
+              acc[question.id] = z.array(z.string()).optional().nullable();
+            }
+            break;
+
+          default:
+            acc[question.id] = z.any();
+        }
+        return acc;
+
       },
       {} as Record<string, z.ZodTypeAny>,
     ) ?? {},

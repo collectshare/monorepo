@@ -63,7 +63,7 @@ export namespace QuestionItem {
     questionType: QuestionType;
     options: string[] | undefined;
     order: number;
-    isRequired: boolean;
+    isRequired?: boolean;
     createdAt: string;
   };
 

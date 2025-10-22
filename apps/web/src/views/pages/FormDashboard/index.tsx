@@ -1,5 +1,8 @@
 
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
+import { DownloadIcon } from 'lucide-react';
+
+import { Button } from '@/components/ui/Button';
 
 import PageLayout from '../../layouts/PageLayout';
 import { QuestionChart } from './components';
@@ -12,6 +15,7 @@ export default function FormDashboard() {
     questions,
     responses,
     isLoadingResponses,
+    handleExport,
   } = useFormDashboardController();
 
   return (
@@ -24,10 +28,19 @@ export default function FormDashboard() {
 
       {form && (
         <div className="mt-4">
-          <h2 className="text-2xl font-bold tracking-tight">Respostas</h2>
-          <p className="text-muted-foreground">
-            Total de respostas: {responses.length}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight">Respostas</h2>
+              <p className="text-muted-foreground">
+                Total de respostas: {responses.length}
+              </p>
+            </div>
+
+            <Button onClick={handleExport} disabled={responses.length === 0}>
+              <DownloadIcon />
+              Exportar CSV
+            </Button>
+          </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             {questions?.map((question: IQuestion) => (

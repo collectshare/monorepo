@@ -109,7 +109,7 @@ export function useFormBuilderController() {
   function addField(questionType: QuestionType) {
     const noOptionsTypes = [QuestionType.TEXT, QuestionType.FILE];
     if (noOptionsTypes.includes(questionType)) {
-      fields.append({ text: 'Novo campo', questionType, isRequired: false });
+      fields.append({ text: 'Novo campo', questionType: questionType as QuestionType.TEXT | QuestionType.FILE, isRequired: false });
     } else if (questionType === QuestionType.STARS) {
       fields.append({ text: 'Novo campo', questionType, isRequired: false, max: 5 });
     } else {

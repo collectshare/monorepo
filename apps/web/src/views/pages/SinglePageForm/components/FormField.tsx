@@ -1,7 +1,9 @@
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Checkbox } from '@/components/ui/Checkbox';
+import { FileUpload } from '@/components/ui/FileUpload';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/RadioGroup';
@@ -12,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/Select';
+import { StarRating } from '@/components/ui/StarRating';
 
 interface FormFieldProps {
   question: IQuestion;
@@ -23,9 +26,9 @@ export function FormField({ question }: FormFieldProps) {
 
   const renderField = () => {
     switch (question.questionType) {
-      case 'TEXT':
-        return <Input {...register(question.id)} className="text-center" />;
-      case 'MULTIPLE_CHOICE':
+      case QuestionType.TEXT:
+        return <Input {...register(question.id)} className="text-center" placeholder="Resposta..." />;
+      case QuestionType.MULTIPLE_CHOICE:
         return (
           <Controller
             control={control}
@@ -49,7 +52,7 @@ export function FormField({ question }: FormFieldProps) {
             )}
           />
         );
-      case 'CHECKBOX':
+      case QuestionType.CHECKBOX:
         return (
           <Controller
             control={control}
@@ -84,7 +87,7 @@ export function FormField({ question }: FormFieldProps) {
             )}
           />
         );
-      case 'DROPDOWN':
+      case QuestionType.DROPDOWN:
         return (
           <Controller
             control={control}
@@ -105,6 +108,24 @@ export function FormField({ question }: FormFieldProps) {
             )}
           />
         );
+        case QuestionType.STARS:
+          return (
+            <Controller
+              control={control}
+              name={question.id}
+              render={({ field }) => (
+                <StarRating max={question.max ?? 5} value={field.value} onChange={field.onChange} />
+              )}
+            />
+          );
+        case QuestionType.FILE:
+          return (
+            <Controller
+              control={control}
+              name={question.id}
+              render={({ field }) => <FileUpload value={field.value} onChange={field.onChange} />}
+            />
+          );
       default:
         return null;
     }

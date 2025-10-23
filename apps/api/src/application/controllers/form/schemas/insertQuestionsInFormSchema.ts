@@ -6,6 +6,7 @@ const questionSchema = z.object({
   questionType: z.nativeEnum(QuestionType),
   order: z.number().int().positive(),
   options: z.array(z.string()).optional(),
+  max: z.number().int().positive().optional(),
   isRequired: z.boolean().optional(),
 });
 

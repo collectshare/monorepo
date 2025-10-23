@@ -3,4 +3,6 @@ export enum QuestionType {
   MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
   CHECKBOX = 'CHECKBOX',
   DROPDOWN = 'DROPDOWN',
+  STARS = 'STARS',
+  FILE = 'FILE',
 }

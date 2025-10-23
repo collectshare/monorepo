@@ -36,6 +36,7 @@ export class QuestionItem {
       questionType: questionItem.questionType,
       options: questionItem.options,
       order: questionItem.order,
+      max: questionItem.max,
       isRequired: questionItem.isRequired,
       createdAt: new Date(questionItem.createdAt),
     });
@@ -64,6 +65,7 @@ export namespace QuestionItem {
     options: string[] | undefined;
     order: number;
     isRequired?: boolean;
+    max?: number;
     createdAt: string;
   };
 

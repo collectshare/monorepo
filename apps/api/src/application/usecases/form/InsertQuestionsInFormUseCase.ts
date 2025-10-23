@@ -61,6 +61,7 @@ export namespace InsertQuestionsInFormUseCase {
       questionType: QuestionType;
       order: number;
       options?: string[];
+      max?: number;
       isRequired?: boolean;
     }>;
   };

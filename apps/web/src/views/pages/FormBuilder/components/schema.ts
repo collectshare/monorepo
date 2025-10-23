@@ -1,12 +1,13 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import z from 'zod';
 
-const textFieldSchema = z.object({
+const noOptionsFieldSchema = z.object({
   id: z.string().optional(),
   text: z.string({ required_error: 'O nome da pergunta é obrigatório' }).min(1, 'O nome da pergunta é obrigatório'),
-  questionType: z.literal(QuestionType.TEXT),
+  questionType: z.enum([QuestionType.TEXT, QuestionType.STARS, QuestionType.FILE]),
   options: z.array(z.string()).optional(),
   isRequired: z.boolean().optional(),
+  max: z.number().optional(),
 });
 
 const optionFieldSchema = z.object({
@@ -32,7 +33,7 @@ const optionFieldSchema = z.object({
 });
 
 export const fieldSchema = z.discriminatedUnion('questionType', [
-  textFieldSchema,
+  noOptionsFieldSchema,
   optionFieldSchema,
 ]);
 

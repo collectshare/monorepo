@@ -9,6 +9,7 @@ export class Question {
   options: string[] | undefined;
   order: number;
   isRequired?: boolean;
+  max?: number;
   readonly createdAt: Date;
 
   constructor(attr: Question.Attributes) {
@@ -19,6 +20,7 @@ export class Question {
     this.options = attr.options;
     this.order = attr.order;
     this.isRequired = attr.isRequired ?? false;
+    this.max = attr.max;
     this.createdAt = attr.createdAt ?? new Date();
   }
 }
@@ -31,6 +33,7 @@ export namespace Question {
     order: number;
     options?: string[];
     isRequired?: boolean;
+    max?: number;
     id?: string;
     createdAt?: Date;
   };

@@ -87,10 +87,12 @@ export default function FormBuilder() {
           </div>
         </header>
         <Separator orientation="horizontal" className="mb-4" />
-        <div className="w-full flex flex-col lg:flex-row gap-4">
-          <div className="w-full lg:w-[320px]">
-            <Sidebar addField={addField} />
-          </div>
+        <div className="w-full flex flex-col-reverse lg:flex-row gap-4">
+          {isMobile && fields.fields.length >= 2 && (
+            <div className="w-full lg:w-[320px]">
+              <Sidebar addField={addField} />
+            </div>
+          )}
           <div className="w-full lg:flex-1">
             <div className="max-w-4xl mx-auto">
               <div className="flex flex-col gap-4">
@@ -143,11 +145,9 @@ export default function FormBuilder() {
               </div>
             </div>
           </div>
-          {isMobile && fields.fields.length >= 2 && (
-            <div className="w-full lg:w-[320px]">
-              <Sidebar addField={addField} />
-            </div>
-          )}
+          <div className="w-full lg:w-[320px]">
+            <Sidebar addField={addField} />
+          </div>
         </div>
       </form>
     </FormProvider>

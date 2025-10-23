@@ -1,5 +1,12 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
-import { CheckSquareIcon, ChevronsUpDownIcon, CircleDotIcon, TypeIcon } from 'lucide-react';
+import {
+  CheckSquareIcon,
+  ChevronsUpDownIcon,
+  CircleDotIcon,
+  FileUpIcon,
+  StarIcon,
+  TypeIcon,
+} from 'lucide-react';
 
 export const fieldTypes = [
   {
@@ -21,5 +28,15 @@ export const fieldTypes = [
     type: QuestionType.DROPDOWN,
     label: 'Dropdown',
     icon: ChevronsUpDownIcon,
+  },
+  {
+    type: QuestionType.STARS,
+    label: 'Estrelas',
+    icon: StarIcon,
+  },
+  {
+    type: QuestionType.FILE,
+    label: 'Arquivo',
+    icon: FileUpIcon,
   },
 ];

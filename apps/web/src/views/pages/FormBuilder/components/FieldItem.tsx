@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/lib/utils';
 
@@ -114,6 +115,29 @@ export function FieldItem({
                 {...form.register(`fields.${index}.text`)}
                 error={form.formState.errors.fields?.[index]?.text?.message}
               />
+              {questionType === QuestionType.STARS && (
+                <div className="mt-2">
+                  <Label>Quantidade de estrelas</Label>
+                  <Controller
+                    control={form.control}
+                    name={`fields.${index}.max`}
+                    render={({ field }) => (
+                      <Select onValueChange={(value) => field.onChange(Number(value))} value={String(field.value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 10 }, (_, i) => i + 1).map((i) => (
+                            <SelectItem key={i} value={String(i)}>
+                              {i}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              )}
               {showOptions && <FieldOptions fieldIndex={index} />}
             </div>
           </div>

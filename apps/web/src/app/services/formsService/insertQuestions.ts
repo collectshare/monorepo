@@ -10,6 +10,7 @@ export type InsertQuestionsRequest = {
     questionType: QuestionType;
     order: number;
     options?: string[] | undefined;
+    max?: number;
     isRequired?: boolean;
   }[];
 }

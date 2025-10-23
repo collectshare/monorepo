@@ -44,6 +44,7 @@ export function useFormBuilderController() {
         questionType: question.questionType,
         options: question.options,
         isRequired: question.isRequired,
+        max: question.max,
       })).map(field => ({
         ...field,
         options: field.options || [],
@@ -106,8 +107,11 @@ export function useFormBuilderController() {
   }
 
   function addField(questionType: QuestionType) {
-    if (questionType === QuestionType.TEXT) {
+    const noOptionsTypes = [QuestionType.TEXT, QuestionType.FILE];
+    if (noOptionsTypes.includes(questionType)) {
       fields.append({ text: 'Novo campo', questionType, isRequired: false });
+    } else if (questionType === QuestionType.STARS) {
+      fields.append({ text: 'Novo campo', questionType, isRequired: false, max: 5 });
     } else {
       fields.append({ text: 'Novo campo', questionType, options: [], isRequired: false });
     }
@@ -119,6 +123,7 @@ export function useFormBuilderController() {
       questionType: field.questionType,
       options: field.options || [],
       isRequired: field.isRequired,
+      max: field.max,
     });
   }
 

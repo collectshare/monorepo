@@ -4,6 +4,7 @@ import { IQuestion } from '@monorepo/shared/types/IQuestion';
 
 import { Chart } from './Chart';
 import { PieChart } from './PieChart';
+import { StarRatingChart } from './StarRatingChart';
 
 interface QuestionChartProps {
   question: IQuestion;
@@ -68,6 +69,8 @@ export function QuestionChart({ question, responses }: QuestionChartProps) {
             </table>
           </div>
         );
+      case QuestionType.STARS:
+        return <StarRatingChart data={data} />;
       default:
         return <Chart data={data} />;
     }

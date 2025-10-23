@@ -4,7 +4,7 @@ export type SubmitFormRequest = {
   id: string;
   answers: {
     questionId: string;
-    value: string | string[];
+    value: string | string[] | number | { name: string; type: string; content: string };
   }[]
 }
 

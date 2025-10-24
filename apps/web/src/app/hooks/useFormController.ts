@@ -66,13 +66,27 @@ export function useFormController({
             }
             break;
 
-          case QuestionType.FILE:
+          case QuestionType.FILE: {
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
             if (question.isRequired) {
-              acc[question.id] = z.instanceof(File, { message: 'Este campo é obrigatório' });
+              acc[question.id] = z
+                .instanceof(File, { message: 'Este campo é obrigatório' })
+                .refine(
+                  (file) => file.size <= MAX_FILE_SIZE,
+                  'O arquivo deve ter no máximo 10MB.',
+                );
             } else {
-              acc[question.id] = z.instanceof(File).optional().nullable();
+              acc[question.id] = z
+                .instanceof(File)
+                .refine(
+                  (file) => file.size <= MAX_FILE_SIZE,
+                  'O arquivo deve ter no máximo 10MB.',
+                )
+                .optional()
+                .nullable();
             }
             break;
+          }
 
           default:
             acc[question.id] = z.any();

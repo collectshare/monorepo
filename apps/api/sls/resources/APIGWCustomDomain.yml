@@ -3,11 +3,11 @@ Conditions:
     - !Not
       - !Equals
         - ${env:API_DOMAIN_NAME, ''}
-        - ''
+        - ""
     - !Not
       - !Equals
         - ${env:ROUTE53_HOSTED_ZONE_ID, ''}
-        - ''
+        - ""
 
 Resources:
   APIGWCustomDomainCertificate:

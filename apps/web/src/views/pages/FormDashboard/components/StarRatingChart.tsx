@@ -1,7 +1,13 @@
 
 import { Star } from 'lucide-react';
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from 'recharts';
 
-import { Chart } from './Chart';
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 
 interface StarRatingChartProps {
   data: {
@@ -10,10 +16,27 @@ interface StarRatingChartProps {
   }[];
 }
 
-export function StarRatingChart({ data }: StarRatingChartProps) {
-  const totalResponses = data.reduce((acc, item) => acc + item.value, 0);
-  const totalStars = data.reduce((acc, item) => acc + Number(item.name) * item.value, 0);
-  const average = totalResponses > 0 ? (totalStars / totalResponses).toFixed(1) : 0;
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
+
+const chartConfig = {
+  value: {
+    label: 'Value',
+  },
+} satisfies ChartConfig;
+
+export function StarRatingChart({ data: originalData }: StarRatingChartProps) {
+  const totalResponses = originalData.reduce((acc, item) => acc + item.value, 0);
+  const totalStars = originalData.reduce(
+    (acc, item) => acc + Number(item.name) * item.value,
+    0,
+  );
+  const average =
+    totalResponses > 0 ? (totalStars / totalResponses).toFixed(1) : 0;
+
+  const data = originalData.map((item, i) => ({
+    ...item,
+    fill: COLORS[i % COLORS.length],
+  }));
 
   return (
     <div>
@@ -21,7 +44,37 @@ export function StarRatingChart({ data }: StarRatingChartProps) {
         <Star className="w-6 h-6 text-primary fill-primary" />
         <span className="text-2xl font-bold">{average}</span>
       </div>
-      <Chart data={data} />
+      <ChartContainer config={chartConfig} className="h-[300px] w-full">
+        <BarChart
+          accessibilityLayer
+          data={data}
+          margin={{
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 20,
+          }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="name"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            tickFormatter={(value) => `${value} ★`}
+          />
+          <YAxis />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dot" />}
+          />
+          <Bar dataKey="value" radius={4}>
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ChartContainer>
     </div>
   );
 }

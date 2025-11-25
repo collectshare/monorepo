@@ -15,5 +15,5 @@ export async function list() {
 
   const { data } = await httpClient.get<ListResponse>('/forms');
 
-  return data.forms;
+  return data.forms.reverse();
 }

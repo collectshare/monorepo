@@ -20,7 +20,7 @@ const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--cha
 
 const chartConfig = {
   value: {
-    label: 'Value',
+    label: 'Quantidade',
   },
 } satisfies ChartConfig;
 

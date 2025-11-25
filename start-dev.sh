@@ -10,16 +10,22 @@ SESSION_NAME="collectshare"
 tmux has-session -t $SESSION_NAME 2>/dev/null
 
 if [ $? != 0 ]; then
-  # Create a new detached session for the root
+  # 1. Cria a sessão (já cria a primeira janela 'root')
   tmux new-session -d -s $SESSION_NAME -n root -c "$PROJECT_ROOT"
+  # Divide a janela 'root' horizontalmente (dois terminais lado a lado)
+  tmux split-window -h -t $SESSION_NAME:root -c "$PROJECT_ROOT"
 
-  # Create a window for the 'api' app
+  # 2. Cria a janela 'api'
   tmux new-window -t $SESSION_NAME -n api -c "$PROJECT_ROOT/apps/api"
+  # Divide a janela 'api' horizontalmente
+  tmux split-window -h -t $SESSION_NAME:api -c "$PROJECT_ROOT/apps/api"
 
-  # Create a window for the 'web' app
+  # 3. Cria a janela 'web'
   tmux new-window -t $SESSION_NAME -n web -c "$PROJECT_ROOT/apps/web"
+  # Divide a janela 'web' horizontalmente
+  tmux split-window -h -t $SESSION_NAME:web -c "$PROJECT_ROOT/apps/web"
 
-  # Select the root window by default
+  # (Opcional) Seleciona a janela root como inicial
   tmux select-window -t $SESSION_NAME:root
 fi
 

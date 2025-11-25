@@ -29,25 +29,53 @@ export class InsertQuestionsInFormUseCase {
     }
 
     const existingQuestions = await this.questionRepository.findByFormId(formId);
-    const existingQuestionIds = new Set(existingQuestions.map(q => q.id));
+    const existingQuestionMap = new Map(existingQuestions.map((q) => [q.id, q]));
 
     const incomingQuestions = questionsData.map(
-      q =>
+      (q) =>
         new Question({
           ...q,
           formId: form.id,
         }),
     );
 
-    const incomingQuestionIds = new Set(incomingQuestions.map(q => q.id));
+    const incomingQuestionIds = new Set(incomingQuestions.map((q) => q.id));
 
-    const questionIdsToDelete = [...existingQuestionIds].filter(id => !incomingQuestionIds.has(id));
+    const questionIdsToDelete = [...existingQuestionMap.keys()].filter(
+      (id) => !incomingQuestionIds.has(id),
+    );
 
     if (questionIdsToDelete.length > 0) {
       await this.questionRepository.deleteMany(formId, questionIdsToDelete);
     }
 
-    await this.questionRepository.saveMany(incomingQuestions);
+    const questionsToSave: Question[] = [];
+
+    for (const question of incomingQuestions) {
+      const existingQuestion = existingQuestionMap.get(question.id);
+
+      if (!existingQuestion) {
+        questionsToSave.push(question);
+        continue;
+      }
+
+      const hasChanged =
+        existingQuestion.text !== question.text ||
+        existingQuestion.questionType !== question.questionType ||
+        existingQuestion.order !== question.order ||
+        existingQuestion.max !== question.max ||
+        existingQuestion.isRequired !== question.isRequired ||
+        JSON.stringify(existingQuestion?.options?.sort((a, b) => a.localeCompare(b)) ?? []) !==
+        JSON.stringify(question.options?.sort((a, b) => a.localeCompare(b)) ?? []);
+
+      if (hasChanged) {
+        questionsToSave.push(question);
+      }
+    }
+
+    if (questionsToSave.length > 0) {
+      await this.questionRepository.saveMany(questionsToSave);
+    }
   }
 }
 

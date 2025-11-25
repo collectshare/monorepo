@@ -40,6 +40,7 @@ export function useFormBuilderController() {
   useEffect(() => {
     if (formToEdit) {
       const fields = formToEdit?.questions.map(question => ({
+        id: question.id,
         text: question.text,
         questionType: question.questionType,
         options: question.options,

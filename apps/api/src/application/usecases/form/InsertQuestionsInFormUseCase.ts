@@ -63,9 +63,9 @@ export class InsertQuestionsInFormUseCase {
         existingQuestion.text !== question.text ||
         existingQuestion.questionType !== question.questionType ||
         existingQuestion.order !== question.order ||
-        existingQuestion.max !== question.max ||
-        existingQuestion.isRequired !== question.isRequired ||
-        JSON.stringify(existingQuestion?.options?.sort((a, b) => a.localeCompare(b)) ?? []) !==
+        (existingQuestion.max ?? null) !== (question.max ?? null) ||
+        (existingQuestion.isRequired ?? false) !== (question.isRequired ?? false) ||
+        JSON.stringify(existingQuestion.options?.sort((a, b) => a.localeCompare(b)) ?? []) !==
         JSON.stringify(question.options?.sort((a, b) => a.localeCompare(b)) ?? []);
 
       if (hasChanged) {

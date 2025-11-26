@@ -13,7 +13,7 @@ interface ChartProps {
 
 const chartConfig = {
   value: {
-    label: 'Value',
+    label: 'Quantidade',
     color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;

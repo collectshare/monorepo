@@ -24,12 +24,21 @@ export function QuestionChart({ question, responses }: QuestionChartProps) {
   const data = (responses as IFormResponseWithAnswers[]).reduce((acc, response) => {
     const answer = response.answers.find((a) => a.questionId === question.id);
 
-    if (!answer) {
+    if (!answer?.value) {
       return acc;
     }
 
-    if (Array.isArray(answer.value)) {
-      answer.value.forEach((value: string) => {
+    let currentAnswerValues = answer.value;
+
+    if (
+      question.questionType === QuestionType.CHECKBOX &&
+      typeof currentAnswerValues === 'string'
+    ) {
+      currentAnswerValues = currentAnswerValues.split(',').map((s) => s.trim());
+    }
+
+    if (Array.isArray(currentAnswerValues)) {
+      currentAnswerValues.forEach((value: string) => {
         const existing = acc.find((item) => item.name === value);
         if (existing) {
           existing.value += 1;
@@ -38,11 +47,12 @@ export function QuestionChart({ question, responses }: QuestionChartProps) {
         }
       });
     } else {
-      const existing = acc.find((item) => item.name === answer.value);
+      const value = String(currentAnswerValues);
+      const existing = acc.find((item) => item.name === value);
       if (existing) {
         existing.value += 1;
       } else {
-        acc.push({ name: answer.value as string, value: 1 });
+        acc.push({ name: value, value: 1 });
       }
     }
 
@@ -51,8 +61,9 @@ export function QuestionChart({ question, responses }: QuestionChartProps) {
 
   const renderChart = () => {
     switch (question.questionType) {
-      case QuestionType.MULTIPLE_CHOICE:
       case QuestionType.CHECKBOX:
+        return <Chart data={data} />;
+      case QuestionType.MULTIPLE_CHOICE:
       case QuestionType.DROPDOWN:
         return <PieChart data={data} />;
       case QuestionType.TEXT:

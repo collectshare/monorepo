@@ -284,6 +284,7 @@ function ChartLegendContent({
           return (
             <div
               key={item.value}
+              title={itemConfig?.label as string}
               className={cn(
                 '[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3',
               )}
@@ -298,7 +299,9 @@ function ChartLegendContent({
                   }}
                 />
               )}
-              {itemConfig?.label}
+              <div className="flex-1 whitespace-normal break-words">
+                {itemConfig?.label}
+              </div>
             </div>
           );
         })}

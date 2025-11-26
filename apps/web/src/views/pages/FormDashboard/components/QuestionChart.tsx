@@ -62,7 +62,7 @@ export function QuestionChart({ question, responses }: QuestionChartProps) {
   const renderChart = () => {
     switch (question.questionType) {
       case QuestionType.CHECKBOX:
-        return <Chart data={data} />;
+        return <Chart data={data} label="Quantidade" />;
       case QuestionType.MULTIPLE_CHOICE:
       case QuestionType.DROPDOWN:
         return <PieChart data={data} />;

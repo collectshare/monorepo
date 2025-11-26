@@ -1,4 +1,5 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import * as React from 'react';
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from 'recharts';
 
 import {
   type ChartConfig,
@@ -9,18 +10,30 @@ import {
 
 interface ChartProps {
   data: { name: string; value: number }[];
+  label?: string;
 }
 
-const chartConfig = {
-  value: {
-    label: 'Quantidade',
-    color: 'hsl(var(--chart-1))',
-  },
-} satisfies ChartConfig;
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
-export function Chart({ data }: ChartProps) {
+export function Chart({ data: originalData, label }: ChartProps) {
+  const data = originalData.map((item, i) => ({
+    ...item,
+    fill: COLORS[i % COLORS.length],
+  }));
+
+  const chartConfig = React.useMemo(() => {
+    const config: ChartConfig = {};
+    data.forEach((item) => {
+      config[item.name] = {
+        label: item.name,
+        color: item.fill,
+      };
+    });
+    return config;
+  }, [data, label]);
+
   return (
-    <ChartContainer config={chartConfig} className="h-[300px] w-full">
+    <ChartContainer config={{ ...chartConfig, value: { label } }} className="h-[400px] w-full">
       <BarChart
         accessibilityLayer
         data={data}
@@ -44,7 +57,11 @@ export function Chart({ data }: ChartProps) {
           cursor={false}
           content={<ChartTooltipContent indicator="dot" />}
         />
-        <Bar dataKey="value" fill="var(--color-value)" radius={4} />
+        <Bar dataKey="value" radius={4}>
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.fill} />
+          ))}
+        </Bar>
       </BarChart>
     </ChartContainer>
   );

@@ -46,15 +46,15 @@ export function useFormDashboardController() {
           if (!answer) { return ''; }
 
           const value = Array.isArray(answer.value)
-            ? answer.value.join('; ')
+            ? answer.value.join(', ')
             : answer.value;
 
           return escapeCsvCell(value);
         })
-        .join(','),
+        .join(';'),
     );
 
-    const csvContent = [header.join(','), ...rows].join('\n');
+    const csvContent = [header.join(';'), ...rows].join('\n');
 
     const blob = new Blob([`\ufeff${csvContent}`], {
       type: 'text/csv;charset=utf-8;',

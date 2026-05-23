@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "serena",
+        "serena-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--project-path",
+        "/Users/leividduan/Collectshare/monorepo"
+      ]
+    }
+  }
+}

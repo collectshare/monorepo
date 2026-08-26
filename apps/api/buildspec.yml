@@ -1,0 +1,21 @@
+version: 0.2
+
+env:
+  variables:
+    NODE_OPTIONS: "--max-old-space-size=8192"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+    commands:
+      - npm install -g pnpm@10.33.4
+      - npm i serverless -g
+      - pnpm install --frozen-lockfile
+      - pnpm install --filter=@monorepo/api
+
+  build:
+    on-failure: ABORT
+    commands:
+      - cd apps/api
+      - pnpm sls deploy --stage $STAGE

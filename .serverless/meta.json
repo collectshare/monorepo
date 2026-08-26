@@ -1,0 +1,27 @@
+{
+  "unknown": {
+    "versionFramework": "4.41.0",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": true,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "command": [
+      "login"
+    ],
+    "options": {},
+    "orgId": "6cf74781-64cd-4acc-b550-861f14295431",
+    "orgName": "collectshare",
+    "userId": "flzj3KyK42T2kj2tFl",
+    "userName": "playpedidos",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Root (runs all apps via Turborepo)
+
 ```bash
 pnpm dev        # Start all dev servers
 pnpm build      # Build all apps
@@ -21,14 +22,17 @@ pnpm clean      # Clean all build artifacts and node_modules
 ```
 
 ### API (`apps/api`)
+
 ```bash
 pnpm typecheck          # TypeScript check (no emit)
 pnpm dev:email          # Preview email templates (react-email dev server)
 pnpm deploy             # Deploy to AWS (sls deploy --stage dev)
 ```
+
 The API has no local dev server — it's deployed to AWS. Use `pnpm typecheck` during development.
 
 ### Web (`apps/web`)
+
 ```bash
 pnpm dev                # Vite dev server (localhost:5173)
 pnpm build              # tsc + vite build
@@ -39,6 +43,7 @@ pnpm validate:env       # Validate environment variables
 ```
 
 ### Dev Environment
+
 `start-dev.sh` creates a tmux session (`collectshare`) with three windows: `root`, `api`, and `web`.
 
 ## API Architecture (Clean Architecture)
@@ -61,6 +66,7 @@ The API uses a custom DI container (`kernel/di/Registry`). Classes decorated wit
 ### Lambda Function Wiring
 
 Each Lambda handler follows this pattern:
+
 ```ts
 // main/functions/{domain}/someAction.ts
 import 'reflect-metadata';  // must be first
@@ -97,6 +103,7 @@ export class MyController extends Controller<'private', MyController.Response> {
 Functions are declared in `sls/functions/{domain}.yml` and resources in `sls/resources/`. The main `serverless.yml` composes them. Auth uses API Gateway JWT authorizer backed by Cognito.
 
 ### TypeScript Path Aliases (API)
+
 ```
 @application/* → src/application/*
 @main/*        → src/main/*
@@ -124,6 +131,7 @@ Services in `app/services/` (`authService`, `accountsService`, `formsService`) a
 `AuthContext` checks localStorage for an access token, then fetches `/accounts/me` to validate the session. Tokens are stored as `ACCESS_TOKEN` / `REFRESH_TOKEN` in localStorage (keys in `app/config/localStorageKeys`). `AuthGuard` in the router redirects unauthenticated users.
 
 ### Path Alias (Web)
+
 ```
 @/ → src/
 ```

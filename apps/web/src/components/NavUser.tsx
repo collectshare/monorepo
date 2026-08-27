@@ -32,7 +32,10 @@ export function NavUser() {
   const { signout, user } = useAuth();
   const { toggleTheme } = useTheme();
   const { isMobile } = useSidebar();
-  const userInitials = `${user?.name?.[0]?.toUpperCase()}${user?.name?.split(' ')?.[1]?.[0]?.toUpperCase()}`;
+  const nameParts = user?.name?.trim().split(' ').filter(Boolean) ?? [];
+  const userInitials = nameParts.length > 1
+    ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase()
+    : (nameParts[0]?.[0]?.toUpperCase() ?? '');
 
   return (
     <SidebarMenu>

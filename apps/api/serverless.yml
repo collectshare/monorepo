@@ -54,6 +54,8 @@ functions:
   - ${file(./sls/functions/auth.yml)}
   - ${file(./sls/functions/form.yml)}
   - ${file(./sls/functions/portal.yml)}
+  - ${file(./sls/functions/apiKeys.yml)}
+  - ${file(./sls/functions/external.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}

@@ -15,7 +15,6 @@
     "@monorepo/ui": "workspace:*",
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-table": "^8.21.3",
-    "algoliasearch": "^4.24.0",
     "axios": "^1.11.0",
     "lucide-react": "^0.540.0",
     "react": "^19.1.1",

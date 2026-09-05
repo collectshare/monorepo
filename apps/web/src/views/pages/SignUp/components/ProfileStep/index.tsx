@@ -1,3 +1,4 @@
+import { Button, Input, Popover, PopoverContent, PopoverTrigger } from '@monorepo/ui';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -5,11 +6,8 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { StepperFooter } from '@/components/Stepper/StepperFooter';
 import { StepperPreviousButton } from '@/components/Stepper/StepperPreviousButton';
-import { Button } from '@/components/ui/Button';
 import { Calendar } from '@/components/ui/Calendar';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
 import { cn } from '@/lib/utils';
 
 import type { OnBoardingFormData } from '../../useSignUpController';

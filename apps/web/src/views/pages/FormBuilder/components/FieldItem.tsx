@@ -1,19 +1,11 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { IQuestionInsert } from '@monorepo/shared/types/IQuestion';
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@monorepo/ui';
 import { Reorder, useDragControls } from 'framer-motion';
 import { CopyIcon, EllipsisIcon, GripVerticalIcon, Trash2Icon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { Button } from '@/components/ui/Button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
 import { cn } from '@/lib/utils';
 

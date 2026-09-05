@@ -7,6 +7,7 @@ export type SaveFormRequest = {
   tags?: string[];
   isAnonymous: boolean;
   onePage: boolean;
+  isPublished: boolean;
 }
 
 export async function save({ id, ...params }: SaveFormRequest): Promise<{ formId?: string }> {

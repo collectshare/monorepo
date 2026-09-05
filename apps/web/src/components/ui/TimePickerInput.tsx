@@ -1,6 +1,6 @@
+import { Input } from '@monorepo/ui';
 import React from 'react';
 
-import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 
 import {

@@ -1,12 +1,8 @@
+import { IForm } from '@monorepo/shared/types/IForm';
+import { Button, DataTable, DataTableContent, DataTablePagination, DataTableTextFilter } from '@monorepo/ui';
 import { CirclePlusIcon } from 'lucide-react';
 
-import { IForm } from '@monorepo/shared/types/IForm';
 import { useModal } from '@/app/hooks/useModal';
-import { DataTable } from '@/components/DataTable';
-import { DataTableContent } from '@/components/DataTable/DataTableContent';
-import { DataTablePagination } from '@/components/DataTable/DataTablePagination';
-import { DataTableTextFilter } from '@/components/DataTable/DataTableTextFilter';
-import { Button } from '@/components/ui/Button';
 import { SaveFormDetailsModal } from '@/views/pages/FormBuilder/components/SaveFormDetailsModal';
 
 import { columns } from './columns';

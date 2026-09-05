@@ -1,10 +1,9 @@
+import { Button } from '@monorepo/ui';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-
-import { Button } from './Button';
 
 export interface IInputProps
   extends React.ComponentProps<'input'> {

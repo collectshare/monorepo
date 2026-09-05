@@ -1,19 +1,12 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@monorepo/ui';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Checkbox } from '@/components/ui/Checkbox';
 import { FileUpload } from '@/components/ui/FileUpload';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/RadioGroup';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/Select';
 import { StarRating } from '@/components/ui/StarRating';
 
 interface FormFieldProps {

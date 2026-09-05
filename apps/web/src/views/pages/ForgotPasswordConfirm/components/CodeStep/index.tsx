@@ -1,10 +1,10 @@
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@monorepo/ui';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { useStepper } from '@/app/hooks/useStepper';
 import { StepperFooter } from '@/components/Stepper/StepperFooter';
 import { StepperNextButton } from '@/components/Stepper/StepperNextButton';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import {
   InputOTP,
   InputOTPGroup,

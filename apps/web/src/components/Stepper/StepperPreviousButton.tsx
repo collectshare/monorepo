@@ -1,5 +1,6 @@
+import { Button } from '@monorepo/ui';
+
 import { useStepper } from '@/app/hooks/useStepper';
-import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
 type IStepperPreviousButtonProps = React.ComponentPropsWithoutRef<typeof Button> & {

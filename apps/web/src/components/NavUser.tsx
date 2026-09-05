@@ -1,6 +1,14 @@
 'use client';
 
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@monorepo/ui';
+import {
   ChevronsUpDown,
   LogOut,
   Moon,
@@ -13,14 +21,6 @@ import {
   Avatar,
   AvatarFallback,
 } from '@/components/ui/Avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu';
 import {
   SidebarMenu,
   SidebarMenuButton,

@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { IFormInsert } from '@monorepo/shared/types/IForm';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { IFormInsert } from '@monorepo/shared/types/IForm';
 import { useModal } from '@/app/hooks/useModal';
 import { formsService } from '@/app/services/formsService';
 import { SaveFormRequest } from '@/app/services/formsService/save';
@@ -17,6 +17,7 @@ const schema = z.object({
   tags: z.array(z.string()).optional(),
   isAnonymous: z.boolean().optional().default(true),
   onePage: z.boolean().optional().default(false),
+  isPublished: z.boolean().optional().default(true),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -44,6 +45,7 @@ export function useSaveFormDetailsModalController({ form }: UseSaveFormDetailsMo
       onePage: form?.onePage ?? false,
       tags: form?.tags ?? [],
       isAnonymous: form?.isAnonymous ?? true,
+      isPublished: form?.isPublished ?? true,
     },
   });
 

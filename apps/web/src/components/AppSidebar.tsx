@@ -1,3 +1,4 @@
+import { Separator } from '@monorepo/ui';
 import {
   CopyrightIcon,
   FilePenIcon,
@@ -13,8 +14,6 @@ import {
   SidebarFooter,
   SidebarHeader,
 } from '@/components/ui/Sidebar';
-
-import { Separator } from './ui/Separator';
 
 const menu = [
   {

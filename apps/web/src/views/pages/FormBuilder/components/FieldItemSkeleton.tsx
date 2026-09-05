@@ -1,6 +1,6 @@
+import { Button } from '@monorepo/ui';
 import { EllipsisIcon, GripVerticalIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 export function FieldItemSkeleton() {

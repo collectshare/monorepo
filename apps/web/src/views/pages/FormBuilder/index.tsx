@@ -1,4 +1,5 @@
 
+import { Button, buttonVariants, Card, Separator } from '@monorepo/ui';
 import { Reorder } from 'framer-motion';
 import { ChevronLeftIcon, Edit2Icon, SaveIcon, SettingsIcon } from 'lucide-react';
 import { FormProvider } from 'react-hook-form';
@@ -6,9 +7,6 @@ import { Link } from 'react-router-dom';
 
 import { useIsMobile } from '@/app/hooks/useIsMobile';
 import { useModal } from '@/app/hooks/useModal';
-import { Button, buttonVariants } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Separator } from '@/components/ui/Separator';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { FieldItem } from './components/FieldItem';

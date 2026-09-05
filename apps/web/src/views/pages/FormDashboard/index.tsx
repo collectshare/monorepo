@@ -1,8 +1,7 @@
 
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
+import { Button } from '@monorepo/ui';
 import { DownloadIcon } from 'lucide-react';
-
-import { Button } from '@/components/ui/Button';
 
 import PageLayout from '../../layouts/PageLayout';
 import { QuestionChart } from './components';

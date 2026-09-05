@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@monorepo/ui';
+
 import { Label } from '@/components/ui/Label';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 

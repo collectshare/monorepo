@@ -17,6 +17,7 @@ provider:
     cors:
       allowedOrigins:
         - "http://localhost:5173"
+        - "http://localhost:5174"
         - "https://app.collectshare.com.br"
         - "https://dev.collectshare.com.br"
       allowedHeaders:
@@ -52,6 +53,7 @@ functions:
   - ${file(./sls/functions/accounts.yml)}
   - ${file(./sls/functions/auth.yml)}
   - ${file(./sls/functions/form.yml)}
+  - ${file(./sls/functions/portal.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}

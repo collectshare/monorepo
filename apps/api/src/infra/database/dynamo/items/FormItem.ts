@@ -40,6 +40,7 @@ export class FormItem {
       isAnonymous: formItem.isAnonymous,
       submissionCount: formItem.submissionCount,
       createdAt: new Date(formItem.createdAt),
+      isPublished: formItem.isPublished ?? true,
     });
   }
 
@@ -78,6 +79,7 @@ export namespace FormItem {
     isAnonymous: boolean;
     submissionCount?: number;
     createdAt: string;
+    isPublished?: boolean;
   };
 
   export type ItemType = Keys & Attributes & {

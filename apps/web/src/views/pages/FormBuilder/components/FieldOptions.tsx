@@ -1,11 +1,10 @@
+import { Button, Input } from '@monorepo/ui';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { Reorder, useDragControls } from 'framer-motion';
 import { GripVerticalIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { cn } from '@/lib/utils';
 

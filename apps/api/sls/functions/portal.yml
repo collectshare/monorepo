@@ -1,0 +1,13 @@
+getPublishedForm:
+  handler: src/main/functions/portal/getPublishedForm.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /portal/datasets/{formId}
+
+getPublishedFormData:
+  handler: src/main/functions/portal/getPublishedFormData.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /portal/datasets/{formId}/data

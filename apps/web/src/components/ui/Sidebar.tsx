@@ -1,14 +1,12 @@
 'use client';
 
+import { Button, Input, Separator } from '@monorepo/ui';
 import { Slot } from '@radix-ui/react-slot';
 import { cva,type VariantProps } from 'class-variance-authority';
 import { PanelLeft } from 'lucide-react';
 import * as React from 'react';
 
 import { useIsMobile } from '@/app/hooks/useIsMobile';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Separator } from '@/components/ui/Separator';
 import { Sheet, SheetContent } from '@/components/ui/Sheet';
 import { Skeleton } from '@/components/ui/Skeleton';
 import {

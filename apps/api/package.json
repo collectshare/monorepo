@@ -6,7 +6,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "dev:email": "email dev --dir src/infra/emails/templates",
-    "deploy": "sls deploy --stage dev"
+    "deploy": "sls deploy --stage dev",
+    "backfill:form-published": "tsx scripts/backfillFormIsPublished.ts"
   },
   "keywords": [],
   "author": "",
@@ -45,6 +46,7 @@
     "@react-email/section": "^0.0.16",
     "@react-email/tailwind": "^1.0.5",
     "@react-email/text": "^0.1.5",
+    "algoliasearch": "^4.24.0",
     "ksuid": "^3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

@@ -10,6 +10,7 @@ export class Form {
   tags?: string[];
   isAnonymous: boolean;
   onePage: boolean;
+  isPublished: boolean;
 
   constructor(attr: Form.Attributes) {
     this.id = attr.id ?? KSUID.randomSync().string;
@@ -21,6 +22,7 @@ export class Form {
     this.isAnonymous = attr.isAnonymous;
     this.submissionCount = attr.submissionCount;
     this.onePage = attr.onePage;
+    this.isPublished = attr.isPublished ?? true;
   }
 }
 
@@ -35,5 +37,6 @@ export namespace Form {
     isAnonymous: boolean;
     onePage: boolean;
     submissionCount?: number;
+    isPublished?: boolean;
   };
 }

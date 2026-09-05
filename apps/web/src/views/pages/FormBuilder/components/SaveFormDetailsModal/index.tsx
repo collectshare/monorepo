@@ -1,12 +1,11 @@
 import { IFormInsert } from '@monorepo/shared/types/IForm';
+import { Button, Input } from '@monorepo/ui';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
 import { CircleAlertIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 
 import { useModal } from '@/app/hooks/useModal';
-import { Button } from '@/components/ui/Button';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Switch } from '@/components/ui/Switch';
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputList } from '@/components/ui/TagsInput';
@@ -116,6 +115,29 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
               />
             )}
           />
+        </div>
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="isPublished" className="flex items-center gap-1">
+              Publicar no portal de dados abertos
+            </Label>
+            <Controller
+              control={control}
+              name="isPublished"
+              render={({ field }) => (
+                <Switch
+                  id="isPublished"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isLoading}
+                  tabIndex={6}
+                />
+              )}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            As respostas deste formulário ficarão públicas e pesquisáveis, sem nenhuma anonimização nesta fase — cuidado com dados pessoais em perguntas de texto livre.
+          </p>
         </div>
          <div className="flex items-center justify-between">
           <Label htmlFor="onePage" className="flex items-center gap-1">

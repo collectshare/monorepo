@@ -11,3 +11,10 @@ getPublishedFormData:
     - httpApi:
         method: GET
         path: /portal/datasets/{formId}/data
+
+searchDatasets:
+  handler: src/main/functions/portal/searchDatasets.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /portal/search

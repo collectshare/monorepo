@@ -26,6 +26,20 @@ export class AlgoliaGateway {
   async deleteRecord(formId: string): Promise<void> {
     await this.index.deleteObject(formId);
   }
+
+  async search(query: string): Promise<AlgoliaGateway.DatasetRecord[]> {
+    const { hits } = await this.index.search<AlgoliaGateway.DatasetRecord & { objectID: string }>(query);
+
+    return hits.map(hit => ({
+      formId: hit.objectID,
+      title: hit.title,
+      description: hit.description,
+      tags: hit.tags,
+      submissionCount: hit.submissionCount,
+      accountName: hit.accountName,
+      createdAt: hit.createdAt,
+    }));
+  }
 }
 
 export namespace AlgoliaGateway {

@@ -26,7 +26,7 @@ Reaproveita o padrão existente (`OnFormSubmittedUseCase implements IDynamoStrea
 - Trade-off aceito: sincronização é *eventually consistent* (delay do stream); aceitável para um índice de busca.
 
 ### 2. Gateway dedicado `AlgoliaGateway`, sem repositório
-Segue o padrão de `StorageGateway` (wrapper fino sobre um SDK externo, injetável via `AppConfig`). Não é um "repositório" porque não modela uma entidade do domínio — é uma integração de infraestrutura com um serviço de busca de terceiros.
+Segue o padrão de `StorageGateway` (wrapper fino sobre um SDK externo, injetável via `AppConfig`). Não é um "repositório" porque não modela uma entidade do domínio — é uma integração de infraestrutura com um serviço de busca de terceiros. Além de `upsertRecord`/`deleteRecord` (escrita, usados pelo `OnFormChangedUseCase`), o gateway ganha um método de busca (`search`) usado pelo endpoint público de busca (Decisão 8).
 
 ### 3. Query pública dedicada em vez de reaproveitar `GetFormSubmissionsQuery`
 `GetPublishedFormDataQuery` é uma classe nova, não uma variação de `GetFormSubmissionsQuery`. Motivo: `GetFormSubmissionsQuery` retorna o objeto `FormSubmission` completo (que inclui `ip`/`userAgent` na entidade); qualquer refatoração futura que adicione um campo sensível à entidade vazaria automaticamente para o público se o path fosse compartilhado. A query pública seleciona explicitamente os campos permitidos e filtra respostas cujo `Question.type === QuestionType.FILE`.
@@ -46,14 +46,19 @@ Extrai só `Button`, `Card`, `Badge`, `Input`, `Table`, `DataTable/*` e os token
 ### 7. `apps/portal` como app irmão, sem `AuthGuard`
 Reaproveita a estrutura de pastas de `apps/web` (`views/pages`, `app/services`) mas sem `AuthContext`/`AuthGuard`/interceptor de `Authorization` — toda rota é pública. `httpClient` do portal é uma cópia simplificada do de `apps/web` (axios puro, sem token).
 
-### 8. Busca client-side via Algolia search-only key
-O portal chama o Algolia diretamente do browser com uma **search-only API key** (não a admin key, que fica só no `apps/api`). Não há proxy de busca no `apps/api` — reduz latência e complexidade, e é o padrão recomendado pelo próprio Algolia para busca pública.
+### 8. Busca proxied pelo backend (`apps/api`), não client-side
+**Revisado**: a versão original desta decisão propunha o `apps/portal` chamar o Algolia diretamente do browser com uma search-only API key. O usuário optou por manter toda a integração com o Algolia no backend — nenhuma credencial ou detalhe do provedor de busca deve ser exposto no bundle do portal.
+
+Novo endpoint público `GET /portal/search?q=` (`SearchDatasetsController`, `Controller<'public', ...>`, sem `authorizer`) recebe o termo de busca e delega ao `AlgoliaGateway.search()`, que consulta o índice usando a mesma configuração (`AppConfig.algolia`) já usada para escrita. O `apps/portal` chama esse endpoint via `portalService` (mesmo padrão axios de `getDataset`/`getDatasetData`), e não depende do SDK `algoliasearch` nem de `VITE_ALGOLIA_*` no bundle.
+- **Alternativa considerada (rejeitada)**: busca client-side com search-only key — reduz uma chamada de rede (search direto no Algolia) e é o padrão mais comum recomendado pelo Algolia, mas expõe app ID/key no bundle público. Rejeitada por decisão explícita do usuário de manter toda a superfície do Algolia no backend, mesmo com a search-only key sendo desenhada para ser pública.
+- Trade-off aceito: a busca agora depende da disponibilidade do `apps/api` (antes era uma chamada direta ao Algolia, independente do backend); latência adicional de um hop a mais (browser → `apps/api` → Algolia).
 
 ## Risks / Trade-offs
 
 - **[Risco] Dados publicados sem anonimização podem expor PII em respostas de texto livre.** → Mitigação: aceito como decisão explícita do usuário para esta fase; UI do FormBuilder deixa isso explícito no copy do switch de publicação antes de ativar `isPublished`.
 - **[Risco] Divergência entre Algolia e Dynamo se o stream falhar silenciosamente (ex.: erro de rede para o Algolia dentro do consumer).** → Mitigação: o consumer deve deixar o erro propagar para que o Lambda/stream reprocesse o batch (mesmo comportamento de falha que `OnFormSubmittedUseCase` já assume implicitamente); nenhuma lógica de retry customizada nesta iteração.
 - **[Risco] `GetPublishedFormDataController` pode ser usado para enumerar/raspar todos os formulários publicados em massa.** → Mitigação: fora de escopo mitigar nesta iteração (sem rate limiting dedicado); aceito como risco conhecido, mesmo padrão de exposição pública que `GET /forms/{formId}` já tem hoje.
+- **[Risco] Busca agora depende do `apps/api` estar no ar (antes seria uma chamada direta browser → Algolia).** → Mitigação: aceito — mesma disponibilidade que os demais endpoints públicos do portal já exigem; o endpoint de busca (`SearchDatasetsController`) não faz nenhuma escrita, só repassa a query ao Algolia, então tem o mesmo perfil de risco dos outros GETs públicos.
 - **[Risco] Backfill via scan completo da `MainTable` é custoso/lento em tabelas grandes.** → Mitigação: aceitável por ser execução única (documento de origem já assume isso); rodar fora de horário de pico, sem necessidade de otimização adicional para o volume atual.
 - **[Trade-off] `packages/ui` com superfície mínima pode divergir de novo se `apps/web` continuar evoluindo componentes fora dele.** → Aceito: escopo deliberadamente pequeno para não bloquear o MVP; expansão do pacote é iteração futura natural.
 

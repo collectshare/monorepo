@@ -22,6 +22,7 @@
 - [x] 3.6 Registrar a função `onFormChanged` em `sls/functions/form.yml` no stream trigger da `MainTable`, com `filterPatterns` para `type: [Form]` e `eventName: [INSERT, MODIFY]`
 - [x] 3.7 Adicionar `algoliasearch` como dependência de `apps/api`
 - [x] 3.8 Rodar `pnpm --filter @monorepo/api typecheck` (passa; erros restantes pré-existentes em `ProfileRepository.ts`)
+- [x] 3.9 Adicionar método `search(query: string)` em `AlgoliaGateway` (usa o mesmo índice/config de escrita, `index.search()` do SDK v4), para suportar a busca proxied pelo backend (ver seção 5)
 
 ## 4. Backend — paginação e query pública de dados (apps/api)
 
@@ -37,6 +38,10 @@
 - [x] 5.4 Criar `sls/functions/portal.yml` com as duas rotas (sem `authorizer`)
 - [x] 5.5 Compor `sls/functions/portal.yml` no `serverless.yml` principal (+ CORS `localhost:5174` para o dev local do portal)
 - [x] 5.6 Rodar `pnpm --filter @monorepo/api typecheck` (passa; erros restantes pré-existentes em `ProfileRepository.ts`)
+- [x] 5.7 **[Revisado — busca movida para o backend]** Criar `application/controllers/portal/SearchDatasetsController.ts` (`Controller<'public', ...>`): `GET /portal/search?q=`, chama `AlgoliaGateway.search()` e retorna os hits
+- [x] 5.8 Criar `main/functions/portal/searchDatasets.ts` (adapter `lambdaHttpAdapter`)
+- [x] 5.9 Adicionar a rota `GET /portal/search` em `sls/functions/portal.yml` (sem `authorizer`)
+- [x] 5.10 Rodar `pnpm --filter @monorepo/api typecheck` após os itens 3.9/5.7–5.9 (passa; erros restantes pré-existentes em `ProfileRepository.ts`)
 
 ## 6. Frontend — form builder (apps/web)
 
@@ -58,12 +63,12 @@
 
 - [x] 8.1 Scaffold `apps/portal` (Vite + React + TS), `package.json` como `@monorepo/portal`, porta dev 5174 (para não colidir com `apps/web`)
 - [x] 8.2 Configurar `app/services/httpClient.ts` (axios sem interceptor de `Authorization`)
-- [x] 8.3 Configurar `app/services/algoliaClient.ts` (wrapper do SDK `algoliasearch/lite`, `VITE_ALGOLIA_APP_ID`/`VITE_ALGOLIA_SEARCH_KEY`/`VITE_ALGOLIA_INDEX_NAME`)
-- [x] 8.4 Criar `app/services/portalService/{getDataset,getDatasetData}.ts`
-- [x] 8.5 Criar `views/pages/Home`: busca via Algolia (debounce de 300ms), cards de resultado (título, descrição, tags, `submissionCount`, autor)
+- [x] 8.3 **[Revisado — busca movida para o backend]** Removido `app/services/algoliaClient.ts` e a dependência `algoliasearch` do `apps/portal` (o SDK e as credenciais do Algolia não existem mais no bundle do frontend)
+- [x] 8.4 Criado `app/services/portalService/{getDataset,getDatasetData,searchDatasets}.ts` — `searchDatasets` chama `GET /portal/search?q=` via `httpClient` (mesmo padrão dos demais métodos do `portalService`)
+- [x] 8.5 Atualizado `views/pages/Home`: busca via `portalService.searchDatasets` (debounce mantido), cards de resultado (título, descrição, tags, `submissionCount`, autor) — sem nenhuma chamada direta ao Algolia
 - [x] 8.6 Criar `views/pages/Dataset/:formId`: metadados do dataset + `DataTable` paginada (TanStack Query `useInfiniteQuery`, cursor/"carregar mais") consumindo `GET /portal/datasets/{formId}/data`; colunas geradas dinamicamente a partir das perguntas do formulário (excluindo `FILE`)
 - [x] 8.7 Configurar rotas do app sem `AuthGuard` (`BrowserRouter` simples com `/` e `/dataset/:formId`)
-- [x] 8.8 Adicionar `algoliasearch` como dependência de `apps/portal`; `pnpm --filter @monorepo/portal build` e typecheck (`tsc -b`) passam limpos; corrigido em `packages/ui` um problema de bundling da augmentation de tipos do `@tanstack/react-table` (import de `.d.ts` quebrava o build do Vite — trocado por `/// <reference path=... />`, ignorado pelo esbuild/rollup mas respeitado pelo `tsc`)
+- [x] 8.8 Removido `VITE_ALGOLIA_APP_ID`/`VITE_ALGOLIA_SEARCH_KEY`/`VITE_ALGOLIA_INDEX_NAME` de `.env-exemple`; `pnpm --filter @monorepo/portal build` e typecheck (`tsc -b`) passam limpos sem o SDK do Algolia (bundle caiu de 532KB para 517KB)
 
 ## 9. Verificação end-to-end
 

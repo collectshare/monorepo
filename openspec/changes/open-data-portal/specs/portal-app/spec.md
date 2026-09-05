@@ -8,7 +8,7 @@ The `apps/portal` application SHALL be entirely public: no route SHALL require l
 - **THEN** the page renders normally without redirecting to a login flow
 
 ### Requirement: Home page provides semantic dataset search
-The portal's Home page SHALL let visitors search published datasets by keyword using the Algolia search index, and SHALL display each result as a card showing title, description, tags, submission count, and author.
+The portal's Home page SHALL let visitors search published datasets by keyword by querying the backend's public search endpoint (`GET /portal/search`, which proxies to the Algolia index — see the `dataset-search` capability), and SHALL display each result as a card showing title, description, tags, submission count, and author. The Home page SHALL NOT call Algolia directly from the browser.
 
 #### Scenario: Searching for a dataset by title
 - **WHEN** a visitor types a keyword matching a published dataset's title into the search box

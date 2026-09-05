@@ -24,3 +24,14 @@ The synchronization to Algolia SHALL happen as an asynchronous reaction to `INSE
 #### Scenario: Stream event for a non-Form item is ignored
 - **WHEN** a DynamoDB stream record has `type` other than `Form`
 - **THEN** the sync handler does not call the Algolia gateway
+
+### Requirement: Dataset search is proxied through a public backend endpoint
+The system SHALL expose a public, unauthenticated endpoint (`GET /portal/search`) that accepts a search query and returns matching records from the Algolia index. The Algolia application ID and API key SHALL NOT be exposed to, or callable directly from, any browser client.
+
+#### Scenario: Searching via the public endpoint
+- **WHEN** a client requests `GET /portal/search?q=<keyword>` matching a published dataset's title or tag
+- **THEN** the system responds with the matching dataset records (title, description, tags, submission count, author)
+
+#### Scenario: No Algolia credentials reach the client
+- **WHEN** the portal frontend performs a search
+- **THEN** it only calls the backend search endpoint; no Algolia application ID or API key is present in the frontend bundle or in any request the browser sends directly to Algolia

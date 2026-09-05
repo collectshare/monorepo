@@ -1,0 +1,26 @@
+createApiKey:
+  handler: src/main/functions/apikeys/createApiKey.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /api-keys
+        authorizer:
+          name: CognitoAuthorizer
+
+listApiKeys:
+  handler: src/main/functions/apikeys/listApiKeys.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /api-keys
+        authorizer:
+          name: CognitoAuthorizer
+
+revokeApiKey:
+  handler: src/main/functions/apikeys/revokeApiKey.handler
+  events:
+    - httpApi:
+        method: DELETE
+        path: /api-keys/{keyId}
+        authorizer:
+          name: CognitoAuthorizer

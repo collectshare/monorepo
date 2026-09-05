@@ -16,6 +16,9 @@ const schema = z.object({
   ALGOLIA_APP_ID: z.string().min(1),
   ALGOLIA_ADMIN_API_KEY: z.string().min(1),
   ALGOLIA_INDEX_NAME: z.string().min(1),
+
+  // Secrets
+  MASTER_SECRET: z.string().min(1),
 });
 
 export const env = schema.parse(process.env);

@@ -11,6 +11,8 @@ export class AppConfig {
 
   readonly algolia: AppConfig.Algolia;
 
+  readonly secrets: AppConfig.Secrets;
+
   constructor() {
     this.auth = {
       cognito: {
@@ -38,6 +40,10 @@ export class AppConfig {
       appId: env.ALGOLIA_APP_ID,
       adminApiKey: env.ALGOLIA_ADMIN_API_KEY,
       indexName: env.ALGOLIA_INDEX_NAME,
+    };
+
+    this.secrets = {
+      masterSecret: env.MASTER_SECRET,
     };
   }
 }
@@ -69,6 +75,10 @@ export namespace AppConfig {
     appId: string;
     adminApiKey: string;
     indexName: string;
+  };
+
+  export type Secrets = {
+    masterSecret: string;
   };
 
   // export type CDNs = {

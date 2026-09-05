@@ -31,22 +31,22 @@ export function Home() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {results.map((hit) => (
-          <Link key={hit.objectID} to={`/dataset/${hit.objectID}`}>
+        {results.map((result) => (
+          <Link key={result.formId} to={`/dataset/${result.formId}`}>
             <Card className="h-full hover:border-primary transition-colors">
               <CardHeader>
-                <CardTitle>{hit.title}</CardTitle>
-                {hit.description && <CardDescription>{hit.description}</CardDescription>}
+                <CardTitle>{result.title}</CardTitle>
+                {result.description && <CardDescription>{result.description}</CardDescription>}
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
                 <div className="flex flex-wrap gap-1">
-                  {hit.tags?.map((tag) => (
+                  {result.tags?.map((tag) => (
                     <Badge key={tag} variant="secondary">{tag}</Badge>
                   ))}
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{hit.accountName}</span>
-                  <span>{hit.submissionCount ?? 0} respostas</span>
+                  <span>{result.accountName}</span>
+                  <span>{result.submissionCount ?? 0} respostas</span>
                 </div>
               </CardContent>
             </Card>

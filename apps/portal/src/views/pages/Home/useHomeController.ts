@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { algoliaIndex, DatasetSearchHit } from '@/app/services/algoliaClient';
+import { DatasetSearchResult, portalService } from '@/app/services/portalService';
 
 export function useHomeController() {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<DatasetSearchHit[]>([]);
+  const [results, setResults] = useState<DatasetSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -12,10 +12,10 @@ export function useHomeController() {
     setIsLoading(true);
 
     const timeout = setTimeout(async () => {
-      const { hits } = await algoliaIndex.search<DatasetSearchHit>(query);
+      const { results: searchResults } = await portalService.searchDatasets(query);
 
       if (!isCancelled) {
-        setResults(hits);
+        setResults(searchResults);
         setIsLoading(false);
       }
     }, 300);

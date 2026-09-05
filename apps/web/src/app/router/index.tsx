@@ -15,6 +15,7 @@ const MyForms = lazy(() => import('@/views/pages/MyForms'));
 const FormBuilder = lazy(() => import('@/views/pages/FormBuilder'));
 const FormRenderer = lazy(() => import('@/views/pages/FormRenderer'));
 const FormDashboard = lazy(() => import('@/views/pages/FormDashboard'));
+const ApiKeys = lazy(() => import('@/views/pages/ApiKeys'));
 
 export default function Router() {
   return (
@@ -38,6 +39,7 @@ export default function Router() {
             <Route path="/forms/builder" element={<FormBuilder />} />
             <Route path="/forms/builder/:id" element={<FormBuilder />} />
             <Route path="/forms/dashboard/:formId" element={<FormDashboard />} />
+            <Route path="/api-keys" element={<ApiKeys />} />
           </Route>
         </Route>
       </Routes>

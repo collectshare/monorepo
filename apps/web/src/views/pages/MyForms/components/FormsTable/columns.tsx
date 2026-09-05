@@ -1,4 +1,5 @@
 import { IForm } from '@monorepo/shared/types/IForm';
+import { Button, DataTableColumnHeader, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@monorepo/ui';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CalendarIcon, ChartPieIcon, CopyIcon, Edit2, Ellipsis, SettingsIcon, SigmaIcon, TextIcon, TypeIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -6,9 +7,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { useModal } from '@/app/hooks/useModal';
 import { formatDate } from '@/app/utils/formatDate';
-import { DataTableColumnHeader } from '@/components/DataTable/DataTableColumnHeader';
-import { Button } from '@/components/ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/DropdownMenu';
 import { SaveFormDetailsModal } from '@/views/pages/FormBuilder/components/SaveFormDetailsModal';
 
 const titleHeader = () => (

@@ -13,6 +13,7 @@ export class CreateFormUseCase {
     onePage,
     tags,
     isAnonymous,
+    isPublished,
   }: CreateFormUseCase.Input): Promise<CreateFormUseCase.Output> {
     const form = new Form({
       accountId,
@@ -21,6 +22,7 @@ export class CreateFormUseCase {
       onePage,
       tags,
       isAnonymous,
+      isPublished,
     });
 
     await this.formRepository.create(form);
@@ -39,6 +41,7 @@ export namespace CreateFormUseCase {
     onePage: boolean;
     tags?: string[];
     isAnonymous: boolean;
+    isPublished?: boolean;
   };
 
   export type Output = {

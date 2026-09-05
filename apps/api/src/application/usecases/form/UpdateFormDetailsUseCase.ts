@@ -10,14 +10,15 @@ export type UpdateFormDetailsUseCaseRequest = {
   description?: string;
   onePage: boolean;
   tags?: string[];
-  isAnonymous?: boolean;
+  isAnonymous: boolean;
+  isPublished: boolean;
 };
 
 @Injectable()
 export class UpdateFormDetailsUseCase {
   constructor(private readonly formRepository: FormRepository) { }
 
-  async execute({ formId, accountId, title, description, onePage, tags, isAnonymous }: UpdateFormDetailsUseCaseRequest): Promise<void> {
+  async execute({ formId, accountId, title, description, onePage, tags, isAnonymous, isPublished }: UpdateFormDetailsUseCaseRequest): Promise<void> {
     const form = await this.formRepository.findById(formId);
 
     if (!form) {
@@ -33,6 +34,7 @@ export class UpdateFormDetailsUseCase {
     form.onePage = onePage;
     form.tags = tags;
     form.isAnonymous = isAnonymous;
+    form.isPublished = isPublished;
 
     await this.formRepository.update(form);
   }

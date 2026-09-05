@@ -1,9 +1,9 @@
+import { Button } from '@monorepo/ui';
 import { Moon, Sun } from 'lucide-react';
 import { FormProvider } from 'react-hook-form';
 
 import { useTheme } from '@/app/hooks/useTheme';
 import { GetByIdResponse } from '@/app/services/formsService/getForm';
-import { Button } from '@/components/ui/Button';
 
 import { FormField } from './components/FormField';
 import { FormFinished } from './components/FormFinished';

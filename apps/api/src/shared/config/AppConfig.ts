@@ -9,6 +9,8 @@ export class AppConfig {
 
   readonly storage: AppConfig.Storage;
 
+  readonly algolia: AppConfig.Algolia;
+
   constructor() {
     this.auth = {
       cognito: {
@@ -30,6 +32,12 @@ export class AppConfig {
 
     this.storage = {
       mainBucket: env.MAIN_BUCKET,
+    };
+
+    this.algolia = {
+      appId: env.ALGOLIA_APP_ID,
+      adminApiKey: env.ALGOLIA_ADMIN_API_KEY,
+      indexName: env.ALGOLIA_INDEX_NAME,
     };
   }
 }
@@ -55,6 +63,12 @@ export namespace AppConfig {
 
   export type Storage = {
     mainBucket: string;
+  };
+
+  export type Algolia = {
+    appId: string;
+    adminApiKey: string;
+    indexName: string;
   };
 
   // export type CDNs = {

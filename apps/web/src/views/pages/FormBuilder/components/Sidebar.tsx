@@ -1,8 +1,6 @@
 
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
-
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@monorepo/ui';
 
 import { fieldTypes } from './fieldTypes';
 

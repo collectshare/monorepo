@@ -7,6 +7,9 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   {
+    ignores: ['dist'],
+  },
+  {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     plugins: { js, 'simple-import-sort': simpleImportSort },
     extends: ['js/recommended'],

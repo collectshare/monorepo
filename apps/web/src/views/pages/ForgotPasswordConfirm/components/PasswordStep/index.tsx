@@ -1,9 +1,8 @@
+import { Button, CardContent, CardDescription, CardHeader, CardTitle } from '@monorepo/ui';
 import { useFormContext } from 'react-hook-form';
 
 import { StepperFooter } from '@/components/Stepper/StepperFooter';
 import { StepperPreviousButton } from '@/components/Stepper/StepperPreviousButton';
-import { Button } from '@/components/ui/Button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Label } from '@/components/ui/Label';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 

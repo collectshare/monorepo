@@ -1,9 +1,9 @@
+import { Input } from '@monorepo/ui';
 import { useFormContext } from 'react-hook-form';
 
 import { useStepper } from '@/app/hooks/useStepper';
 import { StepperFooter } from '@/components/Stepper/StepperFooter';
 import { StepperNextButton } from '@/components/Stepper/StepperNextButton';
-import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 

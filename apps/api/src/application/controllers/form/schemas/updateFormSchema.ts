@@ -6,6 +6,7 @@ export const updateFormSchema = z.object({
   tags: z.array(z.string()).optional(),
   isAnonymous: z.boolean().default(true),
   onePage: z.boolean().default(false),
+  isPublished: z.boolean().default(true),
 });
 
 export type UpdateFormBody = z.infer<typeof updateFormSchema>;

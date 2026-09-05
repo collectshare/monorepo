@@ -70,3 +70,17 @@ onFormSubmitted:
               NewImage:
                 type:
                   S: [FormSubmission]
+
+onFormChanged:
+  handler: src/main/functions/form/onFormChanged.handler
+  events:
+    - stream:
+        type: dynamodb
+        arn: !GetAtt MainTable.StreamArn
+        batchSize: 10
+        filterPatterns:
+          - eventName: [INSERT, MODIFY]
+            dynamodb:
+              NewImage:
+                type:
+                  S: [Form]

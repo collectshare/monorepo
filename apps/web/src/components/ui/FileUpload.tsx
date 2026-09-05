@@ -1,9 +1,7 @@
 
+import { Button, Input } from '@monorepo/ui';
 import { FileUpIcon, XIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
-
-import { Button } from './Button';
-import { Input } from './Input';
 
 interface FileUploadProps {
   value: File | null;

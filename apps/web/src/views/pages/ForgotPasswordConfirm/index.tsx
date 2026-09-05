@@ -1,9 +1,8 @@
+import { Button, Card } from '@monorepo/ui';
 import { FormProvider } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import { StepperProvider } from '@/app/contexts/StepperContext';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 
 import { CodeStep } from './components/CodeStep';
 import { PasswordStep } from './components/PasswordStep';

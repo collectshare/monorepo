@@ -3,6 +3,7 @@ import {
   CopyrightIcon,
   FilePenIcon,
   HomeIcon,
+  KeyRoundIcon,
 } from 'lucide-react';
 import * as React from 'react';
 
@@ -25,6 +26,11 @@ const menu = [
     name: 'Meus formulários',
     url: '/my-forms',
     icon: FilePenIcon,
+  },
+  {
+    name: 'API Keys',
+    url: '/api-keys',
+    icon: KeyRoundIcon,
   },
 ];
 

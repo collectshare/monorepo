@@ -1,0 +1,2 @@
+apiKeyAuthorizer:
+  handler: src/main/functions/external/apiKeyAuthorizer.handler

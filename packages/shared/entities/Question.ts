@@ -1,4 +1,5 @@
 import { QuestionType } from '../enums/QuestionType';
+import { AnonymizationSuggestion } from '../types/AnonymizationSuggestion';
 import KSUID from 'ksuid';
 
 export class Question {
@@ -10,6 +11,7 @@ export class Question {
   order: number;
   isRequired?: boolean;
   max?: number;
+  anonymizationSuggestion?: AnonymizationSuggestion | null;
   readonly createdAt: Date;
 
   constructor(attr: Question.Attributes) {
@@ -21,6 +23,7 @@ export class Question {
     this.order = attr.order;
     this.isRequired = attr.isRequired ?? false;
     this.max = attr.max;
+    this.anonymizationSuggestion = attr.anonymizationSuggestion ?? null;
     this.createdAt = attr.createdAt ?? new Date();
   }
 }
@@ -34,6 +37,7 @@ export namespace Question {
     options?: string[];
     isRequired?: boolean;
     max?: number;
+    anonymizationSuggestion?: AnonymizationSuggestion | null;
     id?: string;
     createdAt?: Date;
   };

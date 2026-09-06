@@ -46,6 +46,7 @@ export function useFormBuilderController() {
         options: question.options,
         isRequired: question.isRequired,
         max: question.max,
+        anonymizationSuggestion: question.anonymizationSuggestion,
       })).map(field => ({
         ...field,
         options: field.options || [],

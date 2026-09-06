@@ -2,16 +2,19 @@ import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { IQuestionInsert } from '@monorepo/shared/types/IQuestion';
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@monorepo/ui';
 import { Reorder, useDragControls } from 'framer-motion';
-import { CopyIcon, EllipsisIcon, GripVerticalIcon, Trash2Icon } from 'lucide-react';
+import { CopyIcon, EllipsisIcon, GripVerticalIcon, ShieldAlertIcon, Trash2Icon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Label } from '@/components/ui/Label';
 import { Switch } from '@/components/ui/Switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import { cn } from '@/lib/utils';
 
 import { FormBuilderFormData } from '../useFormBuilderController';
 import { FieldOptions } from './FieldOptions';
 import { fieldTypes } from './fieldTypes';
+
+const ANONYMIZATION_SUGGESTION_CONFIDENCE_THRESHOLD = 0.6;
 
 interface IFieldItemProps {
   index: number;
@@ -43,6 +46,11 @@ export function FieldItem({
     QuestionType.DROPDOWN,
   ].includes(questionType as any);
 
+  const anonymizationSuggestion = field.anonymizationSuggestion;
+  const showAnonymizationWarning =
+    !!anonymizationSuggestion?.needsAnonymization &&
+    anonymizationSuggestion.confidence >= ANONYMIZATION_SUGGESTION_CONFIDENCE_THRESHOLD;
+
   return (
     <Reorder.Item
       value={field}
@@ -71,10 +79,22 @@ export function FieldItem({
 
             <div className="flex-1 flex flex-col gap-2">
               <div className="flex items-center justify-between mb-2">
-                <div>
+                <div className="flex items-center gap-2">
                   <span className="font-semibold">
                     {fieldTypes.find(field => field.type === questionType)?.label}
                   </span>
+                  {showAnonymizationWarning && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <ShieldAlertIcon className="size-4 text-amber-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Esta pergunta pode coletar dado pessoal. {anonymizationSuggestion?.reason}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

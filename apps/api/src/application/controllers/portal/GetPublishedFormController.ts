@@ -19,7 +19,7 @@ export class GetPublishedFormController extends Controller<'public', GetPublishe
       statusCode: 200,
       body: {
         form,
-        questions,
+        questions: questions.map(({ anonymizationSuggestion: _anonymizationSuggestion, ...question }) => question),
       },
     };
   }

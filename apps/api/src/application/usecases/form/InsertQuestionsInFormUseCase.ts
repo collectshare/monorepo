@@ -3,6 +3,7 @@ import { NotAllowedError } from '@application/errors/application/NotAllowedError
 import { ResourceNotFound } from '@application/errors/application/ResourceNotFound';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
+import { QuestionAnonymizationClassifier } from '@infra/services/QuestionAnonymizationClassifier';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 
@@ -11,6 +12,7 @@ export class InsertQuestionsInFormUseCase {
   constructor(
     private readonly formRepository: FormRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly questionAnonymizationClassifier: QuestionAnonymizationClassifier,
   ) { }
 
   async execute({
@@ -55,22 +57,35 @@ export class InsertQuestionsInFormUseCase {
       const existingQuestion = existingQuestionMap.get(question.id);
 
       if (!existingQuestion) {
+        question.anonymizationSuggestion = await this.questionAnonymizationClassifier.classify(
+          question.text,
+          question.questionType,
+        );
         questionsToSave.push(question);
         continue;
       }
 
-      const hasChanged =
+      const contentChanged =
         existingQuestion.text !== question.text ||
-        existingQuestion.questionType !== question.questionType ||
+        existingQuestion.questionType !== question.questionType;
+
+      const hasChanged =
+        contentChanged ||
         existingQuestion.order !== question.order ||
         (existingQuestion.max ?? null) !== (question.max ?? null) ||
         (existingQuestion.isRequired ?? false) !== (question.isRequired ?? false) ||
         JSON.stringify(existingQuestion.options?.sort((a, b) => a.localeCompare(b)) ?? []) !==
         JSON.stringify(question.options?.sort((a, b) => a.localeCompare(b)) ?? []);
 
-      if (hasChanged) {
-        questionsToSave.push(question);
+      if (!hasChanged) {
+        continue;
       }
+
+      question.anonymizationSuggestion = contentChanged
+        ? await this.questionAnonymizationClassifier.classify(question.text, question.questionType)
+        : existingQuestion.anonymizationSuggestion;
+
+      questionsToSave.push(question);
     }
 
     if (questionsToSave.length > 0) {

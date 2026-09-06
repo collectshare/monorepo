@@ -1,5 +1,6 @@
 import { Question } from '@monorepo/shared/entities/Question';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+import { AnonymizationSuggestion } from '@monorepo/shared/types/AnonymizationSuggestion';
 
 export class QuestionItem {
   static readonly type = 'Question';
@@ -38,6 +39,7 @@ export class QuestionItem {
       order: questionItem.order,
       max: questionItem.max,
       isRequired: questionItem.isRequired,
+      anonymizationSuggestion: questionItem.anonymizationSuggestion,
       createdAt: new Date(questionItem.createdAt),
     });
   }
@@ -66,6 +68,7 @@ export namespace QuestionItem {
     order: number;
     isRequired?: boolean;
     max?: number;
+    anonymizationSuggestion?: AnonymizationSuggestion | null;
     createdAt: string;
   };
 

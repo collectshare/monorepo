@@ -37,6 +37,7 @@
     "@aws-sdk/s3-presigned-post": "^3.916.0",
     "@aws-sdk/s3-request-presigner": "^3.916.0",
     "@aws-sdk/util-dynamodb": "^3.911.0",
+    "@google/generative-ai": "^0.24.1",
     "@monorepo/shared": "workspace:*",
     "@react-email/column": "^0.0.13",
     "@react-email/heading": "^0.0.15",

@@ -13,6 +13,8 @@ export class AppConfig {
 
   readonly secrets: AppConfig.Secrets;
 
+  readonly gemini: AppConfig.Gemini;
+
   constructor() {
     this.auth = {
       cognito: {
@@ -44,6 +46,10 @@ export class AppConfig {
 
     this.secrets = {
       masterSecret: env.MASTER_SECRET,
+    };
+
+    this.gemini = {
+      apiKey: env.GEMINI_API_KEY,
     };
   }
 }
@@ -79,6 +85,10 @@ export namespace AppConfig {
 
   export type Secrets = {
     masterSecret: string;
+  };
+
+  export type Gemini = {
+    apiKey: string;
   };
 
   // export type CDNs = {

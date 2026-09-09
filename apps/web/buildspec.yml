@@ -3,11 +3,11 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 22
+      nodejs: 24
 
   pre_build:
     commands:
-      - npm install -g pnpm
+      - npm install -g pnpm@10.8.0
       - pnpm install --frozen-lockfile
 
   build:

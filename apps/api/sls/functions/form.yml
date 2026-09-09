@@ -50,6 +50,7 @@ getFormSubmissions:
 
 insertQuestionsInForm:
   handler: src/main/functions/form/insertQuestionsInForm.handler
+  timeout: 15
   events:
     - httpApi:
         method: POST

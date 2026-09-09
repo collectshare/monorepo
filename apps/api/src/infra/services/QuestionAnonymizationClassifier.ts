@@ -5,7 +5,7 @@ import { Injectable } from '@kernel/decorators/Injectable';
 import { AppConfig } from '@shared/config/AppConfig';
 
 const TIMEOUT_MS = 3_000;
-const MODEL_NAME = 'gemini-2.0-flash';
+const MODEL_NAME = 'gemini-3.6-flash';
 
 const PROMPT_INSTRUCTION = 'Você classifica perguntas de formulário quanto a coleta de dado pessoal (PII) que deveria ser anonimizado antes da publicação dos dados. Responda apenas com base no texto e tipo da pergunta a seguir, sem inventar contexto adicional.';
 

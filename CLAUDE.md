@@ -7,8 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Monorepo** managed with pnpm workspaces + Turborepo.
 
 - `apps/api` — Serverless Framework (AWS Lambda, DynamoDB, Cognito, S3, SQS), TypeScript
-- `apps/web` — React 19 + Vite + TailwindCSS v4 + TanStack Query, TypeScript
-- `packages/shared` — Entities, types, and enums shared between api and web
+- `apps/web` — React 19 + Vite + TailwindCSS v4 + TanStack Query, TypeScript — the authenticated product (form building, submissions, account/API-key management)
+- `apps/portal` — React 19 + Vite + TailwindCSS v4 + TanStack Query, TypeScript — **public, unauthenticated** open-data portal: search published datasets and browse their paginated raw data. No route requires login.
+- `packages/shared` — Entities, types, and enums shared between api, web, and portal
+- `packages/ui` — Shared design-system components (`Button`, `Card`, `Badge`, `Input`, `Table`, `DataTable`, theme tokens) consumed by both `apps/web` and `apps/portal` via `@monorepo/ui`. Add or change a component here rather than duplicating it in one app.
 
 ## Commands
 
@@ -41,6 +43,18 @@ pnpm typecheck          # TypeScript check (no emit)
 pnpm preview            # Preview production build
 pnpm validate:env       # Validate environment variables
 ```
+
+### Portal (`apps/portal`)
+
+```bash
+pnpm dev                # Vite dev server
+pnpm build              # tsc + vite build
+pnpm lint               # ESLint
+pnpm typecheck          # TypeScript check (no emit)
+pnpm preview            # Preview production build
+```
+
+Public, unauthenticated app — no auth context, no token handling. It only calls the public `/portal/*` endpoints on `apps/api` (never Algolia directly from the browser).
 
 ### Dev Environment
 
@@ -102,6 +116,16 @@ export class MyController extends Controller<'private', MyController.Response> {
 
 Functions are declared in `sls/functions/{domain}.yml` and resources in `sls/resources/`. The main `serverless.yml` composes them. Auth uses API Gateway JWT authorizer backed by Cognito.
 
+### Public Portal Endpoints
+
+`sls/functions/portal.yml` declares unauthenticated (`public` controller) HTTP routes consumed by `apps/portal`:
+
+- `GET /portal/search` — proxies to Algolia (via `infra/gateways/AlgoliaGateway.ts`); the browser never calls Algolia directly.
+- `GET /portal/datasets/{formId}` — published form metadata.
+- `GET /portal/datasets/{formId}/data` — cursor-paginated raw submission data.
+
+These only serve forms with `isPublished === true` (`Form` entity field, opt-out default). A DynamoDB stream consumer (`OnFormChangedUseCase` → `main/functions/form/onFormChanged.ts`) keeps the Algolia index in sync with `isPublished` changes.
+
 ### TypeScript Path Aliases (API)
 
 ```
@@ -136,6 +160,39 @@ Services in `app/services/` (`authService`, `accountsService`, `formsService`) a
 @/ → src/
 ```
 
+## Portal Architecture (`apps/portal`)
+
+```
+src/
+  app/
+    router/     # Routes: "/" (search) and "/dataset/:formId"
+    services/
+      portalService/  # Calls the public /portal/* endpoints on apps/api
+  views/
+    pages/
+      Home/     # Semantic dataset search (GET /portal/search)
+      Dataset/  # Dataset metadata + paginated raw-data table (GET /portal/datasets/{formId}, GET /portal/datasets/{formId}/data)
+```
+
+- No `AuthContext`/`AuthGuard`, no localStorage token handling — every route is public by design.
+- Uses the same `@monorepo/ui` components and Tailwind theme as `apps/web` for visual consistency, but is a fully independent Vite app/deployment.
+- Path alias: `@/ → src/` (same convention as `apps/web`).
+
+## Shared UI Package (`packages/ui`)
+
+Design-system components shared between `apps/web` and `apps/portal`, imported as `@monorepo/ui`:
+
+```
+src/
+  components/
+    ui/         # Button, Card, Badge, Input, Table, Select, Popover, Command, DropdownMenu, Separator
+    DataTable/  # DataTable and its sub-components (header, pagination, faceted filters, etc.)
+  lib/utils.ts
+  styles.css    # Shared theme tokens, imported as "@monorepo/ui/styles.css"
+```
+
+When a component is needed in both `apps/web` and `apps/portal`, add/edit it here rather than duplicating it locally in either app. `apps/web` no longer keeps local copies of components covered by this package.
+
 ## Shared Package (`packages/shared`)
 
-Exposes domain entities (`entities/`), TypeScript interfaces (`types/`), and enums (`enums/`). Both `apps/api` and `apps/web` depend on it as `@monorepo/shared`.
+Exposes domain entities (`entities/`), TypeScript interfaces (`types/`), and enums (`enums/`). `apps/api`, `apps/web`, and `apps/portal` all depend on it as `@monorepo/shared`.

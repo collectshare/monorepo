@@ -20,6 +20,8 @@ provider:
         - "http://localhost:5174"
         - "https://app.collectshare.com.br"
         - "https://dev.collectshare.com.br"
+        - "https://portal.collectshare.com.br"
+        - "https://portal-dev.collectshare.com.br"
       allowedHeaders:
         - "*"
       allowedMethods:

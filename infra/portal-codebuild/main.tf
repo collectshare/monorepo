@@ -2,7 +2,9 @@
 # (api-dev-monorepo/api-prod-monorepo): dev builda em PRERELEASED, prod em
 # RELEASED. O bucket S3 + distribuição CloudFront de destino já existem
 # (portal-dev.collectshare.com.br / portal.collectshare.com.br) e não são
-# provisionados por este módulo.
+# provisionados por este módulo. Compute Lambda (default do módulo), igual
+# ao web/api — ver apps/portal/vite.config.ts (maxParallelFileOps) pro
+# tratamento do limite fixo de file descriptors desse compute (EMFILE).
 
 locals {
   github_repo_url = "https://github.com/collectshare/monorepo"

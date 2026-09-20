@@ -8,12 +8,6 @@ phases:
   pre_build:
     commands:
       - export CI=true
-      # Layout padrão isolado do pnpm (sem hoist): hoistar (via
-      # NPM_CONFIG_PUBLIC_HOIST_PATTERN ou node-linker=hoisted) estoura o limite
-      # fixo de file descriptors do compute Lambda do CodeBuild (EMFILE), que não
-      # pode ser elevado via ulimit ali (Operation not permitted). A resolução de
-      # "react" que o hoist existia pra resolver agora é feita via alias em
-      # vite.config.ts.
       - npm install -g pnpm@10.33.4
       # Install sempre do zero. Com --frozen-lockfile o pnpm faz headless install e
       # considera "up to date" comparando com .modules.yaml — uma árvore parcial de

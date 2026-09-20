@@ -7,7 +7,7 @@ import { AppConfig } from '@shared/config/AppConfig';
 const TIMEOUT_MS = 8_000;
 const MODEL_NAME = 'gemini-3.6-flash';
 
-const PROMPT_INSTRUCTION = 'Você classifica perguntas de formulário quanto a coleta de dado pessoal (PII) que deveria ser anonimizado antes da publicação dos dados. Responda apenas com base no texto e tipo da pergunta a seguir, sem inventar contexto adicional.';
+const PROMPT_INSTRUCTION = 'Você classifica perguntas de formulário quanto a coleta de dado pessoal (PII) que deveria ser anonimizado antes da publicação dos dados. Responda apenas com base no texto e tipo de cada pergunta a seguir, sem inventar contexto adicional. Devolva um item por pergunta recebida, ecoando o campo "id" de cada uma exatamente como informado.';
 
 @Injectable()
 export class QuestionAnonymizationClassifier {
@@ -17,7 +17,17 @@ export class QuestionAnonymizationClassifier {
     this.client = new GoogleGenerativeAI(this.appConfig.gemini.apiKey);
   }
 
-  async classify(text: string, questionType: QuestionType): Promise<AnonymizationSuggestion | null> {
+  async classify(
+    items: QuestionAnonymizationClassifier.Item[],
+  ): Promise<Map<string, AnonymizationSuggestion | null>> {
+    const results = new Map<string, AnonymizationSuggestion | null>(
+      items.map((item) => [item.id, null]),
+    );
+
+    if (items.length === 0) {
+      return results;
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -27,22 +37,30 @@ export class QuestionAnonymizationClassifier {
         generationConfig: {
           responseMimeType: 'application/json',
           responseSchema: {
-            type: SchemaType.OBJECT,
-            properties: {
-              needsAnonymization: { type: SchemaType.BOOLEAN },
-              confidence: { type: SchemaType.NUMBER },
-              reason: { type: SchemaType.STRING },
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                id: { type: SchemaType.STRING },
+                needsAnonymization: { type: SchemaType.BOOLEAN },
+                confidence: { type: SchemaType.NUMBER },
+                reason: { type: SchemaType.STRING },
+              },
+              required: ['id', 'needsAnonymization', 'confidence', 'reason'],
             },
-            required: ['needsAnonymization', 'confidence', 'reason'],
           },
         },
       });
+
+      const questionsList = items
+        .map((item) => `- id: "${item.id}", tipo: ${item.questionType}, pergunta: "${item.text}"`)
+        .join('\n');
 
       const result = await model.generateContent(
         {
           contents: [{
             role: 'user',
-            parts: [{ text: `${PROMPT_INSTRUCTION}\n\nPergunta: "${text}"\nTipo: ${questionType}` }],
+            parts: [{ text: `${PROMPT_INSTRUCTION}\n\nPerguntas:\n${questionsList}` }],
           }],
         },
         { signal: controller.signal },
@@ -50,25 +68,44 @@ export class QuestionAnonymizationClassifier {
 
       const parsed = JSON.parse(result.response.text());
 
-      if (
-        typeof parsed.needsAnonymization !== 'boolean' ||
-        typeof parsed.confidence !== 'number' ||
-        typeof parsed.reason !== 'string'
-      ) {
-        return null;
+      if (!Array.isArray(parsed)) {
+        return results;
       }
 
-      return {
-        needsAnonymization: parsed.needsAnonymization,
-        confidence: parsed.confidence,
-        reason: parsed.reason,
-        classifiedAt: new Date().toISOString(),
-      };
+      for (const entry of parsed) {
+        if (
+          !entry ||
+          typeof entry.id !== 'string' ||
+          typeof entry.needsAnonymization !== 'boolean' ||
+          typeof entry.confidence !== 'number' ||
+          typeof entry.reason !== 'string' ||
+          !results.has(entry.id)
+        ) {
+          continue;
+        }
+
+        results.set(entry.id, {
+          needsAnonymization: entry.needsAnonymization,
+          confidence: entry.confidence,
+          reason: entry.reason,
+          classifiedAt: new Date().toISOString(),
+        });
+      }
+
+      return results;
     } catch (error) {
-      console.error('QuestionAnonymizationClassifier failed to classify question', error);
-      return null;
+      console.error('QuestionAnonymizationClassifier failed to classify questions', error);
+      return results;
     } finally {
       clearTimeout(timeout);
     }
   }
+}
+
+export namespace QuestionAnonymizationClassifier {
+  export type Item = {
+    id: string;
+    text: string;
+    questionType: QuestionType;
+  };
 }

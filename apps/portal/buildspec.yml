@@ -25,9 +25,8 @@ phases:
   build:
     on-failure: ABORT
     commands:
-      - cd apps/web
-      - pnpm validate:env
-      - pnpm turbo run build --filter=@monorepo/web
+      - cd apps/portal
+      - pnpm turbo run build --filter=@monorepo/portal
       - rm -rf dist/**/*.js.map
 
   post_build:

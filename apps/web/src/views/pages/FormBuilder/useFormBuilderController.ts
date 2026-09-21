@@ -47,6 +47,8 @@ export function useFormBuilderController() {
         isRequired: question.isRequired,
         max: question.max,
         anonymizationSuggestion: question.anonymizationSuggestion,
+        piiStrategy: question.piiStrategy,
+        generalizationConfig: question.generalizationConfig,
       })).map(field => ({
         ...field,
         options: field.options || [],
@@ -126,6 +128,8 @@ export function useFormBuilderController() {
       options: field.options || [],
       isRequired: field.isRequired,
       max: field.max,
+      piiStrategy: field.piiStrategy,
+      generalizationConfig: field.generalizationConfig,
     });
   }
 

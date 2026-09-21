@@ -1,4 +1,6 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+// Anonymization strategy is AI-decided only for now — owner-driven selection is disabled, see below.
+// import { GeneralizationConfig } from '@monorepo/shared/types/GeneralizationConfig';
 import { IQuestionInsert } from '@monorepo/shared/types/IQuestion';
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@monorepo/ui';
 import { Reorder, useDragControls } from 'framer-motion';
@@ -50,6 +52,11 @@ export function FieldItem({
   const showAnonymizationWarning =
     !!anonymizationSuggestion?.needsAnonymization &&
     anonymizationSuggestion.confidence >= ANONYMIZATION_SUGGESTION_CONFIDENCE_THRESHOLD;
+
+  // Owner-driven anonymization strategy selection is disabled for now — see the commented
+  // UI block below. The AI-derived value (Question.anonymizationSuggestion) is the only
+  // signal used to decide anonymization until this is re-enabled.
+  // const piiStrategy = form.watch(`fields.${index}.piiStrategy`);
 
   return (
     <Reorder.Item
@@ -151,6 +158,39 @@ export function FieldItem({
                 </div>
               )}
               {showOptions && <FieldOptions fieldIndex={index} />}
+              {/*
+                Owner-driven anonymization strategy selector — disabled for now.
+                In this first phase, the anonymization strategy is decided entirely by the
+                AI classifier (Question.anonymizationSuggestion.needsAnonymization), not by
+                the form owner. Keeping this UI here, commented out, to re-enable later.
+
+              <div className="flex flex-col gap-2 mt-2">
+                <Label htmlFor={`fields.${index}.piiStrategy`}>Anonimização</Label>
+                <Controller
+                  control={form.control}
+                  name={`fields.${index}.piiStrategy`}
+                  render={({ field: { onChange, value } }) => (
+                    <Select
+                      value={value ?? 'none'}
+                      onValueChange={(newValue) => onChange(newValue === 'none' ? null : newValue)}
+                    >
+                      <SelectTrigger id={`fields.${index}.piiStrategy`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sem anonimização</SelectItem>
+                        <SelectItem value="pseudonymize">Pseudonimizar</SelectItem>
+                        <SelectItem value="generalize">Generalizar</SelectItem>
+                        <SelectItem value="suppress">Suprimir</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {piiStrategy === 'generalize' && (
+                  <GeneralizationConfigFields fieldIndex={index} />
+                )}
+              </div>
+              */}
             </div>
           </div>
           <div className="flex items-center justify-end gap-2 pt-4 border-t">
@@ -174,3 +214,101 @@ export function FieldItem({
     </Reorder.Item>
   );
 }
+
+// Sub-form for GeneralizationConfig, used by the (currently disabled) owner-driven
+// anonymization strategy selector above. Kept commented out alongside it.
+//
+// function GeneralizationConfigFields({ fieldIndex }: { fieldIndex: number }) {
+//   const form = useFormContext<FormBuilderFormData>();
+//   const configType = form.watch(`fields.${fieldIndex}.generalizationConfig.type`);
+//
+//   return (
+//     <div className="flex flex-col sm:flex-row gap-2">
+//       <Controller
+//         control={form.control}
+//         name={`fields.${fieldIndex}.generalizationConfig.type`}
+//         render={({ field: { onChange, value } }) => (
+//           <Select value={value} onValueChange={(newValue) => onChange(newValue as GeneralizationConfig['type'])}>
+//             <SelectTrigger>
+//               <SelectValue placeholder="Tipo de generalização" />
+//             </SelectTrigger>
+//             <SelectContent>
+//               <SelectItem value="date_truncate">Data (ano/mês)</SelectItem>
+//               <SelectItem value="numeric_range">Faixa numérica</SelectItem>
+//               <SelectItem value="text_prefix">Prefixo de texto</SelectItem>
+//               <SelectItem value="cep_region">Região do CEP</SelectItem>
+//             </SelectContent>
+//           </Select>
+//         )}
+//       />
+//
+//       {configType === 'date_truncate' && (
+//         <Controller
+//           control={form.control}
+//           name={`fields.${fieldIndex}.generalizationConfig.precision`}
+//           render={({ field: { onChange, value } }) => (
+//             <Select value={value} onValueChange={onChange}>
+//               <SelectTrigger>
+//                 <SelectValue placeholder="Precisão" />
+//               </SelectTrigger>
+//               <SelectContent>
+//                 <SelectItem value="year">Ano</SelectItem>
+//                 <SelectItem value="month">Ano e mês</SelectItem>
+//               </SelectContent>
+//             </Select>
+//           )}
+//         />
+//       )}
+//
+//       {configType === 'numeric_range' && (
+//         <Controller
+//           control={form.control}
+//           name={`fields.${fieldIndex}.generalizationConfig.step`}
+//           render={({ field: { onChange, value } }) => (
+//             <Input
+//               type="number"
+//               min={1}
+//               placeholder="Tamanho da faixa (ex: 10)"
+//               value={value ?? ''}
+//               onChange={(e) => onChange(Number(e.target.value))}
+//             />
+//           )}
+//         />
+//       )}
+//
+//       {configType === 'text_prefix' && (
+//         <Controller
+//           control={form.control}
+//           name={`fields.${fieldIndex}.generalizationConfig.chars`}
+//           render={({ field: { onChange, value } }) => (
+//             <Input
+//               type="number"
+//               min={1}
+//               placeholder="Quantidade de caracteres"
+//               value={value ?? ''}
+//               onChange={(e) => onChange(Number(e.target.value))}
+//             />
+//           )}
+//         />
+//       )}
+//
+//       {configType === 'cep_region' && (
+//         <Controller
+//           control={form.control}
+//           name={`fields.${fieldIndex}.generalizationConfig.precision`}
+//           render={({ field: { onChange, value } }) => (
+//             <Select value={value} onValueChange={onChange}>
+//               <SelectTrigger>
+//                 <SelectValue placeholder="Precisão" />
+//               </SelectTrigger>
+//               <SelectContent>
+//                 <SelectItem value="state">Estado</SelectItem>
+//                 <SelectItem value="ddd">DDD</SelectItem>
+//               </SelectContent>
+//             </Select>
+//           )}
+//         />
+//       )}
+//     </div>
+//   );
+// }

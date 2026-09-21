@@ -1,4 +1,5 @@
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+import { GeneralizationConfig } from '@monorepo/shared/types/GeneralizationConfig';
 
 import { httpClient } from '../httpClient';
 
@@ -12,6 +13,8 @@ export type InsertQuestionsRequest = {
     options?: string[] | undefined;
     max?: number;
     isRequired?: boolean;
+    piiStrategy?: 'pseudonymize' | 'generalize' | 'suppress' | null;
+    generalizationConfig?: GeneralizationConfig;
   }[];
 }
 

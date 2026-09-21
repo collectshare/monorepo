@@ -1,5 +1,6 @@
 import { QuestionType } from '../enums/QuestionType';
 import { AnonymizationSuggestion } from '../types/AnonymizationSuggestion';
+import { GeneralizationConfig } from '../types/GeneralizationConfig';
 import KSUID from 'ksuid';
 
 export class Question {
@@ -12,6 +13,8 @@ export class Question {
   isRequired?: boolean;
   max?: number;
   anonymizationSuggestion?: AnonymizationSuggestion | null;
+  piiStrategy?: 'pseudonymize' | 'generalize' | 'suppress' | null;
+  generalizationConfig?: GeneralizationConfig;
   readonly createdAt: Date;
 
   constructor(attr: Question.Attributes) {
@@ -24,6 +27,8 @@ export class Question {
     this.isRequired = attr.isRequired ?? false;
     this.max = attr.max;
     this.anonymizationSuggestion = attr.anonymizationSuggestion ?? null;
+    this.piiStrategy = attr.piiStrategy ?? null;
+    this.generalizationConfig = attr.generalizationConfig;
     this.createdAt = attr.createdAt ?? new Date();
   }
 }
@@ -38,6 +43,8 @@ export namespace Question {
     isRequired?: boolean;
     max?: number;
     anonymizationSuggestion?: AnonymizationSuggestion | null;
+    piiStrategy?: 'pseudonymize' | 'generalize' | 'suppress' | null;
+    generalizationConfig?: GeneralizationConfig;
     id?: string;
     createdAt?: Date;
   };

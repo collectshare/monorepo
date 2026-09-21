@@ -2,6 +2,7 @@ import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { AnswerRepository } from '@infra/database/dynamo/repositories/AnswerRepository';
 import { FormSubmissionRepository } from '@infra/database/dynamo/repositories/FormSubmissionRepository';
 import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
+import { AnonymizationEngine } from '@infra/services/AnonymizationEngine';
 import { Injectable } from '@kernel/decorators/Injectable';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class GetPublishedFormDataQuery {
     private readonly submissionRepository: FormSubmissionRepository,
     private readonly answerRepository: AnswerRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly anonymizationEngine: AnonymizationEngine,
   ) { }
 
   async execute({
@@ -22,9 +24,7 @@ export class GetPublishedFormDataQuery {
       this.questionRepository.findByFormId(formId),
     ]);
 
-    const fileQuestionIds = new Set(
-      questions.filter(question => question.questionType === QuestionType.FILE).map(question => question.id),
-    );
+    const questionById = new Map(questions.map(question => [question.id, question]));
 
     const rows = await Promise.all(
       submissions.map(async (submission) => {
@@ -34,11 +34,17 @@ export class GetPublishedFormDataQuery {
           submissionId: submission.id,
           submittedAt: submission.submittedAt,
           answers: answers
-            .filter(answer => !fileQuestionIds.has(answer.questionId))
-            .map(answer => ({
-              questionId: answer.questionId,
-              value: answer.value,
-            })),
+            .filter(answer => questionById.get(answer.questionId)?.questionType !== QuestionType.FILE)
+            .map(answer => {
+              const question = questionById.get(answer.questionId);
+
+              return {
+                questionId: answer.questionId,
+                value: question
+                  ? this.anonymizationEngine.resolve(question, answer.value)
+                  : answer.value,
+              };
+            }),
         };
       }),
     );
@@ -59,7 +65,7 @@ export namespace GetPublishedFormDataQuery {
     submittedAt: Date;
     answers: Array<{
       questionId: string;
-      value: string | string[];
+      value: string | string[] | null;
     }>;
   };
 

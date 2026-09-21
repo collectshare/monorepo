@@ -46,6 +46,7 @@ export class AppConfig {
 
     this.secrets = {
       masterSecret: env.MASTER_SECRET,
+      exportSecret: env.EXPORT_SECRET,
     };
 
     this.gemini = {
@@ -85,6 +86,7 @@ export namespace AppConfig {
 
   export type Secrets = {
     masterSecret: string;
+    exportSecret: string;
   };
 
   export type Gemini = {

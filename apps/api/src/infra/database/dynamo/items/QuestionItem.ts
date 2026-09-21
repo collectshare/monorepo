@@ -1,6 +1,7 @@
 import { Question } from '@monorepo/shared/entities/Question';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { AnonymizationSuggestion } from '@monorepo/shared/types/AnonymizationSuggestion';
+import { GeneralizationConfig } from '@monorepo/shared/types/GeneralizationConfig';
 
 export class QuestionItem {
   static readonly type = 'Question';
@@ -40,6 +41,8 @@ export class QuestionItem {
       max: questionItem.max,
       isRequired: questionItem.isRequired,
       anonymizationSuggestion: questionItem.anonymizationSuggestion,
+      piiStrategy: questionItem.piiStrategy,
+      generalizationConfig: questionItem.generalizationConfig,
       createdAt: new Date(questionItem.createdAt),
     });
   }
@@ -69,6 +72,8 @@ export namespace QuestionItem {
     isRequired?: boolean;
     max?: number;
     anonymizationSuggestion?: AnonymizationSuggestion | null;
+    piiStrategy?: 'pseudonymize' | 'generalize' | 'suppress' | null;
+    generalizationConfig?: GeneralizationConfig;
     createdAt: string;
   };
 

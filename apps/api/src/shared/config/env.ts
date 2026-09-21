@@ -19,6 +19,7 @@ const schema = z.object({
 
   // Secrets
   MASTER_SECRET: z.string().min(1),
+  EXPORT_SECRET: z.string().min(1),
 
   // Gemini
   GEMINI_API_KEY: z.string().min(1),

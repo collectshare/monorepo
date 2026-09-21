@@ -8,6 +8,7 @@ import { QuestionAnonymizationClassifier } from '@infra/services/QuestionAnonymi
 import { PiiHeuristics } from '@infra/services/PiiHeuristics';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+import { GeneralizationConfig } from '@monorepo/shared/types/GeneralizationConfig';
 import { hashQuestionContent } from '@shared/utils/hashQuestionContent';
 
 type ClassificationSource = 'heuristic' | 'cache' | 'llm';
@@ -78,6 +79,9 @@ export class InsertQuestionsInFormUseCase {
         existingQuestion.order !== question.order ||
         (existingQuestion.max ?? null) !== (question.max ?? null) ||
         (existingQuestion.isRequired ?? false) !== (question.isRequired ?? false) ||
+        (existingQuestion.piiStrategy ?? null) !== (question.piiStrategy ?? null) ||
+        JSON.stringify(existingQuestion.generalizationConfig ?? null) !==
+        JSON.stringify(question.generalizationConfig ?? null) ||
         JSON.stringify(existingQuestion.options?.sort((a, b) => a.localeCompare(b)) ?? []) !==
         JSON.stringify(question.options?.sort((a, b) => a.localeCompare(b)) ?? []);
 
@@ -185,6 +189,8 @@ export namespace InsertQuestionsInFormUseCase {
       options?: string[];
       max?: number;
       isRequired?: boolean;
+      piiStrategy?: 'pseudonymize' | 'generalize' | 'suppress' | null;
+      generalizationConfig?: GeneralizationConfig;
     }>;
   };
 }

@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "dev:email": "email dev --dir src/infra/emails/templates",
     "deploy": "sls deploy --stage dev",
     "backfill:form-published": "tsx scripts/backfillFormIsPublished.ts"
@@ -26,7 +28,8 @@
     "react-email": "^4.0.16",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.37.0"
+    "typescript-eslint": "^8.37.0",
+    "vitest": "^5.0.1"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.916.0",

@@ -36,8 +36,9 @@ const STATE_BY_CEP_PREFIX: Record<string, string> = {
 export class AnonymizationEngine {
   constructor(private readonly appConfig: AppConfig) { }
 
-  hash(value: string): string {
-    return createHmac('sha256', this.appConfig.secrets.exportSecret).update(value).digest('hex');
+  hash(value: string, formId: string): string {
+    const formKey = createHmac('sha256', this.appConfig.secrets.exportSecret).update(formId).digest();
+    return createHmac('sha256', formKey).update(value).digest('hex');
   }
 
   generalize(value: string, config: GeneralizationConfig): string {
@@ -74,6 +75,7 @@ export class AnonymizationEngine {
     value: string | string[] | null,
     piiStrategy: 'pseudonymize' | 'generalize' | 'suppress',
     generalizationConfig: GeneralizationConfig | undefined,
+    formId: string,
   ): string | string[] | null {
     if (piiStrategy === 'suppress') { return null; }
 
@@ -84,18 +86,18 @@ export class AnonymizationEngine {
     }
 
     // 'pseudonymize', or 'generalize' with no usable config (fail-safe fallback — never pass PII through raw)
-    if (Array.isArray(value)) { return value.map((v) => this.hash(v)); }
+    if (Array.isArray(value)) { return value.map((v) => this.hash(v, formId)); }
     if (value === null) { return null; }
-    return this.hash(value);
+    return this.hash(value, formId);
   }
 
   resolve(question: Question, value: string | string[] | null): string | string[] | null {
     if (question.piiStrategy) {
-      return this.applyToValue(value, question.piiStrategy, question.generalizationConfig);
+      return this.applyToValue(value, question.piiStrategy, question.generalizationConfig, question.formId);
     }
 
     if (question.anonymizationSuggestion?.needsAnonymization) {
-      return this.applyToValue(value, 'pseudonymize', undefined);
+      return this.applyToValue(value, 'pseudonymize', undefined, question.formId);
     }
 
     return value;

@@ -35,7 +35,10 @@ export function lambdaHttpAdapter(controller: Controller<any, unknown>) {
 
       return {
         statusCode: response.statusCode,
-        body: response.body ? JSON.stringify(response.body) : undefined,
+        headers: response.headers,
+        body: response.body === undefined
+          ? undefined
+          : (response.isRawBody ? (response.body as unknown as string) : JSON.stringify(response.body)),
       };
     } catch (error) {
       if (error instanceof ZodError) {

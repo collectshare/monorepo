@@ -4,14 +4,11 @@ import {
   DataTable,
   DataTableColumnHeader,
   DataTableContent,
-  DataTableTextFilter,
 } from '@monorepo/ui';
 import type { ColumnDef } from '@tanstack/react-table';
 import { ReactNode, useMemo } from 'react';
 
 import { formatDate } from '@/app/utils/formatDate';
-
-const MAX_ROWS = 500;
 
 interface AnswerRow {
   submissionId: string;
@@ -87,14 +84,11 @@ export function AnswersTable({ question, responses, valueColumnTitle, renderValu
       columns={columns}
       pagination={{
         pageIndex: 0,
-        pageSize: MAX_ROWS,
+        pageSize: data.length || 1,
       }}
     >
       <div className="flex h-[400px] flex-col">
-        <div className="mb-4 shrink-0">
-          <DataTableTextFilter className="max-w-[350px] w-[350px]" placeholder="Filtrar respostas..." />
-        </div>
-        <div className="min-h-0 flex-1">
+        <div className="min-h-0 flex-1 mt-2">
           <DataTableContent isLoading={false} />
         </div>
       </div>

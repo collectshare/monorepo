@@ -42,6 +42,7 @@ export class AppConfig {
       appId: env.ALGOLIA_APP_ID,
       adminApiKey: env.ALGOLIA_ADMIN_API_KEY,
       indexName: env.ALGOLIA_INDEX_NAME,
+      trendingIndexName: env.ALGOLIA_TRENDING_INDEX_NAME || `${env.ALGOLIA_INDEX_NAME}_trending`,
     };
 
     this.secrets = {
@@ -82,6 +83,7 @@ export namespace AppConfig {
     appId: string;
     adminApiKey: string;
     indexName: string;
+    trendingIndexName: string;
   };
 
   export type Secrets = {

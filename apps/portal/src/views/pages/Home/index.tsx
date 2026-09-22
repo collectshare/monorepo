@@ -1,11 +1,11 @@
-import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@monorepo/ui';
+import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@monorepo/ui';
 import { SearchIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useHomeController } from './useHomeController';
 
 export function Home() {
-  const { query, setQuery, results, isLoading } = useHomeController();
+  const { query, setQuery, sort, setSort, results, isLoading } = useHomeController();
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
@@ -14,7 +14,7 @@ export function Home() {
         Explore datasets públicos publicados por formulários do CollectShare.
       </p>
 
-      <div className="relative mb-8">
+      <div className="relative mb-4">
         <SearchIcon className="absolute w-4 h-4 left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
           className="indent-6 h-12"
@@ -22,6 +22,23 @@ export function Home() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
+      </div>
+
+      <div className="flex gap-2 mb-8">
+        <button
+          type="button"
+          className={buttonVariants({ variant: sort === 'relevance' ? 'default' : 'outline', size: 'sm' })}
+          onClick={() => setSort('relevance')}
+        >
+          Relevância
+        </button>
+        <button
+          type="button"
+          className={buttonVariants({ variant: sort === 'trending' ? 'default' : 'outline', size: 'sm' })}
+          onClick={() => setSort('trending')}
+        >
+          Em alta
+        </button>
       </div>
 
       {isLoading && <p className="text-center text-muted-foreground">Buscando...</p>}

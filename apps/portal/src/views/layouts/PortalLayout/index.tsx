@@ -1,4 +1,4 @@
-import { Button } from '@monorepo/ui';
+import { buttonVariants } from '@monorepo/ui';
 import { Outlet } from 'react-router-dom';
 
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -13,11 +13,14 @@ export function PortalLayout() {
 
         <div className="flex items-center gap-2">
           {WEB_APP_URL && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
-                Entrar
-              </a>
-            </Button>
+            <a
+              href={WEB_APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              Entrar
+            </a>
           )}
           <ThemeSwitcher />
         </div>

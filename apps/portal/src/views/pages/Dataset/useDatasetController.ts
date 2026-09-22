@@ -55,6 +55,8 @@ export function useDatasetController() {
     ];
   }, [dataset?.questions]);
 
+  const exportUrl = portalService.getDatasetExportUrl(formId);
+
   return {
     formId,
     dataset,
@@ -65,5 +67,6 @@ export function useDatasetController() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    exportUrl,
   };
 }

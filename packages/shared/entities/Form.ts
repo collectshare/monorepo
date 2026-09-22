@@ -5,6 +5,8 @@ export class Form {
   readonly accountId: string;
   readonly createdAt: Date;
   readonly submissionCount?: number;
+  readonly clickCount?: number;
+  readonly downloadCount?: number;
   title: string;
   description: string | undefined;
   tags?: string[];
@@ -21,6 +23,8 @@ export class Form {
     this.tags = attr.tags;
     this.isAnonymous = attr.isAnonymous;
     this.submissionCount = attr.submissionCount;
+    this.clickCount = attr.clickCount;
+    this.downloadCount = attr.downloadCount;
     this.onePage = attr.onePage;
     this.isPublished = attr.isPublished ?? true;
   }
@@ -37,6 +41,8 @@ export namespace Form {
     isAnonymous: boolean;
     onePage: boolean;
     submissionCount?: number;
+    clickCount?: number;
+    downloadCount?: number;
     isPublished?: boolean;
   };
 }

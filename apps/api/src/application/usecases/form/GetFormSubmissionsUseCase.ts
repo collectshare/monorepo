@@ -4,7 +4,10 @@ import { GetFormSubmissionsQuery } from '@application/queries/GetFormSubmissions
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { StorageGateway } from '@infra/gateways/StorageGateway';
 import { Injectable } from '@kernel/decorators/Injectable';
+import { Form } from '@monorepo/shared/entities/Form';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
+
+const DEFAULT_SUBMISSIONS_LIMIT = 500;
 
 @Injectable()
 export class GetFormSubmissionsUseCase {
@@ -17,6 +20,7 @@ export class GetFormSubmissionsUseCase {
   async execute({
     formId,
     accountId,
+    limit = DEFAULT_SUBMISSIONS_LIMIT,
   }: GetFormSubmissionsUseCase.Input): Promise<GetFormSubmissionsUseCase.Output> {
     const form = await this.formRepository.findById(formId);
 
@@ -30,6 +34,7 @@ export class GetFormSubmissionsUseCase {
 
     const { questions, submissions } = await this.getFormSubmissionsQuery.execute(
       formId,
+      { limit },
     );
 
     const fileQuestions = questions.filter(
@@ -52,7 +57,7 @@ export class GetFormSubmissionsUseCase {
       );
     }
 
-    return { questions, submissions };
+    return { form, questions, submissions };
   }
 }
 
@@ -60,7 +65,10 @@ export namespace GetFormSubmissionsUseCase {
   export type Input = {
     formId: string;
     accountId: string;
+    limit?: number;
   };
 
-  export type Output = GetFormSubmissionsQuery.Output;
+  export type Output = GetFormSubmissionsQuery.Output & {
+    form: Form;
+  };
 }

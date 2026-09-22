@@ -1,6 +1,7 @@
 import {
   Badge,
   Button,
+  buttonVariants,
   Card,
   CardContent,
   CardHeader,
@@ -43,12 +44,10 @@ export function Dataset() {
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <CardTitle className="text-2xl">{dataset.form.title}</CardTitle>
-          <Button variant="outline" size="sm" asChild>
-            <a href={exportUrl} download>
-              <DownloadIcon />
-              Baixar CSV
-            </a>
-          </Button>
+          <a href={exportUrl} download className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+            <DownloadIcon />
+            Baixar CSV
+          </a>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {dataset.form.description && <p className="text-muted-foreground">{dataset.form.description}</p>}

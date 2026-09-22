@@ -1,10 +1,11 @@
 
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
 import { Button } from '@monorepo/ui';
-import { DownloadIcon } from 'lucide-react';
+import { ChartColumnIcon, DownloadIcon, TableIcon } from 'lucide-react';
+import { useState } from 'react';
 
 import PageLayout from '../../layouts/PageLayout';
-import { QuestionChart } from './components';
+import { AllResponsesTable, QuestionChart } from './components';
 import { useFormDashboardController } from './useFormDashboardController';
 
 const DASHBOARD_SUBMISSIONS_LIMIT = 500;
@@ -19,6 +20,8 @@ export default function FormDashboard() {
     handleExport,
     isExporting,
   } = useFormDashboardController();
+
+  const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
 
   const totalSubmissions = form?.submissionCount ?? responses.length;
   const exceedsLimit = totalSubmissions > DASHBOARD_SUBMISSIONS_LIMIT;
@@ -41,10 +44,28 @@ export default function FormDashboard() {
               </p>
             </div>
 
-            <Button onClick={() => handleExport()} disabled={totalSubmissions === 0 || isExporting}>
-              <DownloadIcon />
-              {isExporting ? 'Exportando...' : 'Exportar CSV'}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setViewMode((mode) => (mode === 'chart' ? 'table' : 'chart'))}
+              >
+                {viewMode === 'chart' ? (
+                  <>
+                    <TableIcon className="size-4" /> Ver todas as respostas em tabela
+                  </>
+                ) : (
+                  <>
+                    <ChartColumnIcon className="size-4" /> Ver gráficos
+                  </>
+                )}
+              </Button>
+
+              <Button onClick={() => handleExport()} disabled={totalSubmissions === 0 || isExporting}>
+                <DownloadIcon />
+                {isExporting ? 'Exportando...' : 'Exportar CSV'}
+              </Button>
+            </div>
           </div>
 
           {exceedsLimit && (
@@ -56,15 +77,21 @@ export default function FormDashboard() {
             </div>
           )}
 
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {questions?.map((question: IQuestion) => (
-              <QuestionChart
-                key={question.id}
-                question={question}
-                responses={responses}
-              />
-            ))}
-          </div>
+          {viewMode === 'table' ? (
+            <div className="mt-4">
+              <AllResponsesTable questions={questions ?? []} responses={responses} />
+            </div>
+          ) : (
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {questions?.map((question: IQuestion) => (
+                <QuestionChart
+                  key={question.id}
+                  question={question}
+                  responses={responses}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </PageLayout>

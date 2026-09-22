@@ -1,3 +1,4 @@
+import { exportSubmissions } from './exportSubmissions';
 import { getForm } from './getForm';
 import { getResponses } from './getResponses';
 import { insertQuestions } from './insertQuestions';
@@ -6,6 +7,7 @@ import { save } from './save';
 import { submit } from './submit';
 
 export const formsService = {
+  exportSubmissions,
   getForm,
   getResponses,
   insertQuestions,

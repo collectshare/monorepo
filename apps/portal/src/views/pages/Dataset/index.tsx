@@ -8,6 +8,7 @@ import {
   DataTable,
   DataTableContent,
 } from '@monorepo/ui';
+import { DownloadIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useDatasetController } from './useDatasetController';
@@ -22,6 +23,7 @@ export function Dataset() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    exportUrl,
   } = useDatasetController();
 
   if (isLoadingDataset) {
@@ -39,8 +41,14 @@ export function Dataset() {
       </Link>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-start justify-between gap-4">
           <CardTitle className="text-2xl">{dataset.form.title}</CardTitle>
+          <Button variant="outline" size="sm" asChild>
+            <a href={exportUrl} download>
+              <DownloadIcon />
+              Baixar CSV
+            </a>
+          </Button>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {dataset.form.description && <p className="text-muted-foreground">{dataset.form.description}</p>}

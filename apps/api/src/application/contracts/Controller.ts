@@ -66,5 +66,8 @@ export namespace Controller {
   export type Response<TBody = undefined> = {
     statusCode: number;
     body?: TBody;
+    headers?: Record<string, string>;
+    /** When true, `body` is sent as-is (must be a string) instead of JSON.stringify'd. */
+    isRawBody?: boolean;
   };
 }

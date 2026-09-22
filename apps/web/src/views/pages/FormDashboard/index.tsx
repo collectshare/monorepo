@@ -22,9 +22,36 @@ export default function FormDashboard() {
   } = useFormDashboardController();
 
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [draftFilterState, setDraftFilterState] = useState<FilterState>(EMPTY_FILTER_STATE);
+  const [appliedFilterState, setAppliedFilterState] = useState<FilterState>(EMPTY_FILTER_STATE);
 
+  const filteredResponses = useMemo(
+    () => applyFilters(responses, appliedFilterState, questions ?? []),
+    [responses, appliedFilterState, questions],
+  );
+
+  const activeConditionsCount = appliedFilterState.groups.reduce(
+    (count, group) => count + group.conditions.length,
+    0,
+  );
+  const isFilterActive = activeConditionsCount > 0;
+  const appliedFilterKey = JSON.stringify(appliedFilterState);
+  const hasFilterableQuestions = (questions ?? []).some((question) =>
+    FILTERABLE_QUESTION_TYPES.includes(question.questionType),
+  );
   const totalSubmissions = form?.submissionCount ?? responses.length;
-  const exceedsLimit = totalSubmissions > DASHBOARD_SUBMISSIONS_LIMIT;
+
+  function handleApplyFilters() {
+    setAppliedFilterState(draftFilterState);
+    setIsFilterPanelOpen(false);
+  }
+
+  function handleClearFilters() {
+    setDraftFilterState(EMPTY_FILTER_STATE);
+    setAppliedFilterState(EMPTY_FILTER_STATE);
+    setIsFilterPanelOpen(false);
+  }
 
   return (
     <PageLayout
@@ -40,11 +67,43 @@ export default function FormDashboard() {
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Respostas</h2>
               <p className="text-muted-foreground">
-                Total de respostas: {totalSubmissions}
+                {isFilterActive
+                  ? `Mostrando ${filteredResponses.length} de ${totalSubmissions} respostas`
+                  : `Total de respostas: ${totalSubmissions}`}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
+              {hasFilterableQuestions && (
+                <Popover open={isFilterPanelOpen} onOpenChange={setIsFilterPanelOpen}>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline">
+                      <FilterIcon className="size-4" /> Filtros
+                      {isFilterActive && (
+                        <Badge variant="secondary" className="ml-1 rounded-full px-1.5">
+                          {activeConditionsCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="max-h-[80vh] w-[min(960px,95vw)] overflow-y-auto">
+                    <SubmissionFilterBuilder
+                      questions={questions ?? []}
+                      filterState={draftFilterState}
+                      onChange={setDraftFilterState}
+                    />
+                    <div className="mt-4 flex items-center justify-end gap-2 border-t pt-3">
+                      <Button type="button" variant="ghost" size="sm" onClick={handleClearFilters}>
+                        Limpar filtros
+                      </Button>
+                      <Button type="button" size="sm" onClick={handleApplyFilters}>
+                        Aplicar filtros
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+
               <Button
                 type="button"
                 variant="outline"

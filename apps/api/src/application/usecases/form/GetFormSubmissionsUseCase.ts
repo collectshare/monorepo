@@ -7,8 +7,6 @@ import { Injectable } from '@kernel/decorators/Injectable';
 import { Form } from '@monorepo/shared/entities/Form';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 
-const DEFAULT_SUBMISSIONS_LIMIT = 500;
-
 @Injectable()
 export class GetFormSubmissionsUseCase {
   constructor(
@@ -20,7 +18,7 @@ export class GetFormSubmissionsUseCase {
   async execute({
     formId,
     accountId,
-    limit = DEFAULT_SUBMISSIONS_LIMIT,
+    limit,
   }: GetFormSubmissionsUseCase.Input): Promise<GetFormSubmissionsUseCase.Output> {
     const form = await this.formRepository.findById(formId);
 

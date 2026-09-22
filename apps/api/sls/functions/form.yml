@@ -48,6 +48,15 @@ getFormSubmissions:
         authorizer:
           name: CognitoAuthorizer
 
+exportFormSubmissions:
+  handler: src/main/functions/form/exportFormSubmissions.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /forms/{formId}/submissions/export
+        authorizer:
+          name: CognitoAuthorizer
+
 insertQuestionsInForm:
   handler: src/main/functions/form/insertQuestionsInForm.handler
   timeout: 15

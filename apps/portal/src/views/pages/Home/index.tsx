@@ -8,9 +8,9 @@ export function Home() {
   const { query, setQuery, results, isLoading } = useHomeController();
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold text-center mb-2">Portal de Dados Abertos</h1>
-      <p className="text-muted-foreground text-center mb-8">
+    <div className="max-w-5xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-bold mb-1">Datasets</h1>
+      <p className="text-muted-foreground mb-6">
         Explore datasets públicos publicados por formulários do CollectShare.
       </p>
 

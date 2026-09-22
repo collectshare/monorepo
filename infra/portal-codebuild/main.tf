@@ -23,9 +23,10 @@ module "portal_dev" {
   deploy_cloudfront_distribution_id = "EX156V5FRTSFI"
 
   environment_variables = {
-    VITE_API_URL  = "https://dev-api.collectshare.com.br"
-    DEPLOY_BUCKET = "portal-dev.collectshare.com.br"
-    CF_ID         = "EX156V5FRTSFI"
+    VITE_API_URL     = "https://dev-api.collectshare.com.br"
+    VITE_WEB_APP_URL = "https://dev.collectshare.com.br"
+    DEPLOY_BUCKET    = "portal-dev.collectshare.com.br"
+    CF_ID            = "EX156V5FRTSFI"
   }
 }
 
@@ -42,8 +43,9 @@ module "portal_prod" {
   deploy_cloudfront_distribution_id = "ES3XHH1DCYY8T"
 
   environment_variables = {
-    VITE_API_URL  = "https://api.collectshare.com.br"
-    DEPLOY_BUCKET = "portal.collectshare.com.br"
-    CF_ID         = "ES3XHH1DCYY8T"
+    VITE_API_URL     = "https://api.collectshare.com.br"
+    VITE_WEB_APP_URL = "https://app.collectshare.com.br"
+    DEPLOY_BUCKET    = "portal.collectshare.com.br"
+    CF_ID            = "ES3XHH1DCYY8T"
   }
 }

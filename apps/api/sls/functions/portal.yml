@@ -12,6 +12,13 @@ getPublishedFormData:
         method: GET
         path: /portal/datasets/{formId}/data
 
+exportPublishedFormData:
+  handler: src/main/functions/portal/exportPublishedFormData.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /portal/datasets/{formId}/export
+
 searchDatasets:
   handler: src/main/functions/portal/searchDatasets.handler
   events:

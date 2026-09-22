@@ -3,6 +3,7 @@ import { ResourceNotFound } from '@application/errors/application/ResourceNotFou
 import { ExportPublishedFormDataQuery } from '@application/queries/ExportPublishedFormDataQuery';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { Injectable } from '@kernel/decorators/Injectable';
+import { slugify } from '@shared/utils/slugify';
 import { toCsv } from '@shared/utils/toCsv';
 
 @Injectable()
@@ -54,15 +55,6 @@ export class ExportPublishedFormDataController extends Controller<'public', stri
       body: toCsv(headers, csvRows),
     };
   }
-}
-
-function slugify(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
 }
 
 export namespace ExportPublishedFormDataController {

@@ -37,20 +37,14 @@ export class ProfileRepository {
         PK: profileItem.PK,
         SK: profileItem.SK,
       },
-      UpdateExpression: 'SET #name = :name, #birthDate = :birthDate, #gender = :gender, #height = :height, #weight = :weight',
+      UpdateExpression: 'SET #name = :name, #birthDate = :birthDate',
       ExpressionAttributeNames: {
         '#name': 'name',
         '#birthDate': 'birthDate',
-        '#gender': 'gender',
-        '#height': 'height',
-        '#weight': 'weight',
       },
       ExpressionAttributeValues: {
         ':name': profileItem.name,
         ':birthDate': profileItem.birthDate,
-        ':gender': profileItem.gender,
-        ':height': profileItem.height,
-        ':weight': profileItem.weight,
       },
       ReturnValues: 'NONE',
     });

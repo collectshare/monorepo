@@ -55,18 +55,18 @@ export function AnswersTable({ question, responses, valueColumnTitle, renderValu
 
   const columns = useMemo<ColumnDef<AnswerRow>[]>(
     () => [
-      {
-        accessorKey: 'submissionId',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="ID da submissão" />,
-        enableResizing: false,
-        enableHiding: false,
-      },
-      {
+       {
         accessorKey: 'value',
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={valueColumnTitle ?? 'Resposta'} />
         ),
         cell: ({ row }) => (renderValue ? renderValue(row.original.value) : row.original.value),
+        enableResizing: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: 'submissionId',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="ID da submissão" />,
         enableResizing: false,
         enableHiding: false,
       },
@@ -90,10 +90,14 @@ export function AnswersTable({ question, responses, valueColumnTitle, renderValu
         pageSize: MAX_ROWS,
       }}
     >
-      <div className="mb-4">
-        <DataTableTextFilter className="max-w-[350px] w-[350px]" placeholder="Filtrar respostas..." />
+      <div className="flex h-[400px] flex-col">
+        <div className="mb-4 shrink-0">
+          <DataTableTextFilter className="max-w-[350px] w-[350px]" placeholder="Filtrar respostas..." />
+        </div>
+        <div className="min-h-0 flex-1">
+          <DataTableContent isLoading={false} />
+        </div>
       </div>
-      <DataTableContent isLoading={false} />
     </DataTable>
   );
 }

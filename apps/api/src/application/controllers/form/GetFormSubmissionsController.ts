@@ -1,6 +1,5 @@
 import { Controller } from '@application/contracts/Controller';
-import { Answer } from '@monorepo/shared/entities/Answer';
-import { FormSubmission } from '@monorepo/shared/entities/FormSubmission';
+import { GetFormSubmissionsQuery } from '@application/queries/GetFormSubmissionsQuery';
 import { Question } from '@monorepo/shared/entities/Question';
 import { GetFormSubmissionsUseCase } from '@application/usecases/form/GetFormSubmissionsUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -31,10 +30,7 @@ export class GetFormSubmissionsController extends Controller<'private', GetFormS
 
 export namespace GetFormSubmissionsController {
   export type Response = {
-    submissions: Array<{
-      submission: FormSubmission;
-      answers: Answer[];
-    }>;
+    submissions: GetFormSubmissionsQuery.SubmissionWithAnswers[];
     questions: Question[];
   };
 }

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { DatasetSearchResult, portalService } from '@/app/services/portalService';
+import { DatasetSearchResult, DatasetSort, portalService } from '@/app/services/portalService';
 
 export function useHomeController() {
   const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<DatasetSort>('relevance');
   const [results, setResults] = useState<DatasetSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -12,7 +13,7 @@ export function useHomeController() {
     setIsLoading(true);
 
     const timeout = setTimeout(async () => {
-      const { results: searchResults } = await portalService.searchDatasets(query);
+      const { results: searchResults } = await portalService.searchDatasets(query, sort);
 
       if (!isCancelled) {
         setResults(searchResults);
@@ -24,11 +25,13 @@ export function useHomeController() {
       isCancelled = true;
       clearTimeout(timeout);
     };
-  }, [query]);
+  }, [query, sort]);
 
   return {
     query,
     setQuery,
+    sort,
+    setSort,
     results,
     isLoading,
   };

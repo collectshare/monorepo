@@ -1,6 +1,6 @@
 
-import { IFormSubmission } from '@monorepo/shared/types/IFormSubmission';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 
 import { formsService } from '@/app/services/formsService';
@@ -20,57 +20,22 @@ export function useFormDashboardController() {
     enabled: !!formId,
   });
 
-  const handleExport = () => {
-    if (!form?.questions || !responses || responses?.submissions.length === 0) {
-      return;
-    }
-
-    const escapeCsvCell = (cell: string | number | null | undefined) => {
-      if (cell === null || cell === undefined) { return ''; }
-      const str = String(cell);
-      if (str.includes(',') || str.includes('\n') || str.includes('"')) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
-      return str;
-    };
-
-    const header = form.questions.map((q) => escapeCsvCell(q.text));
-
-    const rows = (responses?.submissions as IFormSubmission[]).map((response) =>
-      form.questions
-        .map((question) => {
-          const answer = response.answers.find(
-            (a) => a.questionId === question.id,
-          );
-
-          if (!answer) { return ''; }
-
-          const value = Array.isArray(answer.value)
-            ? answer.value.join(', ')
-            : answer.value;
-
-          return escapeCsvCell(value);
-        })
-        .join(';'),
-    );
-
-    const csvContent = [header.join(';'), ...rows].join('\n');
-
-    const blob = new Blob([`\ufeff${csvContent}`], {
-      type: 'text/csv;charset=utf-8;',
-    });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute(
-      'download',
-      `${form?.form?.title?.replace(/ /g, '_') ?? 'export'}.csv`,
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  const { mutate: handleExport, isPending: isExporting } = useMutation({
+    mutationFn: () => formsService.exportSubmissions(formId!),
+    onSuccess: ({ blob, filename }) => {
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    },
+    onError: () => {
+      toast.error('N\u00e3o foi poss\u00edvel exportar as respostas. Tente novamente.');
+    },
+  });
 
   return {
     form: form?.form,
@@ -79,5 +44,6 @@ export function useFormDashboardController() {
     responses: responses?.submissions ?? [],
     isLoadingResponses,
     handleExport,
+    isExporting,
   };
 }

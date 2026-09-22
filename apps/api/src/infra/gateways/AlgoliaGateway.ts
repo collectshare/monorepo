@@ -6,9 +6,12 @@ import { AppConfig } from '@shared/config/AppConfig';
 export class AlgoliaGateway {
   private readonly index: SearchIndex;
 
+  private readonly trendingIndex: SearchIndex;
+
   constructor(private readonly appConfig: AppConfig) {
     const client = algoliasearch(this.appConfig.algolia.appId, this.appConfig.algolia.adminApiKey);
     this.index = client.initIndex(this.appConfig.algolia.indexName);
+    this.trendingIndex = client.initIndex(this.appConfig.algolia.trendingIndexName);
   }
 
   async upsertRecord(record: AlgoliaGateway.DatasetRecord): Promise<void> {
@@ -29,8 +32,10 @@ export class AlgoliaGateway {
     await this.index.deleteObject(formId);
   }
 
-  async search(query: string): Promise<AlgoliaGateway.DatasetRecord[]> {
-    const { hits } = await this.index.search<AlgoliaGateway.DatasetRecord & { objectID: string }>(query);
+  async search(query: string, sort?: AlgoliaGateway.Sort): Promise<AlgoliaGateway.DatasetRecord[]> {
+    const index = sort === 'trending' ? this.trendingIndex : this.index;
+
+    const { hits } = await index.search<AlgoliaGateway.DatasetRecord & { objectID: string }>(query);
 
     return hits.map(hit => ({
       formId: hit.objectID,

@@ -11,7 +11,7 @@ export class SearchDatasetsController extends Controller<'public', SearchDataset
   protected override async handle(
     { queryParams }: Controller.Request<'public', any, Record<string, never>, SearchDatasetsController.QueryParams>,
   ): Promise<Controller.Response<SearchDatasetsController.Response>> {
-    const results = await this.algoliaGateway.search(queryParams.q ?? '');
+    const results = await this.algoliaGateway.search(queryParams.q ?? '', queryParams.sort);
 
     return {
       statusCode: 200,
@@ -29,5 +29,6 @@ export namespace SearchDatasetsController {
 
   export type QueryParams = {
     q?: string;
+    sort?: AlgoliaGateway.Sort;
   };
 }

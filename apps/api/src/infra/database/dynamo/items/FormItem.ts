@@ -39,6 +39,8 @@ export class FormItem {
       onePage: formItem.onePage,
       isAnonymous: formItem.isAnonymous,
       submissionCount: formItem.submissionCount,
+      clickCount: formItem.clickCount,
+      downloadCount: formItem.downloadCount,
       createdAt: new Date(formItem.createdAt),
       isPublished: formItem.isPublished ?? true,
     });
@@ -78,6 +80,8 @@ export namespace FormItem {
     onePage: boolean;
     isAnonymous: boolean;
     submissionCount?: number;
+    clickCount?: number;
+    downloadCount?: number;
     createdAt: string;
     isPublished?: boolean;
   };

@@ -75,6 +75,46 @@ export class FormRepository {
     await dynamoClient.send(command);
   }
 
+  async incrementClickCount(formId: string): Promise<void> {
+    const command = new UpdateCommand({
+      TableName: this.config.db.dynamodb.mainTable,
+      Key: {
+        PK: FormItem.getPK(formId),
+        SK: FormItem.getSK(),
+      },
+      UpdateExpression: 'SET #clickCount = if_not_exists(#clickCount, :zero) + :incr',
+      ExpressionAttributeNames: {
+        '#clickCount': 'clickCount',
+      },
+      ExpressionAttributeValues: {
+        ':incr': 1,
+        ':zero': 0,
+      },
+    });
+
+    await dynamoClient.send(command);
+  }
+
+  async incrementDownloadCount(formId: string): Promise<void> {
+    const command = new UpdateCommand({
+      TableName: this.config.db.dynamodb.mainTable,
+      Key: {
+        PK: FormItem.getPK(formId),
+        SK: FormItem.getSK(),
+      },
+      UpdateExpression: 'SET #downloadCount = if_not_exists(#downloadCount, :zero) + :incr',
+      ExpressionAttributeNames: {
+        '#downloadCount': 'downloadCount',
+      },
+      ExpressionAttributeValues: {
+        ':incr': 1,
+        ':zero': 0,
+      },
+    });
+
+    await dynamoClient.send(command);
+  }
+
   async create(form: Form): Promise<void> {
     await dynamoClient.send(
       new PutCommand(this.getPutCommandInput(form)),

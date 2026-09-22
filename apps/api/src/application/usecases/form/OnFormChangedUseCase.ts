@@ -42,6 +42,8 @@ export class OnFormChangedUseCase implements IDynamoStreamConsumer {
       description: form.description,
       tags: form.tags,
       submissionCount: form.submissionCount,
+      clickCount: form.clickCount,
+      downloadCount: form.downloadCount,
       accountName: profile?.name ?? 'Anônimo',
       createdAt: form.createdAt,
     });

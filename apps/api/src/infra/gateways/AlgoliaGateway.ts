@@ -18,6 +18,8 @@ export class AlgoliaGateway {
       description: record.description,
       tags: record.tags,
       submissionCount: record.submissionCount,
+      clickCount: record.clickCount,
+      downloadCount: record.downloadCount,
       accountName: record.accountName,
       createdAt: record.createdAt,
     });
@@ -36,6 +38,8 @@ export class AlgoliaGateway {
       description: hit.description,
       tags: hit.tags,
       submissionCount: hit.submissionCount,
+      clickCount: hit.clickCount,
+      downloadCount: hit.downloadCount,
       accountName: hit.accountName,
       createdAt: hit.createdAt,
     }));
@@ -43,12 +47,16 @@ export class AlgoliaGateway {
 }
 
 export namespace AlgoliaGateway {
+  export type Sort = 'relevance' | 'trending';
+
   export type DatasetRecord = {
     formId: string;
     title: string;
     description?: string;
     tags?: string[];
     submissionCount?: number;
+    clickCount?: number;
+    downloadCount?: number;
     accountName: string;
     createdAt: string;
   };

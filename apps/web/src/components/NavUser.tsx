@@ -11,12 +11,9 @@ import {
 import {
   ChevronsUpDown,
   LogOut,
-  Moon,
-  Sun,
 } from 'lucide-react';
 
 import { useAuth } from '@/app/hooks/useAuth';
-import { useTheme } from '@/app/hooks/useTheme';
 import {
   Avatar,
   AvatarFallback,
@@ -30,7 +27,6 @@ import {
 
 export function NavUser() {
   const { signout, user } = useAuth();
-  const { toggleTheme } = useTheme();
   const { isMobile } = useSidebar();
   const nameParts = user?.name?.trim().split(' ').filter(Boolean) ?? [];
   const userInitials = nameParts.length > 1
@@ -73,12 +69,6 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => toggleTheme()}>
-              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              Trocar tema
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signout()}>
               <LogOut />

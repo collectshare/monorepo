@@ -1,14 +1,14 @@
 
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
-import { Button } from '@monorepo/ui';
-import { ChartColumnIcon, DownloadIcon, TableIcon } from 'lucide-react';
-import { useState } from 'react';
+import { Badge, Button, Popover, PopoverContent, PopoverTrigger } from '@monorepo/ui';
+import { ChartColumnIcon, DownloadIcon, FilterIcon, TableIcon } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 import PageLayout from '../../layouts/PageLayout';
-import { AllResponsesTable, QuestionChart } from './components';
+import { AllResponsesTable, QuestionChart, SubmissionFilterBuilder } from './components';
+import { applyFilters } from './filters/applyFilters';
+import { EMPTY_FILTER_STATE, FILTERABLE_QUESTION_TYPES, FilterState } from './filters/types';
 import { useFormDashboardController } from './useFormDashboardController';
-
-const DASHBOARD_SUBMISSIONS_LIMIT = 500;
 
 export default function FormDashboard() {
   const {
@@ -68,26 +68,21 @@ export default function FormDashboard() {
             </div>
           </div>
 
-          {exceedsLimit && (
-            <div className="mt-4 rounded-lg border p-4 bg-amber-50 dark:bg-amber-950">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
-                Este formulário tem {totalSubmissions} respostas. O dashboard exibe apenas as primeiras{' '}
-                {DASHBOARD_SUBMISSIONS_LIMIT}. Para ver todas as respostas, exporte o CSV.
-              </p>
-            </div>
-          )}
-
           {viewMode === 'table' ? (
             <div className="mt-4">
-              <AllResponsesTable questions={questions ?? []} responses={responses} />
+              <AllResponsesTable
+                key={appliedFilterKey}
+                questions={questions ?? []}
+                responses={filteredResponses}
+              />
             </div>
           ) : (
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               {questions?.map((question: IQuestion) => (
                 <QuestionChart
-                  key={question.id}
+                  key={`${question.id}-${appliedFilterKey}`}
                   question={question}
-                  responses={responses}
+                  responses={filteredResponses}
                 />
               ))}
             </div>

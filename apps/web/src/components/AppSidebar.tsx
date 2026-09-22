@@ -8,6 +8,7 @@ import {
 import * as React from 'react';
 
 import { NavMenus } from '@/components/NavMenus';
+import { NavThemeToggle } from '@/components/NavThemeToggle';
 import { NavUser } from '@/components/NavUser';
 import {
   Sidebar,
@@ -48,6 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMenus menus={menu} />
       </SidebarContent>
       <SidebarFooter>
+        <NavThemeToggle />
         <NavUser />
       </SidebarFooter>
     </Sidebar>

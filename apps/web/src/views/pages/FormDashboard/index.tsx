@@ -1,10 +1,11 @@
 
 import { IQuestion } from '@monorepo/shared/types/IQuestion';
-import { Badge, Button, Popover, PopoverContent, PopoverTrigger } from '@monorepo/ui';
-import { ChartColumnIcon, DownloadIcon, FilterIcon, TableIcon } from 'lucide-react';
+import { Badge, Button, buttonVariants, Popover, PopoverContent, PopoverTrigger } from '@monorepo/ui';
+import { ChartColumnIcon, CopyIcon, DownloadIcon, FilterIcon, PencilIcon, TableIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
-import PageLayout from '../../layouts/PageLayout';
 import { AllResponsesTable, QuestionChart, SubmissionFilterBuilder } from './components';
 import { applyFilters } from './filters/applyFilters';
 import { EMPTY_FILTER_STATE, FILTERABLE_QUESTION_TYPES, FilterState } from './filters/types';
@@ -53,26 +54,49 @@ export default function FormDashboard() {
     setIsFilterPanelOpen(false);
   }
 
+  function handleCopyLink() {
+    if (!form) {return;}
+    const url = `${window.location.origin}/forms/response/${form.id}`;
+    navigator.clipboard.writeText(url);
+    toast.success('Link copiado para a área de transferência');
+  }
+
   return (
-    <PageLayout
-      title={form?.title ?? ''}
-      subtitle="Visualize as respostas do seu formulário"
-    >
+    <div className="h-full flex-1 flex-col md:flex">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-bold tracking-tight">{form?.title ?? ''}</h2>
+          {form && (
+            <span className="text-muted-foreground text-sm">
+              {isFilterActive
+                ? `Mostrando ${filteredResponses.length} de ${totalSubmissions} respostas`
+                : `Total de respostas: ${totalSubmissions}`}
+            </span>
+          )}
+        </div>
+
+        {form && (
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="outline" onClick={handleCopyLink}>
+              <CopyIcon className="size-4" /> Copiar link
+            </Button>
+
+            <Link
+              to={`/forms/builder/${form.id}`}
+              className={buttonVariants({ variant: 'outline', className: 'flex items-center gap-2' })}
+            >
+              <PencilIcon className="size-4" /> Editar
+            </Link>
+          </div>
+        )}
+      </div>
+
       {(isLoadingForm || isLoadingResponses) && <p>Carregando...</p>}
       {!isLoadingForm && !form && <p>Formulário não encontrado</p>}
 
       {form && (
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">Respostas</h2>
-              <p className="text-muted-foreground">
-                {isFilterActive
-                  ? `Mostrando ${filteredResponses.length} de ${totalSubmissions} respostas`
-                  : `Total de respostas: ${totalSubmissions}`}
-              </p>
-            </div>
-
             <div className="flex items-center gap-2">
               {hasFilterableQuestions && (
                 <Popover open={isFilterPanelOpen} onOpenChange={setIsFilterPanelOpen}>
@@ -120,11 +144,11 @@ export default function FormDashboard() {
                 )}
               </Button>
 
-              <Button onClick={() => handleExport()} disabled={totalSubmissions === 0 || isExporting}>
-                <DownloadIcon />
-                {isExporting ? 'Exportando...' : 'Exportar CSV'}
-              </Button>
             </div>
+            <Button onClick={() => handleExport()} disabled={totalSubmissions === 0 || isExporting}>
+              <DownloadIcon />
+              {isExporting ? 'Exportando...' : 'Exportar CSV'}
+            </Button>
           </div>
 
           {viewMode === 'table' ? (
@@ -148,6 +172,6 @@ export default function FormDashboard() {
           )}
         </div>
       )}
-    </PageLayout>
+    </div>
   );
 }

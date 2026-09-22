@@ -1,8 +1,9 @@
 
 import { Button, buttonVariants, Card, Separator } from '@monorepo/ui';
 import { Reorder } from 'framer-motion';
-import { ChevronLeftIcon, Edit2Icon, SaveIcon, SettingsIcon } from 'lucide-react';
+import { ChartPieIcon, ChevronLeftIcon, CopyIcon, Edit2Icon, SaveIcon, SettingsIcon } from 'lucide-react';
 import { FormProvider } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
 import { useIsMobile } from '@/app/hooks/useIsMobile';
@@ -35,6 +36,15 @@ export default function FormBuilder() {
 
   function handleOpenSaveDetailsModal() {
     openModal(<SaveFormDetailsModal form={formEntity} />);
+  }
+
+  function handleCopyLink() {
+    if (!formEntity) {
+      return;
+    }
+    const url = `${window.location.origin}/forms/response/${formEntity.id}`;
+    navigator.clipboard.writeText(url);
+    toast.success('Link copiado para a área de transferência');
   }
 
   return (
@@ -77,6 +87,27 @@ export default function FormBuilder() {
             >
               <ChevronLeftIcon className="size-4" />
               <span className="hidden sm:inline">Voltar</span>
+            </Link>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center gap-2"
+              disabled={isLoading || !formEntity}
+              onClick={handleCopyLink}
+            >
+              <CopyIcon className="size-4" />
+              <span className="hidden sm:inline">Copiar link</span>
+            </Button>
+            <Link
+              to={formEntity ? `/forms/dashboard/${formEntity.id}` : '#'}
+              aria-disabled={!formEntity}
+              className={buttonVariants({
+                variant: 'outline',
+                className: `flex items-center gap-2${!formEntity ? ' pointer-events-none opacity-50' : ''}`,
+              })}
+            >
+              <ChartPieIcon className="size-4" />
+              <span className="hidden sm:inline">Ver resultados</span>
             </Link>
             <Button type="submit" className="flex items-center gap-2" disabled={isLoading}>
               <SaveIcon className="size-4" />

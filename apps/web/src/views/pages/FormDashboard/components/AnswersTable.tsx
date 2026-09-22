@@ -84,7 +84,7 @@ export function AnswersTable({ question, responses, valueColumnTitle, renderValu
       columns={columns}
       pagination={{
         pageIndex: 0,
-        pageSize: data.length || 1,
+        pageSize: 100_000,
       }}
     >
       <div className="flex h-[400px] flex-col">

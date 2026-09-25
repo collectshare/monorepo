@@ -1,5 +1,5 @@
 import { buttonVariants } from '@monorepo/ui';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 import { ThemeSwitcher } from './ThemeSwitcher';
 
@@ -22,6 +22,9 @@ export function PortalLayout() {
               Entrar
             </a>
           )}
+          <Link to="/api-docs" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+            API Docs
+          </Link>
           <ThemeSwitcher />
         </div>
       </header>

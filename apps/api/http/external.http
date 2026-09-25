@@ -1,0 +1,112 @@
+@baseUrl = "https://dev-api.collectshare.com.br"
+@formId = {{formId}}
+@ownFormId = {{ownFormId}}
+@apiKey = "cs_sk_e35aefc35fbfff608b8e8afcb1b32585cff26589670799c1bd89a4464c823449"
+
+### 1. Get published dataset raw data — first page
+GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data?limit=5
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 2. Get published dataset raw data — next page
+# Copy `nextCursor` from the previous response's body into the `cursor` param below.
+GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data?limit=5&cursor=PASTE_NEXT_CURSOR_HERE
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 3. Get published dataset raw data — limit clamped to MAX_LIMIT (1000) when exceeded
+GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data?limit=5000
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 4. Get published dataset raw data — unknown/unpublished form (expect 404)
+GET {{baseUrl}}/v1/portal/datasets/this-form-does-not-exist/data
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 5. Get published dataset raw data — missing API key (expect 401 from the authorizer)
+GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data
+Accept: application/json
+
+### 6. Get published dataset raw data — malformed key, wrong prefix (expect 401)
+GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data
+x-api-key: not-a-valid-key
+Accept: application/json
+
+### 7. Get published dataset raw data — key without `portal:read` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["data:read"] only.
+GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data
+x-api-key: PASTE_A_DATA_READ_ONLY_KEY_HERE
+Accept: application/json
+
+### 8. Get own submission data — first page
+GET {{baseUrl}}/v1/submissions/{{ownFormId}}?limit=5
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 9. Get own submission data — next page
+# Copy `nextCursor` from request #8's response body into the `cursor` param below.
+GET {{baseUrl}}/v1/submissions/{{ownFormId}}?limit=5&cursor=PASTE_NEXT_CURSOR_HERE
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 10. Get own submission data — limit clamped to MAX_LIMIT (1000) when exceeded
+GET {{baseUrl}}/v1/submissions/{{ownFormId}}?limit=5000
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 11. Get own submission data — unknown form (expect 404)
+GET {{baseUrl}}/v1/submissions/this-form-does-not-exist
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 12. Get own submission data — form exists but belongs to a different account (expect 405 NotAllowedError)
+# Swap in a formId owned by an account other than the one that issued `apiKey`.
+GET {{baseUrl}}/v1/submissions/PASTE_A_FORM_ID_OWNED_BY_ANOTHER_ACCOUNT_HERE
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 13. Get own submission data — key without `data:read` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["portal:read"] only.
+GET {{baseUrl}}/v1/submissions/{{ownFormId}}
+x-api-key: PASTE_A_PORTAL_READ_ONLY_KEY_HERE
+Accept: application/json
+
+### 14. Get own submission data — missing API key (expect 401 from the authorizer)
+GET {{baseUrl}}/v1/submissions/{{ownFormId}}
+Accept: application/json
+
+### 15. List own forms
+GET {{baseUrl}}/v1/forms
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 16. List own forms — key without `data:read` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["portal:read"] only.
+GET {{baseUrl}}/v1/forms
+x-api-key: PASTE_A_PORTAL_READ_ONLY_KEY_HERE
+Accept: application/json
+
+### 17. List own forms — missing API key (expect 401 from the authorizer)
+GET {{baseUrl}}/v1/forms
+Accept: application/json
+
+### 18. Search datasets
+GET {{baseUrl}}/v1/portal/search?q=rain
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 19. Search datasets — no query term
+GET {{baseUrl}}/v1/portal/search
+x-api-key: {{apiKey}}
+Accept: application/json
+
+### 20. Search datasets — key without `portal:read` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["data:read"] only.
+GET {{baseUrl}}/v1/portal/search?q=rain
+x-api-key: PASTE_A_DATA_READ_ONLY_KEY_HERE
+Accept: application/json
+
+### 21. Search datasets — missing API key (expect 401 from the authorizer)
+GET {{baseUrl}}/v1/portal/search?q=rain
+Accept: application/json

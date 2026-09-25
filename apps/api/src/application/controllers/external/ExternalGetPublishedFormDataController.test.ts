@@ -1,4 +1,6 @@
 import { Form } from '@monorepo/shared/entities/Form';
+import { Question } from '@monorepo/shared/entities/Question';
+import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -6,6 +8,7 @@ import { Controller } from '@application/contracts/Controller';
 import { NotAllowedError } from '@application/errors/application/NotAllowedError';
 import { ResourceNotFound } from '@application/errors/application/ResourceNotFound';
 import type { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
+import type { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
 import type { GetPublishedFormDataQuery } from '@application/queries/GetPublishedFormDataQuery';
 
 import { ExternalGetPublishedFormDataController } from './ExternalGetPublishedFormDataController';
@@ -21,19 +24,28 @@ function createForm(attrs: Partial<Form.Attributes> = {}): Form {
 
 function createController(options: {
   form?: Form | null;
+  questions?: Question[];
   queryResult?: GetPublishedFormDataQuery.Output;
 }) {
   const formRepository = {
     findById: vi.fn().mockResolvedValue(options.form ?? null),
   } as unknown as FormRepository;
 
+  const questionRepository = {
+    findByFormId: vi.fn().mockResolvedValue(options.questions ?? []),
+  } as unknown as QuestionRepository;
+
   const getPublishedFormDataQuery = {
     execute: vi.fn().mockResolvedValue(options.queryResult ?? { rows: [], nextCursor: undefined }),
   } as unknown as GetPublishedFormDataQuery;
 
-  const controller = new ExternalGetPublishedFormDataController(formRepository, getPublishedFormDataQuery);
+  const controller = new ExternalGetPublishedFormDataController(
+    formRepository,
+    questionRepository,
+    getPublishedFormDataQuery,
+  );
 
-  return { controller, formRepository, getPublishedFormDataQuery };
+  return { controller, formRepository, questionRepository, getPublishedFormDataQuery };
 }
 
 function request(overrides: Partial<Controller.Request<'apiKey'>> = {}): Controller.Request<'apiKey'> {
@@ -71,16 +83,29 @@ describe('ExternalGetPublishedFormDataController', () => {
     await expect(controller.execute(request())).rejects.toBeInstanceOf(ResourceNotFound);
   });
 
-  it('returns a page of rows for a published form with a valid scope', async () => {
+  it('returns a page of rows and the form\'s questions for a published form with a valid scope', async () => {
+    const question = new Question({
+      formId: 'form-1',
+      text: 'How was your day?',
+      questionType: QuestionType.TEXT,
+      order: 0,
+      anonymizationSuggestion: { needsAnonymization: true } as any,
+    });
     const queryResult = { rows: [{ submissionId: 's1', submittedAt: new Date(), answers: [] }], nextCursor: 'cursor-2' };
-    const { controller, getPublishedFormDataQuery } = createController({
+    const { controller, questionRepository, getPublishedFormDataQuery } = createController({
       form: createForm(),
+      questions: [question],
       queryResult,
     });
 
     const response = await controller.execute(request());
 
-    expect(response.body).toEqual(queryResult);
+    expect(response.body).toEqual({
+      questions: [{ ...question, anonymizationSuggestion: undefined }],
+      rows: queryResult.rows,
+      nextCursor: queryResult.nextCursor,
+    });
+    expect(questionRepository.findByFormId).toHaveBeenCalledWith('form-1');
     expect(getPublishedFormDataQuery.execute).toHaveBeenCalledWith({
       formId: 'form-1',
       limit: 20,

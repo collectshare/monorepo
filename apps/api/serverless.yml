@@ -39,6 +39,13 @@ provider:
         issuerUrl: !GetAtt UserPool.ProviderURL
         audience:
           - !Ref UserPoolClient
+      ApiKeyAuthorizer:
+        type: request
+        functionName: apiKeyAuthorizer
+        identitySource:
+          - $request.header.Authorization
+          - $request.header.x-api-key
+        enableSimpleResponses: true
 
 package:
   individually: true

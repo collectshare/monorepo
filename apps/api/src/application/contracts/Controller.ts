@@ -1,6 +1,7 @@
 import { getSchema } from '@kernel/decorators/Schema';
+import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
 
-type TRouteType = 'public' | 'private';
+type TRouteType = 'public' | 'private' | 'apiKey';
 
 export abstract class Controller<TType extends TRouteType, TBody = undefined> {
   protected abstract handle(request: Controller.Request<TType>): Promise<Controller.Response<TBody>>;
@@ -54,6 +55,16 @@ export namespace Controller {
     accountId: string;
   };
 
+  type ApiKeyRequest<
+    TBody = Record<string, unknown>,
+    TParams = Record<string, unknown>,
+    TQueryParams = Record<string, unknown>,
+  > = BaseRequest<TBody, TParams, TQueryParams> & {
+    accountId: string;
+    apiKeyId: string;
+    scopes: ApiKeyScope[];
+  };
+
   export type Request<
     TType extends TRouteType,
     TBody = Record<string, unknown>,
@@ -61,7 +72,9 @@ export namespace Controller {
     TQueryParams = Record<string, unknown>,
   > = TType extends 'public'
         ? PublicRequest<TBody, TParams, TQueryParams>
-        : PrivateRequest<TBody, TParams, TQueryParams>;
+        : TType extends 'apiKey'
+          ? ApiKeyRequest<TBody, TParams, TQueryParams>
+          : PrivateRequest<TBody, TParams, TQueryParams>;
 
   export type Response<TBody = undefined> = {
     statusCode: number;

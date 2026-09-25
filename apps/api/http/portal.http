@@ -19,6 +19,7 @@
 # You can find one by running the "Search datasets" request first and copying a
 # `formId` from the `results` array of the response.
 
+@baseUrl = "https://dev-api.collectshare.com.br"
 @formId = {{formId}}
 
 ### 1. Search datasets — semantic search (proxies Algolia), default relevance sort

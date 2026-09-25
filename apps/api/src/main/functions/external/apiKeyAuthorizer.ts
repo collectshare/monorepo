@@ -2,22 +2,23 @@ import 'reflect-metadata';
 
 import { createHmac } from 'crypto';
 import { APIGatewayRequestAuthorizerEventV2, APIGatewaySimpleAuthorizerWithContextResult } from 'aws-lambda';
-import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
 import { ApiKeyRepository } from '@infra/database/dynamo/repositories/ApiKeyRepository';
 import { Registry } from '@kernel/di/Registry';
 import { AppConfig } from '@shared/config/AppConfig';
 
+export type ApiKeyAuthorizerContext = { accountId: string; apiKeyId: string; scopes: string };
+
 const apiKeyRepository = Registry.getInstance().resolve(ApiKeyRepository);
 const appConfig = Registry.getInstance().resolve(AppConfig);
 
-const deny: APIGatewaySimpleAuthorizerWithContextResult<{ accountId: string; apiKeyId: string }> = {
+const deny: APIGatewaySimpleAuthorizerWithContextResult<ApiKeyAuthorizerContext> = {
   isAuthorized: false,
-  context: { accountId: '', apiKeyId: '' },
+  context: { accountId: '', apiKeyId: '', scopes: '' },
 };
 
 export const handler = async (
   event: APIGatewayRequestAuthorizerEventV2,
-): Promise<APIGatewaySimpleAuthorizerWithContextResult<{ accountId: string; apiKeyId: string }>> => {
+): Promise<APIGatewaySimpleAuthorizerWithContextResult<ApiKeyAuthorizerContext>> => {
   try {
     const authHeader =
       event.headers?.['authorization'] ??
@@ -39,7 +40,7 @@ export const handler = async (
     if (!apiKey) { return deny; }
     if (apiKey.revokedAt) { return deny; }
     if (apiKey.expiresAt && apiKey.expiresAt < new Date()) { return deny; }
-    if (!apiKey.scopes.includes(ApiKeyScope.PORTAL_READ)) { return deny; }
+    if (apiKey.scopes.length === 0) { return deny; }
 
     // eslint-disable-next-line no-console
     console.log(JSON.stringify({
@@ -54,6 +55,7 @@ export const handler = async (
       context: {
         accountId: apiKey.accountId,
         apiKeyId: apiKey.id,
+        scopes: apiKey.scopes.join(','),
       },
     };
   } catch (err) {

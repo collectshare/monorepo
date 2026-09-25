@@ -18,12 +18,16 @@ export class GetFormSubmissionsQuery {
     formId: string,
     options?: GetFormSubmissionsQuery.Options,
   ): Promise<GetFormSubmissionsQuery.Output> {
-    const [submissions, questions] = await Promise.all([
+    const [{ submissions, nextCursor }, questions] = await Promise.all([
       options?.limit
-        ? this.submissionRepository
-          .findByFormIdPaginated(formId, { limit: options.limit })
-          .then(({ submissions: page }) => page)
-        : this.submissionRepository.findByFormId(formId),
+        ? this.submissionRepository.findByFormIdPaginated(formId, {
+          limit: options.limit,
+          cursor: options.cursor,
+        })
+        : this.submissionRepository.findByFormId(formId).then(page => ({
+          submissions: page,
+          nextCursor: undefined as string | undefined,
+        })),
       this.questionRepository.findByFormId(formId),
     ]);
 
@@ -42,6 +46,7 @@ export class GetFormSubmissionsQuery {
     return {
       submissions: submissionsWithAnswers,
       questions,
+      nextCursor,
     };
   }
 }
@@ -49,6 +54,7 @@ export class GetFormSubmissionsQuery {
 export namespace GetFormSubmissionsQuery {
   export type Options = {
     limit?: number;
+    cursor?: string;
   };
 
   export type SubmissionWithAnswers = FormSubmission & {
@@ -58,5 +64,6 @@ export namespace GetFormSubmissionsQuery {
   export type Output = {
     submissions: SubmissionWithAnswers[];
     questions: Question[];
+    nextCursor?: string;
   };
 }

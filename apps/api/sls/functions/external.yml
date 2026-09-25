@@ -1,2 +1,20 @@
 apiKeyAuthorizer:
   handler: src/main/functions/external/apiKeyAuthorizer.handler
+
+getPortalDatasetData:
+  handler: src/main/functions/external/getPortalDatasetData.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /external/portal/datasets/{formId}/data
+        authorizer:
+          name: ApiKeyAuthorizer
+
+getOwnSubmissionData:
+  handler: src/main/functions/external/getOwnSubmissionData.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /external/submissions/{formId}
+        authorizer:
+          name: ApiKeyAuthorizer

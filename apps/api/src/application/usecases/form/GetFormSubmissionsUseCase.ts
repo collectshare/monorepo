@@ -19,6 +19,7 @@ export class GetFormSubmissionsUseCase {
     formId,
     accountId,
     limit,
+    cursor,
   }: GetFormSubmissionsUseCase.Input): Promise<GetFormSubmissionsUseCase.Output> {
     const form = await this.formRepository.findById(formId);
 
@@ -30,9 +31,9 @@ export class GetFormSubmissionsUseCase {
       throw new NotAllowedError();
     }
 
-    const { questions, submissions } = await this.getFormSubmissionsQuery.execute(
+    const { questions, submissions, nextCursor } = await this.getFormSubmissionsQuery.execute(
       formId,
-      { limit },
+      { limit, cursor },
     );
 
     const fileQuestions = questions.filter(
@@ -55,7 +56,7 @@ export class GetFormSubmissionsUseCase {
       );
     }
 
-    return { form, questions, submissions };
+    return { form, questions, submissions, nextCursor };
   }
 }
 
@@ -64,6 +65,7 @@ export namespace GetFormSubmissionsUseCase {
     formId: string;
     accountId: string;
     limit?: number;
+    cursor?: string;
   };
 
   export type Output = GetFormSubmissionsQuery.Output & {

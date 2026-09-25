@@ -3,8 +3,10 @@ import { NotAllowedError } from '@application/errors/application/NotAllowedError
 import { ResourceNotFound } from '@application/errors/application/ResourceNotFound';
 import { GetPublishedFormDataQuery } from '@application/queries/GetPublishedFormDataQuery';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
+import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
+import { Question } from '@monorepo/shared/entities/Question';
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 1000;
@@ -16,6 +18,7 @@ export class ExternalGetPublishedFormDataController extends Controller<
 > {
   constructor(
     private readonly formRepository: FormRepository,
+    private readonly questionRepository: QuestionRepository,
     private readonly getPublishedFormDataQuery: GetPublishedFormDataQuery,
   ) {
     super();
@@ -41,15 +44,19 @@ export class ExternalGetPublishedFormDataController extends Controller<
 
     const limit = Math.min(Number(queryParams.limit) || DEFAULT_LIMIT, MAX_LIMIT);
 
-    const { rows, nextCursor } = await this.getPublishedFormDataQuery.execute({
-      formId: params.formId,
-      limit,
-      cursor: queryParams.cursor,
-    });
+    const [questions, { rows, nextCursor }] = await Promise.all([
+      this.questionRepository.findByFormId(params.formId),
+      this.getPublishedFormDataQuery.execute({
+        formId: params.formId,
+        limit,
+        cursor: queryParams.cursor,
+      }),
+    ]);
 
     return {
       statusCode: 200,
       body: {
+        questions: questions.map(({ anonymizationSuggestion: _anonymizationSuggestion, ...question }) => question),
         rows,
         nextCursor,
       },
@@ -59,6 +66,7 @@ export class ExternalGetPublishedFormDataController extends Controller<
 
 export namespace ExternalGetPublishedFormDataController {
   export type Response = {
+    questions: Omit<Question, 'anonymizationSuggestion'>[];
     rows: GetPublishedFormDataQuery.Row[];
     nextCursor?: string;
   };

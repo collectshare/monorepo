@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,6 +10,7 @@ import { apiKeysService } from '@/app/services/apiKeysService';
 
 const schema = z.object({
   name: z.string().min(1, 'O nome é obrigatório'),
+  scopes: z.array(z.nativeEnum(ApiKeyScope)).min(1, 'Selecione ao menos um escopo'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -24,10 +26,11 @@ export function useApiKeysController() {
 
   const { register, handleSubmit: hookFormSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: { scopes: [ApiKeyScope.PORTAL_READ] },
   });
 
   const { mutateAsync: create, isPending: isCreating } = useMutation({
-    mutationFn: (data: FormData) => apiKeysService.createApiKey({ name: data.name }),
+    mutationFn: (data: FormData) => apiKeysService.createApiKey({ name: data.name, scopes: data.scopes }),
     onSuccess: async (response) => {
       setCreatedKey(response.key);
       reset();

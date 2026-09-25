@@ -1,4 +1,5 @@
 import { Button, Input } from '@monorepo/ui';
+import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
 import { ClipboardCopyIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -7,6 +8,19 @@ import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { Label } from '@/components/ui/Label';
 
 import { useApiKeysController } from '../../useApiKeysController';
+
+const scopeOptions = [
+  {
+    value: ApiKeyScope.PORTAL_READ,
+    label: 'Leitura do portal',
+    description: 'Lê dados de datasets publicados, anonimizados — o mesmo que o portal público expõe.',
+  },
+  {
+    value: ApiKeyScope.DATA_READ,
+    label: 'Meus dados',
+    description: 'Lê os dados brutos (sem anonimização) dos seus próprios formulários, publicados ou não.',
+  },
+];
 
 function copyToClipboard(text: string) {
   navigator.clipboard.writeText(text);
@@ -77,6 +91,27 @@ export function CreateApiKeyModal() {
             {...register('name')}
             error={errors.name?.message}
           />
+        </div>
+        <div className="grid gap-2">
+          <Label>Escopos</Label>
+          {scopeOptions.map(option => (
+            <label key={option.value} className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1"
+                value={option.value}
+                disabled={isCreating}
+                {...register('scopes')}
+              />
+              <span>
+                <span className="font-medium">{option.label}</span>
+                <span className="block text-xs text-muted-foreground">{option.description}</span>
+              </span>
+            </label>
+          ))}
+          {errors.scopes?.message && (
+            <span className="text-xs text-destructive">{errors.scopes.message}</span>
+          )}
         </div>
       </form>
       <DialogFooter>

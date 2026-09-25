@@ -20,15 +20,9 @@ export const handler = async (
   event: APIGatewayRequestAuthorizerEventV2,
 ): Promise<APIGatewaySimpleAuthorizerWithContextResult<ApiKeyAuthorizerContext>> => {
   try {
-    const authHeader =
-      event.headers?.['authorization'] ??
-      event.headers?.['Authorization'] ??
-      event.headers?.['x-api-key'] ??
-      event.headers?.['X-Api-Key'];
+    const rawKey = event.headers?.['x-api-key'] ?? event.headers?.['X-Api-Key'];
 
-    if (!authHeader) { return deny; }
-
-    const rawKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+    if (!rawKey) { return deny; }
     if (!rawKey.startsWith('cs_sk_')) { return deny; }
 
     const keyHash = createHmac('sha256', appConfig.secrets.masterSecret)

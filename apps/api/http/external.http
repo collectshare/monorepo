@@ -34,9 +34,9 @@ x-api-key: not-a-valid-key
 Accept: application/json
 
 ### 7. Get published dataset raw data — key without `portal:read` scope (expect 405 NotAllowedError)
-# Swap in a key created with e.g. scopes: ["data:read"] only.
+# Swap in a key created with e.g. scopes: ["forms:read"] only.
 GET {{baseUrl}}/v1/portal/datasets/{{formId}}/data
-x-api-key: PASTE_A_DATA_READ_ONLY_KEY_HERE
+x-api-key: PASTE_A_FORMS_READ_ONLY_KEY_HERE
 Accept: application/json
 
 ### 8. Get own submission data — first page
@@ -66,7 +66,7 @@ GET {{baseUrl}}/v1/submissions/PASTE_A_FORM_ID_OWNED_BY_ANOTHER_ACCOUNT_HERE
 x-api-key: {{apiKey}}
 Accept: application/json
 
-### 13. Get own submission data — key without `data:read` scope (expect 405 NotAllowedError)
+### 13. Get own submission data — key without `forms:read` scope (expect 405 NotAllowedError)
 # Swap in a key created with e.g. scopes: ["portal:read"] only.
 GET {{baseUrl}}/v1/submissions/{{ownFormId}}
 x-api-key: PASTE_A_PORTAL_READ_ONLY_KEY_HERE
@@ -81,7 +81,7 @@ GET {{baseUrl}}/v1/forms
 x-api-key: {{apiKey}}
 Accept: application/json
 
-### 16. List own forms — key without `data:read` scope (expect 405 NotAllowedError)
+### 16. List own forms — key without `forms:read` scope (expect 405 NotAllowedError)
 # Swap in a key created with e.g. scopes: ["portal:read"] only.
 GET {{baseUrl}}/v1/forms
 x-api-key: PASTE_A_PORTAL_READ_ONLY_KEY_HERE
@@ -102,11 +102,186 @@ x-api-key: {{apiKey}}
 Accept: application/json
 
 ### 20. Search datasets — key without `portal:read` scope (expect 405 NotAllowedError)
-# Swap in a key created with e.g. scopes: ["data:read"] only.
+# Swap in a key created with e.g. scopes: ["forms:read"] only.
 GET {{baseUrl}}/v1/portal/search?q=rain
-x-api-key: PASTE_A_DATA_READ_ONLY_KEY_HERE
+x-api-key: PASTE_A_FORMS_READ_ONLY_KEY_HERE
 Accept: application/json
 
 ### 21. Search datasets — missing API key (expect 401 from the authorizer)
 GET {{baseUrl}}/v1/portal/search?q=rain
 Accept: application/json
+
+### 22. Create a form
+POST {{baseUrl}}/v1/forms
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação",
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 23. Create a form — missing required title (expect 400 Bad Request)
+POST {{baseUrl}}/v1/forms
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 24. Create a form — key without `forms:write` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["forms:read"] only.
+POST {{baseUrl}}/v1/forms
+x-api-key: PASTE_A_FORMS_READ_ONLY_KEY_HERE
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação"
+}
+
+### 25. Create a form — missing API key (expect 401 from the authorizer)
+POST {{baseUrl}}/v1/forms
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação"
+}
+
+### 26. Update a form's details — WARNING: mutates {{ownFormId}}, point it at a disposable form
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação (atualizada)",
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 27. Update a form's details — form does not exist (expect 404 Not Found)
+PUT {{baseUrl}}/v1/forms/this-form-does-not-exist
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação",
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 28. Update a form's details — form belongs to a different account (expect 405 NotAllowedError)
+# Swap in a formId owned by an account other than the one that issued {{apiKey}}.
+PUT {{baseUrl}}/v1/forms/PASTE_A_FORM_ID_OWNED_BY_ANOTHER_ACCOUNT_HERE
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação",
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 29. Update a form's details — key without `forms:write` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["forms:read"] only.
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}
+x-api-key: PASTE_A_FORMS_READ_ONLY_KEY_HERE
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação",
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 30. Update a form's details — invalid body, missing title (expect 400 Bad Request)
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "isAnonymous": true,
+  "onePage": false,
+  "isPublished": true
+}
+
+### 31. Update a form's details — missing API key (expect 401 from the authorizer)
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}
+Content-Type: application/json
+
+{
+  "title": "Pesquisa de satisfação"
+}
+
+### 32. Replace a form's questions — WARNING: mutates {{ownFormId}}, deletes any question not listed here
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}/questions
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "questions": [
+    { "text": "Qual sua idade?", "questionType": "TEXT", "order": 1 }
+  ]
+}
+
+### 33. Replace a form's questions — empty questions array (expect 400 Bad Request)
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}/questions
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "questions": []
+}
+
+### 34. Replace a form's questions — form does not exist (expect 404 Not Found)
+PUT {{baseUrl}}/v1/forms/this-form-does-not-exist/questions
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "questions": [
+    { "text": "Qual sua idade?", "questionType": "TEXT", "order": 1 }
+  ]
+}
+
+### 35. Replace a form's questions — form belongs to a different account (expect 405 NotAllowedError)
+# Swap in a formId owned by an account other than the one that issued {{apiKey}}.
+PUT {{baseUrl}}/v1/forms/PASTE_A_FORM_ID_OWNED_BY_ANOTHER_ACCOUNT_HERE/questions
+x-api-key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "questions": [
+    { "text": "Qual sua idade?", "questionType": "TEXT", "order": 1 }
+  ]
+}
+
+### 36. Replace a form's questions — key without `forms:write` scope (expect 405 NotAllowedError)
+# Swap in a key created with e.g. scopes: ["forms:read"] only.
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}/questions
+x-api-key: PASTE_A_FORMS_READ_ONLY_KEY_HERE
+Content-Type: application/json
+
+{
+  "questions": [
+    { "text": "Qual sua idade?", "questionType": "TEXT", "order": 1 }
+  ]
+}
+
+### 37. Replace a form's questions — missing API key (expect 401 from the authorizer)
+PUT {{baseUrl}}/v1/forms/{{ownFormId}}/questions
+Content-Type: application/json
+
+{
+  "questions": [
+    { "text": "Qual sua idade?", "questionType": "TEXT", "order": 1 }
+  ]
+}

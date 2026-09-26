@@ -67,7 +67,7 @@ describe('ExternalGetPublishedFormDataController', () => {
     const { controller } = createController({ form: createForm() });
 
     await expect(
-      controller.execute(request({ scopes: [ApiKeyScope.DATA_READ] })),
+      controller.execute(request({ scopes: [ApiKeyScope.FORMS_READ] })),
     ).rejects.toBeInstanceOf(NotAllowedError);
   });
 

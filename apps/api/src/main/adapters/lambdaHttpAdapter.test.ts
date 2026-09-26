@@ -39,14 +39,14 @@ describe('lambdaHttpAdapter', () => {
     const handler = lambdaHttpAdapter(controller);
 
     await handler(baseEvent({
-      authorizer: { lambda: { accountId: 'account-1', apiKeyId: 'key-1', scopes: 'portal:read,data:read' } },
+      authorizer: { lambda: { accountId: 'account-1', apiKeyId: 'key-1', scopes: 'portal:read,forms:read' } },
     }));
 
     expect(controller.execute).toHaveBeenCalledWith(
       expect.objectContaining({
         accountId: 'account-1',
         apiKeyId: 'key-1',
-        scopes: ['portal:read', 'data:read'],
+        scopes: ['portal:read', 'forms:read'],
       }),
     );
   });

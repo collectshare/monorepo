@@ -16,9 +16,14 @@ const scopeOptions = [
     description: 'Lê dados de datasets publicados, anonimizados — o mesmo que o portal público expõe.',
   },
   {
-    value: ApiKeyScope.DATA_READ,
+    value: ApiKeyScope.FORMS_READ,
     label: 'Meus dados',
     description: 'Lê os dados brutos (sem anonimização) dos seus próprios formulários, publicados ou não.',
+  },
+  {
+    value: ApiKeyScope.FORMS_WRITE,
+    label: 'Gerenciar formulários',
+    description: 'Cria e atualiza formulários e perguntas dos seus próprios formulários.',
   },
 ];
 

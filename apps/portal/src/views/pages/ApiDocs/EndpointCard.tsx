@@ -52,6 +52,13 @@ export function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
           </div>
         )}
 
+        {endpoint.body && (
+          <div>
+            <h3 className="text-sm font-semibold mb-2">Corpo da requisição</h3>
+            <p className="text-sm text-muted-foreground">{endpoint.body}</p>
+          </div>
+        )}
+
         <div>
           <h3 className="text-sm font-semibold mb-2">Resposta</h3>
           <p className="text-sm text-muted-foreground">{endpoint.response}</p>

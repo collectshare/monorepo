@@ -1,6 +1,34 @@
 apiKeyAuthorizer:
   handler: src/main/functions/external/apiKeyAuthorizer.handler
 
+createForm:
+  handler: src/main/functions/external/createForm.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /v1/forms
+        authorizer:
+          name: ApiKeyAuthorizer
+
+updateForm:
+  handler: src/main/functions/external/updateForm.handler
+  events:
+    - httpApi:
+        method: PUT
+        path: /v1/forms/{formId}
+        authorizer:
+          name: ApiKeyAuthorizer
+
+insertQuestionsInForm:
+  handler: src/main/functions/external/insertQuestionsInForm.handler
+  timeout: 15
+  events:
+    - httpApi:
+        method: PUT
+        path: /v1/forms/{formId}/questions
+        authorizer:
+          name: ApiKeyAuthorizer
+
 getPortalDatasetData:
   handler: src/main/functions/external/getPortalDatasetData.handler
   events:

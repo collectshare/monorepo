@@ -1,4 +1,5 @@
 export enum ApiKeyScope {
   PORTAL_READ = 'portal:read',
-  DATA_READ = 'data:read',
+  FORMS_READ = 'forms:read',
+  FORMS_WRITE = 'forms:write',
 }

@@ -27,7 +27,8 @@ export function ApiDocs() {
         <h1 className="text-2xl font-bold mb-1">Documentação da API</h1>
         <p className="text-muted-foreground">
           Referência da API externa do CollectShare (<code className="font-mono text-sm">/v1/*</code>), usada para
-          buscar datasets, ler dados publicados e ler os próprios formulários e respostas de uma conta.
+          buscar datasets, ler dados publicados, ler os próprios formulários e respostas de uma conta, e criar ou
+          manter formulários e perguntas.
         </p>
       </div>
 
@@ -99,10 +100,18 @@ x-api-key: cs_sk_...`}</CodeBlock>
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell><Badge variant="outline">data:read</Badge></TableCell>
+                <TableCell><Badge variant="outline">forms:read</Badge></TableCell>
                 <TableCell className="text-muted-foreground">
                   <code className="font-mono text-sm">GET /v1/forms</code> e{' '}
                   <code className="font-mono text-sm">GET /v1/submissions/{'{formId}'}</code>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell><Badge variant="outline">forms:write</Badge></TableCell>
+                <TableCell className="text-muted-foreground">
+                  <code className="font-mono text-sm">POST /v1/forms</code>,{' '}
+                  <code className="font-mono text-sm">PUT /v1/forms/{'{formId}'}</code> e{' '}
+                  <code className="font-mono text-sm">PUT /v1/forms/{'{formId}'}/questions</code>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -160,6 +169,15 @@ x-api-key: cs_sk_...`}</CodeBlock>
             </TableHeader>
             <TableBody>
               <TableRow>
+                <TableCell className="font-mono whitespace-nowrap">400 Bad Request</TableCell>
+                <TableCell className="text-muted-foreground">
+                  O corpo da requisição não passa na validação, nas rotas que aceitam corpo (
+                  <code className="font-mono text-sm">POST /v1/forms</code>,{' '}
+                  <code className="font-mono text-sm">PUT /v1/forms/{'{formId}'}</code> e{' '}
+                  <code className="font-mono text-sm">PUT /v1/forms/{'{formId}'}/questions</code>).
+                </TableCell>
+              </TableRow>
+              <TableRow>
                 <TableCell className="font-mono whitespace-nowrap">401 Unauthorized</TableCell>
                 <TableCell className="text-muted-foreground">
                   Chave ausente, mal formatada, desconhecida, revogada ou expirada.
@@ -176,8 +194,8 @@ x-api-key: cs_sk_...`}</CodeBlock>
                 <TableCell className="font-mono whitespace-nowrap">405 Not Allowed</TableCell>
                 <TableCell className="text-muted-foreground">
                   A chave é válida mas não possui o scope exigido pela rota, ou (em{' '}
-                  <code className="font-mono text-sm">/v1/submissions/{'{formId}'}</code>) o formulário pertence a
-                  outra conta.
+                  <code className="font-mono text-sm">/v1/submissions/{'{formId}'}</code> e nas rotas de{' '}
+                  <code className="font-mono text-sm">forms:write</code>) o formulário pertence a outra conta.
                 </TableCell>
               </TableRow>
             </TableBody>

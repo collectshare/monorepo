@@ -40,7 +40,7 @@ describe('ExternalSearchDatasetsController', () => {
     const { controller } = createController({});
 
     await expect(
-      controller.execute(request({ scopes: [ApiKeyScope.DATA_READ] })),
+      controller.execute(request({ scopes: [ApiKeyScope.FORMS_READ] })),
     ).rejects.toBeInstanceOf(NotAllowedError);
   });
 

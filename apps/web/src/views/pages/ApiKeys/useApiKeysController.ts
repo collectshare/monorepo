@@ -24,7 +24,7 @@ export function useApiKeysController() {
     queryFn: apiKeysService.listApiKeys,
   });
 
-  const { register, handleSubmit: hookFormSubmit, formState: { errors }, reset } = useForm<FormData>({
+  const { register, control, handleSubmit: hookFormSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { scopes: [ApiKeyScope.PORTAL_READ] },
   });
@@ -59,6 +59,7 @@ export function useApiKeysController() {
     createdKey,
     setCreatedKey,
     register,
+    control,
     handleSubmit,
     errors,
     isCreating,

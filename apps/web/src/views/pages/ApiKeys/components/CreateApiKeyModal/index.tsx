@@ -1,9 +1,11 @@
-import { Button, Input } from '@monorepo/ui';
 import { ApiKeyScope } from '@monorepo/shared/enums/ApiKeyScope';
+import { Button, Input } from '@monorepo/ui';
 import { ClipboardCopyIcon } from 'lucide-react';
+import { Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 import { useModal } from '@/app/hooks/useModal';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Label } from '@/components/ui/Label';
 
@@ -38,6 +40,7 @@ export function CreateApiKeyModal() {
     createdKey,
     setCreatedKey,
     register,
+    control,
     handleSubmit,
     errors,
     isCreating,
@@ -99,21 +102,39 @@ export function CreateApiKeyModal() {
         </div>
         <div className="grid gap-2">
           <Label>Escopos</Label>
-          {scopeOptions.map(option => (
-            <label key={option.value} className="flex items-start gap-2 text-sm">
-              <input
-                type="checkbox"
-                className="mt-1"
-                value={option.value}
-                disabled={isCreating}
-                {...register('scopes')}
-              />
-              <span>
-                <span className="font-medium">{option.label}</span>
-                <span className="block text-xs text-muted-foreground">{option.description}</span>
-              </span>
-            </label>
-          ))}
+          <Controller
+            control={control}
+            name="scopes"
+            render={({ field }) => (
+              <>
+                {scopeOptions.map(option => (
+                  <Label
+                    key={option.value}
+                    htmlFor={`scope-${option.value}`}
+                    className="flex items-start gap-2 text-sm font-normal cursor-pointer"
+                  >
+                    <Checkbox
+                      id={`scope-${option.value}`}
+                      className="mt-1"
+                      disabled={isCreating}
+                      checked={field.value?.includes(option.value)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          field.onChange([...field.value, option.value]);
+                        } else {
+                          field.onChange(field.value.filter(value => value !== option.value));
+                        }
+                      }}
+                    />
+                    <span>
+                      <span className="font-medium">{option.label}</span>
+                      <span className="block text-xs text-muted-foreground">{option.description}</span>
+                    </span>
+                  </Label>
+                ))}
+              </>
+            )}
+          />
           {errors.scopes?.message && (
             <span className="text-xs text-destructive">{errors.scopes.message}</span>
           )}

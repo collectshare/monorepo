@@ -19,7 +19,7 @@ getOwnSubmissionData:
         authorizer:
           name: ApiKeyAuthorizer
 
-listForms:
+externalListForms:
   handler: src/main/functions/external/listForms.handler
   events:
     - httpApi:
@@ -28,7 +28,7 @@ listForms:
         authorizer:
           name: ApiKeyAuthorizer
 
-searchDatasets:
+externalSearchDatasets:
   handler: src/main/functions/external/searchDatasets.handler
   events:
     - httpApi:

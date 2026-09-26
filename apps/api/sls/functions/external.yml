@@ -1,7 +1,7 @@
 apiKeyAuthorizer:
   handler: src/main/functions/external/apiKeyAuthorizer.handler
 
-createForm:
+externalCreateForm:
   handler: src/main/functions/external/createForm.handler
   events:
     - httpApi:
@@ -10,7 +10,7 @@ createForm:
         authorizer:
           name: ApiKeyAuthorizer
 
-updateForm:
+externalUpdateForm:
   handler: src/main/functions/external/updateForm.handler
   events:
     - httpApi:
@@ -19,7 +19,7 @@ updateForm:
         authorizer:
           name: ApiKeyAuthorizer
 
-insertQuestionsInForm:
+externalInsertQuestionsInForm:
   handler: src/main/functions/external/insertQuestionsInForm.handler
   timeout: 15
   events:

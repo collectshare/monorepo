@@ -17,7 +17,7 @@ export class ExternalListFormsController extends Controller<
   protected override async handle(
     { accountId, scopes }: Controller.Request<'apiKey'>,
   ): Promise<Controller.Response<ExternalListFormsController.Response>> {
-    if (!scopes.includes(ApiKeyScope.DATA_READ)) {
+    if (!scopes.includes(ApiKeyScope.FORMS_READ)) {
       throw new NotAllowedError();
     }
 

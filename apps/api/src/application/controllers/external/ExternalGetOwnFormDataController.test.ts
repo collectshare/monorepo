@@ -32,13 +32,13 @@ function request(overrides: Partial<Controller.Request<'apiKey'>> = {}): Control
     userAgent: null,
     accountId: 'account-1',
     apiKeyId: 'key-1',
-    scopes: [ApiKeyScope.DATA_READ],
+    scopes: [ApiKeyScope.FORMS_READ],
     ...overrides,
   };
 }
 
 describe('ExternalGetOwnFormDataController', () => {
-  it('denies when the key lacks the data:read scope', async () => {
+  it('denies when the key lacks the forms:read scope', async () => {
     const { controller } = createController({});
 
     await expect(

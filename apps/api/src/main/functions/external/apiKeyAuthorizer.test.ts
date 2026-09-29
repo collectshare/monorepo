@@ -22,6 +22,7 @@ vi.mock('@shared/config/env', () => ({
     ALGOLIA_TRENDING_INDEX_NAME: 'test',
     MASTER_SECRET,
     EXPORT_SECRET: 'test',
+    TYPESAFE_API_KEY: 'test',
     GEMINI_API_KEY: 'test',
   },
 }));

@@ -13,6 +13,8 @@ export class AppConfig {
 
   readonly secrets: AppConfig.Secrets;
 
+  readonly typesafe: AppConfig.TypeSafe;
+
   readonly gemini: AppConfig.Gemini;
 
   constructor() {
@@ -48,6 +50,10 @@ export class AppConfig {
     this.secrets = {
       masterSecret: env.MASTER_SECRET,
       exportSecret: env.EXPORT_SECRET,
+    };
+
+    this.typesafe = {
+      apiKey: env.TYPESAFE_API_KEY,
     };
 
     this.gemini = {
@@ -89,6 +95,10 @@ export namespace AppConfig {
   export type Secrets = {
     masterSecret: string;
     exportSecret: string;
+  };
+
+  export type TypeSafe = {
+    apiKey: string;
   };
 
   export type Gemini = {

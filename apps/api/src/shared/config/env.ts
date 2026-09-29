@@ -22,7 +22,10 @@ const schema = z.object({
   MASTER_SECRET: z.string().min(1),
   EXPORT_SECRET: z.string().min(1),
 
-  // Gemini
+  // TypeSafe AI (Jev)
+  TYPESAFE_API_KEY: z.string().min(1),
+
+  // Gemini (fallback)
   GEMINI_API_KEY: z.string().min(1),
 });
 

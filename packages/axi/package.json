@@ -1,0 +1,40 @@
+{
+  "name": "@collectshare/axi",
+  "version": "0.1.0",
+  "description": "AXI (Agent eXperience Interface) CLI for driving the Collectshare API from AI coding agents.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/collectshare/monorepo",
+    "directory": "packages/axi"
+  },
+  "type": "module",
+  "bin": {
+    "axi": "bin/axi.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "skills",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "pretest": "npm run build",
+    "test": "vitest run",
+    "skill:gen": "node scripts/gen-skill.mjs",
+    "skill:check": "node scripts/gen-skill.mjs --check",
+    "prepublishOnly": "npm run build && npm run skill:gen"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

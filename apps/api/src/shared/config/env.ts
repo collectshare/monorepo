@@ -24,6 +24,11 @@ const schema = z.object({
 
   // Gemini
   GEMINI_API_KEY: z.string().min(1),
+
+  // OAuth (MCP)
+  OAUTH_ISSUER_URL: z.string().url(),
+  WEB_APP_URL: z.string().url(),
+  MCP_OAUTH_EXTRA_REDIRECT_URIS: z.string().optional(),
 });
 
 export const env = schema.parse(process.env);

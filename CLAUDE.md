@@ -27,6 +27,7 @@ pnpm clean      # Clean all build artifacts and node_modules
 
 ```bash
 pnpm typecheck          # TypeScript check (no emit)
+pnpm test               # Vitest (uses SWC so decorator metadata / DI wiring is real)
 pnpm dev:email          # Preview email templates (react-email dev server)
 pnpm deploy             # Deploy to AWS (sls deploy --stage dev)
 ```
@@ -125,6 +126,45 @@ Functions are declared in `sls/functions/{domain}.yml` and resources in `sls/res
 - `GET /portal/datasets/{formId}/data` — cursor-paginated raw submission data.
 
 These only serve forms with `isPublished === true` (`Form` entity field, opt-out default). A DynamoDB stream consumer (`OnFormChangedUseCase` → `main/functions/form/onFormChanged.ts`) keeps the Algolia index in sync with `isPublished` changes.
+
+### MCP OAuth (authorization server)
+
+`apps/api` is also a small OAuth 2.1 authorization server so MCP clients (claude.ai, Claude Code, Cursor) can act on behalf of a logged-in user. Cognito only proves identity — it has no Hosted UI and no Dynamic Client Registration here — and the MCP endpoint that consumes these tokens is `POST /mcp` (see MCP Server below). API keys (PATs, `cs_sk_…`) stay exclusive to `/v1`.
+
+- Discovery: `GET /.well-known/oauth-protected-resource[/mcp]`, `GET /.well-known/oauth-authorization-server` (`authorization_endpoint` is the `apps/web` consent page `/oauth/authorize`).
+- `POST /oauth/register` — stateless DCR; the `client_id` is an HMAC-signed blob of the registered `redirect_uris`. Allowed redirects: claude.ai/claude.com callbacks, `http` loopback (any port), plus `MCP_OAUTH_EXTRA_REDIRECT_URIS` (comma-separated, exact match).
+- `GET`/`POST /oauth/authorize` — **Cognito-authorized JSON endpoints** called by the web consent page (validate, then approve/deny → `redirectTo`). Not the browser-facing authorization endpoint.
+- `POST /oauth/token` — `authorization_code` (PKCE `S256` only) and `refresh_token`, form-urlencoded or JSON.
+- Tokens are opaque and Collectshare-owned: access `cs_mat_…` (1h), refresh `cs_mrt_…` (30d, rotated; reusing a spent refresh token revokes the grant). Only their HMAC is stored (items `OAUTH_CODE#`, `MCPGRANT#`, `MCPTOKEN#` in the main table; `expiresAt` in epoch **seconds** so DynamoDB TTL applies). They are not valid on Cognito-authorized or `/v1` routes.
+- `McpTokenAuthenticator` (`application/oauth/`) resolves a raw access token to `{ accountId, grantId }`; the `/mcp` Lambda must call it itself because API Gateway HTTP API authorizers cannot emit `WWW-Authenticate`.
+- Config (deploy-time env): `WEB_APP_URL` (required), `MCP_OAUTH_EXTRA_REDIRECT_URIS` (optional), and the issuer, derived in `sls/config/env.yml` as `https://$API_DOMAIN_NAME` when the custom domain is configured, otherwise the `execute-api` URL. On the default `execute-api` host, recreating the stack changes the issuer and clients must reconnect.
+- `apps/web`: `/oauth/authorize` page (sign-in with `returnTo` if needed, then Authorize/Cancel). It refuses to render inside a frame; also set `frame-ancestors 'none'` for that path on the web CloudFront distribution (not managed in this repo).
+- Verify a deployed stack with `API_URL=… EMAIL=… PASSWORD=… pnpm --filter @monorepo/api verify:mcp-oauth`.
+
+### MCP Server (`POST /mcp`)
+
+A stateless [Model Context Protocol](https://modelcontextprotocol.io) server (Streamable HTTP, JSON responses, hand-written JSON-RPC, no SDK) so AI clients can work on the logged-in user's Collectshare account. Connect it in claude.ai (custom connector), Claude Code (`claude mcp add --transport http collectshare https://<api>/mcp`) or Cursor by giving the `/mcp` URL; the client starts the OAuth login described above.
+
+- **Auth:** `Authorization: Bearer cs_mat_…` (an MCP OAuth access token). `lambdaMcpAdapter` authenticates inside the Lambda — no API Gateway authorizer, because HTTP API cannot add `WWW-Authenticate` — and answers `401` with `WWW-Authenticate: Bearer resource_metadata="<issuer>/.well-known/oauth-protected-resource/mcp"`. PATs (`x-api-key`, `cs_sk_…`) and Cognito tokens are **not** accepted.
+- **Protocol:** `initialize`, `ping`, `tools/list`, `tools/call`; notifications get `202`; `GET /mcp` is `405`; JSON-RPC batches are rejected.
+- **Code:** `application/mcp/` (`McpDispatcher`, `ToolRegistry`, `McpTool` base, `tools/`), `McpController`, `main/adapters/lambdaMcpAdapter.ts`, `sls/functions/mcp.yml` (timeout 25s).
+- **Tools** (each is a thin adapter over an existing controller, run in-process as the token's account; the account is never read from arguments):
+
+| Tool | Runs | Notes |
+|---|---|---|
+| `list_forms` | `ListFormsController` | read-only |
+| `get_form` | `GetFormController` | read-only, public route semantics |
+| `create_form` | `CreateFormController` | |
+| `update_form` | `UpdateFormDetailsController` | **destructive** (full replace) |
+| `insert_questions` | `InsertQuestionsInFormController` | **destructive** (omitted questions are deleted) |
+| `get_form_submissions` | `GetFormSubmissionsController` | `limit` default 50, max 200, returns `total`/`truncated` |
+| `search_datasets` | `SearchDatasetsController` | read-only |
+| `get_dataset_data` | `GetPublishedFormDataController` | `limit` default 20, max 100, paginate with `nextCursor` |
+
+- **Adding a tool:** subclass `McpTool` (Zod `argsSchema` → JSON Schema input + validation), decorate with `@Injectable()`, register it in `ToolRegistry`. Set annotations (`readOnlyHint`/`destructiveHint`/`idempotentHint`) honestly.
+- **Errors:** tool failures (validation, not-found, not-allowed, unexpected) are returned as `result.isError = true` via the shared `toErrorPayload` (`application/errors/`), also used by `lambdaHttpAdapter`; only protocol problems are JSON-RPC errors.
+- **Security — prompt injection:** dataset rows and form submissions are text written by other people and are returned next to write tools. Tool descriptions and server `instructions` tell the model to treat them as data, and the write tools carry destructive annotations so clients can ask for confirmation, but a grant still means full access to the user's account: connect only clients you trust (a connection UI to list and revoke grants does not exist yet; grants are revocable in the data model).
+- Verify a deployed stack with `API_URL=… EMAIL=… PASSWORD=… pnpm --filter @monorepo/api verify:mcp-server` (optionally `FOREIGN_FORM_ID` to check ownership isolation and `API_KEY` to check PAT rejection).
 
 ### TypeScript Path Aliases (API)
 

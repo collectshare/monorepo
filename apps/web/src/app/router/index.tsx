@@ -16,6 +16,7 @@ const FormBuilder = lazy(() => import('@/views/pages/FormBuilder'));
 const FormRenderer = lazy(() => import('@/views/pages/FormRenderer'));
 const FormDashboard = lazy(() => import('@/views/pages/FormDashboard'));
 const ApiKeys = lazy(() => import('@/views/pages/ApiKeys'));
+const OAuthAuthorize = lazy(() => import('@/views/pages/OAuthAuthorize'));
 
 export default function Router() {
   return (
@@ -30,6 +31,11 @@ export default function Router() {
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/forgot-password/confirm" element={<ForgotPasswordConfirm />} />
+          </Route>
+        </Route>
+        <Route element={<AuthGuard isPrivate />}>
+          <Route element={<AuthLayout />}>
+            <Route path="/oauth/authorize" element={<OAuthAuthorize />} />
           </Route>
         </Route>
         <Route element={<AuthGuard isPrivate />}>

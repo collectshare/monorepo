@@ -64,6 +64,8 @@ functions:
   - ${file(./sls/functions/portal.yml)}
   - ${file(./sls/functions/apiKeys.yml)}
   - ${file(./sls/functions/external.yml)}
+  - ${file(./sls/functions/oauth.yml)}
+  - ${file(./sls/functions/mcp.yml)}
 
 resources:
   - ${file(./sls/resources/UserPool.yml)}

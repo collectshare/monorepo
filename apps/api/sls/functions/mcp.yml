@@ -1,0 +1,12 @@
+# No API Gateway authorizer on purpose: HTTP API cannot add `WWW-Authenticate` to a denial, which
+# MCP clients need to discover the OAuth flow. lambdaMcpAdapter validates the Bearer token itself.
+mcp:
+  handler: src/main/functions/mcp/handler.handler
+  timeout: 25
+  events:
+    - httpApi:
+        method: POST
+        path: /mcp
+    - httpApi:
+        method: GET
+        path: /mcp

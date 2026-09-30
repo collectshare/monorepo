@@ -25,7 +25,7 @@ export class DecideAuthorizationUseCase {
     if (decision === 'deny') {
       redirectUrl.searchParams.set('error', 'access_denied');
     } else {
-      const code = this.mcpTokenService.generateAuthorizationCode();
+      const code = this.mcpTokenService.generate();
       const now = Date.now();
 
       await this.oauthCodeRepository.create({

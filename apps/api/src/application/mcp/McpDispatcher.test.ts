@@ -151,12 +151,11 @@ describe('McpDispatcher tools/call', () => {
 
   it('never lets an accountId argument through', async () => {
     const impl = vi.fn().mockResolvedValue({});
-    const { dispatcher, tool } = createDispatcher(impl);
-    const execute = vi.spyOn(tool, 'execute');
+    const { dispatcher } = createDispatcher(impl);
 
     await dispatcher.handle(call({ name: 'fake_tool', arguments: { value: 'x', accountId: 'victim' } }), context);
 
-    expect(execute).toHaveBeenCalledWith({ value: 'x' }, context);
+    expect(impl).toHaveBeenCalledWith({ value: 'x' }, context);
   });
 
   it('reports invalid arguments as an isError result naming the field', async () => {

@@ -77,26 +77,25 @@ export abstract class McpTool<TArgsSchema extends z.ZodTypeAny = z.ZodTypeAny> {
     return { type: 'object', ...schema };
   }
 
-  protected callPrivate(
-    controller: Controller<'private', any>,
-    { body = {}, params = {}, queryParams = {} }: ControllerRequestParts,
-    { accountId, ip, userAgent }: McpToolContext,
-  ): Promise<unknown> {
-    return this.toResult(controller.execute({ body, params, queryParams, accountId, ip, userAgent }));
+  protected callPrivate(controller: Controller<'private', any>, parts: ControllerRequestParts, context: McpToolContext) {
+    return this.call(controller, parts, context, context.accountId);
   }
 
-  protected callPublic(
-    controller: Controller<'public', any>,
+  protected callPublic(controller: Controller<'public', any>, parts: ControllerRequestParts, context: McpToolContext) {
+    return this.call(controller, parts, context, null);
+  }
+
+  private async call(
+    controller: Controller<any, any>,
     { body = {}, params = {}, queryParams = {} }: ControllerRequestParts,
     { ip, userAgent }: McpToolContext,
+    accountId: string | null,
   ): Promise<unknown> {
-    return this.toResult(controller.execute({ body, params, queryParams, accountId: null, ip, userAgent }));
-  }
-
-  private async toResult(response: Promise<Controller.Response<any>>): Promise<unknown> {
-    const { body } = await response;
+    const response = await controller.execute(
+      { body, params, queryParams, accountId, ip, userAgent } as Controller.Request<'private' | 'public'>,
+    );
 
     // Controllers answering 204 have no body; give the model an explicit acknowledgement.
-    return body === undefined ? { ok: true } : body;
+    return response.body === undefined ? { ok: true } : response.body;
   }
 }

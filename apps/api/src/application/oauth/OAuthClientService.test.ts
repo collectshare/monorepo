@@ -60,7 +60,7 @@ describe('OAuthClientService', () => {
     const { clientId } = service.register({ redirectUris: ['http://localhost:1234/cb'] });
     const [, signature] = clientId.split('.');
     const forgedPayload = Buffer.from(JSON.stringify({
-      v: 1, ru: ['https://evil.example/cb'], cn: 'x', iat: 1,
+      v: 1, ru: ['https://evil.example/cb'], cn: 'x',
     })).toString('base64url');
 
     expect(() => service.verify(`${forgedPayload}.${signature}`))

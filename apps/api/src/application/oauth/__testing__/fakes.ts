@@ -45,10 +45,6 @@ export function createFakeRepositories() {
       const grant = grants.get(grantId);
       if (grant && !grant.revokedAt) { grants.set(grantId, { ...grant, revokedAt: new Date().toISOString() }); }
     },
-    touch: async (_accountId: string, grantId: string) => {
-      const grant = grants.get(grantId);
-      if (grant) { grants.set(grantId, { ...grant, lastUsedAt: new Date().toISOString() }); }
-    },
   } as unknown as McpGrantRepository;
 
   const mcpTokenRepository = {

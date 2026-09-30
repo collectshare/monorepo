@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 import { Controller } from '@application/contracts/Controller';
-import { OAuthError } from '@application/oauth/OAuthError';
-import { oauthNoStoreHeaders, withOAuthErrors } from '@application/oauth/oauthResponse';
+import { OAuthError, OAuthErrorBody } from '@application/oauth/OAuthError';
+import { NO_STORE_HEADERS, withOAuthErrors } from '@application/oauth/oauthResponse';
 import { RegisterOAuthClientUseCase } from '@application/usecases/oauth/RegisterOAuthClientUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
 
@@ -13,7 +13,7 @@ const registerSchema = z.object({
 
 /** RFC 7591 Dynamic Client Registration, stateless. */
 @Injectable()
-export class OAuthRegisterController extends Controller<'public', OAuthRegisterController.Response | OAuthRegisterController.ErrorResponse> {
+export class OAuthRegisterController extends Controller<'public', OAuthRegisterController.Response | OAuthErrorBody> {
   constructor(private readonly registerOAuthClientUseCase: RegisterOAuthClientUseCase) {
     super();
   }
@@ -35,7 +35,7 @@ export class OAuthRegisterController extends Controller<'public', OAuthRegisterC
 
       return {
         statusCode: 201,
-        headers: oauthNoStoreHeaders(),
+        headers: NO_STORE_HEADERS,
         body: {
           client_id: client.clientId,
           client_name: client.clientName,
@@ -57,10 +57,5 @@ export namespace OAuthRegisterController {
     grant_types: string[];
     response_types: string[];
     token_endpoint_auth_method: 'none';
-  };
-
-  export type ErrorResponse = {
-    error: string;
-    error_description?: string;
   };
 }

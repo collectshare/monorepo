@@ -19,24 +19,20 @@ export type JsonRpcRequest = {
 
 export type JsonRpcResponse =
   | { jsonrpc: typeof JSON_RPC_VERSION; id: JsonRpcId; result: unknown }
-  | { jsonrpc: typeof JSON_RPC_VERSION; id: JsonRpcId; error: { code: number; message: string; data?: unknown } };
+  | { jsonrpc: typeof JSON_RPC_VERSION; id: JsonRpcId; error: { code: number; message: string } };
 
 export function successResponse(id: JsonRpcId, result: unknown): JsonRpcResponse {
   return { jsonrpc: JSON_RPC_VERSION, id, result };
 }
 
-export function errorResponse(id: JsonRpcId, code: number, message: string, data?: unknown): JsonRpcResponse {
-  return {
-    jsonrpc: JSON_RPC_VERSION,
-    id,
-    error: { code, message, ...(data === undefined ? {} : { data }) },
-  };
+export function errorResponse(id: JsonRpcId, code: number, message: string): JsonRpcResponse {
+  return { jsonrpc: JSON_RPC_VERSION, id, error: { code, message } };
 }
 
 export type ClassifiedMessage =
   | { kind: 'request'; message: JsonRpcRequest }
-  | { kind: 'notification' }
-  | { kind: 'response' }
+  /** Notifications and client responses: nothing is sent back. */
+  | { kind: 'ignore' }
   | { kind: 'batch' }
   | { kind: 'invalid'; id: JsonRpcId };
 
@@ -63,7 +59,7 @@ export function classifyMessage(raw: unknown): ClassifiedMessage {
 
   if (typeof message.method === 'string') {
     if (!('id' in message)) {
-      return { kind: 'notification' };
+      return { kind: 'ignore' };
     }
 
     if (!isJsonRpcId(message.id)) {
@@ -74,7 +70,7 @@ export function classifyMessage(raw: unknown): ClassifiedMessage {
   }
 
   if (isJsonRpcId(message.id) && ('result' in message || 'error' in message)) {
-    return { kind: 'response' };
+    return { kind: 'ignore' };
   }
 
   return { kind: 'invalid', id };

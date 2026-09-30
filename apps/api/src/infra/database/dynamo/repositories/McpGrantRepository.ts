@@ -50,20 +50,4 @@ export class McpGrantRepository {
       }),
     );
   }
-
-  async touch(accountId: string, grantId: string): Promise<void> {
-    await dynamoClient.send(
-      new UpdateCommand({
-        TableName: this.config.db.dynamodb.mainTable,
-        Key: {
-          PK: McpGrantItem.getPK(accountId),
-          SK: McpGrantItem.getSK(grantId),
-        },
-        ConditionExpression: 'attribute_exists(#PK)',
-        UpdateExpression: 'SET #lastUsedAt = :lastUsedAt',
-        ExpressionAttributeNames: { '#PK': 'PK', '#lastUsedAt': 'lastUsedAt' },
-        ExpressionAttributeValues: { ':lastUsedAt': new Date().toISOString() },
-      }),
-    );
-  }
 }

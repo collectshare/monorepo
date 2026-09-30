@@ -30,15 +30,8 @@ function getErrorMessage(error: unknown): string {
 export function useOAuthAuthorizeController() {
   const [searchParams] = useSearchParams();
 
-  const params = useMemo<Partial<OAuthAuthorizeParams>>(() => ({
-    client_id: searchParams.get('client_id') ?? undefined,
-    redirect_uri: searchParams.get('redirect_uri') ?? undefined,
-    response_type: searchParams.get('response_type') ?? undefined,
-    code_challenge: searchParams.get('code_challenge') ?? undefined,
-    code_challenge_method: searchParams.get('code_challenge_method') ?? undefined,
-    state: searchParams.get('state') ?? undefined,
-    resource: searchParams.get('resource') ?? undefined,
-  }), [searchParams]);
+  // The API reads only the OAuth keys it knows; anything else in the URL is ignored.
+  const params = useMemo<Partial<OAuthAuthorizeParams>>(() => Object.fromEntries(searchParams), [searchParams]);
 
   const isFramed = useMemo(isRenderedInFrame, []);
 
@@ -51,7 +44,6 @@ export function useOAuthAuthorizeController() {
   });
 
   const decision = useMutation({
-    mutationKey: ['oauth', 'decide'],
     mutationFn: async (value: OAuthDecision) => {
       const { redirectTo } = await oauthService.decideAuthorization({ ...params, decision: value });
 

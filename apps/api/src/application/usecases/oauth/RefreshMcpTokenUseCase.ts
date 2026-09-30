@@ -1,6 +1,6 @@
 import { AuthorizationRequestValidator } from '@application/oauth/AuthorizationRequestValidator';
 import { McpTokenIssuer } from '@application/oauth/McpTokenIssuer';
-import { MCP_REFRESH_TOKEN_PREFIX, McpTokenService } from '@application/oauth/McpTokenService';
+import { McpTokenService } from '@application/oauth/McpTokenService';
 import { OAuthClientService } from '@application/oauth/OAuthClientService';
 import { OAuthError } from '@application/oauth/OAuthError';
 import { AccountRepository } from '@infra/database/dynamo/repositories/AccountRepository';
@@ -29,10 +29,6 @@ export class RefreshMcpTokenUseCase {
     this.authorizationRequestValidator.assertResource(resource);
 
     const invalidGrant = () => new OAuthError('invalid_grant', 'The refresh token is invalid or expired.');
-
-    if (!refreshToken.startsWith(MCP_REFRESH_TOKEN_PREFIX)) {
-      throw invalidGrant();
-    }
 
     const token = await this.mcpTokenRepository.findByHash(this.mcpTokenService.hashToken(refreshToken));
 
@@ -65,14 +61,10 @@ export class RefreshMcpTokenUseCase {
       throw invalidGrant();
     }
 
-    const tokens = await this.mcpTokenIssuer.issue({
+    return this.mcpTokenIssuer.issue({
       accountId: token.accountId,
       grantId: token.grantId,
     });
-
-    await this.mcpGrantRepository.touch(token.accountId, token.grantId);
-
-    return tokens;
   }
 }
 

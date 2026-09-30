@@ -1,0 +1,50 @@
+oauthProtectedResourceMetadata:
+  handler: src/main/functions/oauth/protectedResourceMetadata.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /.well-known/oauth-protected-resource
+    - httpApi:
+        method: GET
+        path: /.well-known/oauth-protected-resource/mcp
+
+oauthAuthorizationServerMetadata:
+  handler: src/main/functions/oauth/authorizationServerMetadata.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /.well-known/oauth-authorization-server
+
+oauthRegister:
+  handler: src/main/functions/oauth/register.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /oauth/register
+
+# The two authorize endpoints are called by the consent page in apps/web with the user's
+# Cognito session. The browser-facing authorization_endpoint is that page, not these routes.
+oauthAuthorizeValidate:
+  handler: src/main/functions/oauth/authorizeValidate.handler
+  events:
+    - httpApi:
+        method: GET
+        path: /oauth/authorize
+        authorizer:
+          name: CognitoAuthorizer
+
+oauthAuthorizeDecision:
+  handler: src/main/functions/oauth/authorizeDecision.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /oauth/authorize
+        authorizer:
+          name: CognitoAuthorizer
+
+oauthToken:
+  handler: src/main/functions/oauth/token.handler
+  events:
+    - httpApi:
+        method: POST
+        path: /oauth/token

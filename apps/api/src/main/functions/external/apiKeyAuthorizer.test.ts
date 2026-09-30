@@ -23,6 +23,8 @@ vi.mock('@shared/config/env', () => ({
     MASTER_SECRET,
     EXPORT_SECRET: 'test',
     GEMINI_API_KEY: 'test',
+    OAUTH_ISSUER_URL: 'https://api.test',
+    WEB_APP_URL: 'https://app.test',
   },
 }));
 

@@ -15,6 +15,8 @@ export class AppConfig {
 
   readonly gemini: AppConfig.Gemini;
 
+  readonly oauth: AppConfig.OAuth;
+
   constructor() {
     this.auth = {
       cognito: {
@@ -52,6 +54,15 @@ export class AppConfig {
 
     this.gemini = {
       apiKey: env.GEMINI_API_KEY,
+    };
+
+    this.oauth = {
+      issuer: env.OAUTH_ISSUER_URL.replace(/\/+$/, ''),
+      webAppUrl: env.WEB_APP_URL.replace(/\/+$/, ''),
+      extraRedirectUris: (env.MCP_OAUTH_EXTRA_REDIRECT_URIS ?? '')
+        .split(',')
+        .map(uri => uri.trim())
+        .filter(Boolean),
     };
   }
 }
@@ -93,6 +104,15 @@ export namespace AppConfig {
 
   export type Gemini = {
     apiKey: string;
+  };
+
+  export type OAuth = {
+    /** Public base URL of this API (custom domain or execute-api URL), no trailing slash. */
+    issuer: string;
+    /** Public base URL of apps/web (hosts the OAuth consent page), no trailing slash. */
+    webAppUrl: string;
+    /** Redirect URIs allowed in addition to the built-in claude.ai/claude.com callbacks and loopback. */
+    extraRedirectUris: string[];
   };
 
   // export type CDNs = {

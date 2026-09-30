@@ -1,4 +1,5 @@
 import { Controller } from '@application/contracts/Controller';
+import type { OAuthErrorBody } from '@application/oauth/OAuthError';
 import { withOAuthErrors } from '@application/oauth/oauthResponse';
 import { ValidateAuthorizationRequestUseCase } from '@application/usecases/oauth/ValidateAuthorizationRequestUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -10,7 +11,7 @@ import { Injectable } from '@kernel/decorators/Injectable';
 @Injectable()
 export class OAuthAuthorizeValidateController extends Controller<
   'private',
-  OAuthAuthorizeValidateController.Response | OAuthAuthorizeValidateController.ErrorResponse
+  OAuthAuthorizeValidateController.Response | OAuthErrorBody
 > {
   constructor(private readonly validateAuthorizationRequestUseCase: ValidateAuthorizationRequestUseCase) {
     super();
@@ -51,10 +52,5 @@ export namespace OAuthAuthorizeValidateController {
   export type Response = {
     clientName: string;
     redirectHost: string;
-  };
-
-  export type ErrorResponse = {
-    error: string;
-    error_description?: string;
   };
 }

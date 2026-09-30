@@ -35,10 +35,9 @@ export class AuthorizationRequestValidator {
 
     this.assertResource(params.resource);
 
-    return {
-      client,
-      redirectHost: this.getRedirectHost(params.redirectUri),
-    };
+    const { host, protocol } = new URL(params.redirectUri);
+
+    return { client, redirectHost: host || protocol };
   }
 
   /** RFC 8707: when the client names a resource it must be this server's MCP endpoint. */
@@ -65,12 +64,6 @@ export class AuthorizationRequestValidator {
 
       throw error;
     }
-  }
-
-  private getRedirectHost(redirectUri: string): string {
-    const url = new URL(redirectUri);
-
-    return url.host || url.protocol;
   }
 }
 

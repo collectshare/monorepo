@@ -15,29 +15,18 @@ export const OAUTH_CODE_TTL_SECONDS = 60;
 export class McpTokenService {
   constructor(private readonly appConfig: AppConfig) {}
 
-  generateAccessToken(): string {
-    return `${MCP_ACCESS_TOKEN_PREFIX}${randomBytes(32).toString('base64url')}`;
-  }
-
-  generateRefreshToken(): string {
-    return `${MCP_REFRESH_TOKEN_PREFIX}${randomBytes(32).toString('base64url')}`;
-  }
-
-  generateAuthorizationCode(): string {
-    return randomBytes(32).toString('base64url');
+  /** A random secret; tokens pass their `cs_mat_`/`cs_mrt_` prefix, authorization codes none. */
+  generate(prefix = ''): string {
+    return `${prefix}${randomBytes(32).toString('base64url')}`;
   }
 
   hashToken(rawToken: string): string {
-    return this.hmac(rawToken);
+    return createHmac('sha256', this.appConfig.secrets.masterSecret)
+      .update(rawToken)
+      .digest('hex');
   }
 
   hashAuthorizationCode(code: string): string {
-    return this.hmac(`oauth-code:${code}`);
-  }
-
-  private hmac(value: string): string {
-    return createHmac('sha256', this.appConfig.secrets.masterSecret)
-      .update(value)
-      .digest('hex');
+    return this.hashToken(`oauth-code:${code}`);
   }
 }

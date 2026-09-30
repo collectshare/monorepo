@@ -26,7 +26,6 @@ export class McpGrantItem {
       clientId: item.clientId,
       clientName: item.clientName,
       createdAt: item.createdAt,
-      lastUsedAt: item.lastUsedAt,
       revokedAt: item.revokedAt,
     };
   }
@@ -52,7 +51,6 @@ export namespace McpGrantItem {
     clientId: string;
     clientName: string;
     createdAt: string;
-    lastUsedAt?: string;
     revokedAt?: string;
   };
 

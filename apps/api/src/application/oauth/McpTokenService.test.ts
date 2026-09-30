@@ -12,17 +12,17 @@ const service = new McpTokenService({ secrets: { masterSecret: 'secret-a' } } as
 
 describe('McpTokenService', () => {
   it('generates prefixed, unique, high-entropy tokens', () => {
-    const first = service.generateAccessToken();
-    const second = service.generateAccessToken();
+    const first = service.generate(MCP_ACCESS_TOKEN_PREFIX);
+    const second = service.generate(MCP_ACCESS_TOKEN_PREFIX);
 
     expect(first.startsWith(MCP_ACCESS_TOKEN_PREFIX)).toBe(true);
     expect(first).not.toBe(second);
     expect(first.length).toBeGreaterThan(MCP_ACCESS_TOKEN_PREFIX.length + 40);
-    expect(service.generateRefreshToken().startsWith(MCP_REFRESH_TOKEN_PREFIX)).toBe(true);
+    expect(service.generate(MCP_REFRESH_TOKEN_PREFIX).startsWith(MCP_REFRESH_TOKEN_PREFIX)).toBe(true);
   });
 
   it('hashes deterministically and never returns the raw value', () => {
-    const token = service.generateAccessToken();
+    const token = service.generate(MCP_ACCESS_TOKEN_PREFIX);
 
     expect(service.hashToken(token)).toBe(service.hashToken(token));
     expect(service.hashToken(token)).not.toContain(token);

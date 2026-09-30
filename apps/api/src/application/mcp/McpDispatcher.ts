@@ -34,8 +34,7 @@ export class McpDispatcher {
     const classified = classifyMessage(raw);
 
     switch (classified.kind) {
-      case 'notification':
-      case 'response':
+      case 'ignore':
         return null;
       case 'batch':
         return errorResponse(null, JsonRpcErrorCode.InvalidRequest, 'JSON-RPC batching is not supported.');
@@ -100,10 +99,8 @@ export class McpDispatcher {
     }
 
     try {
-      // The account comes from the token only; never let an argument shadow it.
-      const safeArgs = { ...(args as Record<string, unknown>) };
-      delete safeArgs.accountId;
-      const result = await tool.execute(safeArgs, context);
+      // argsSchema strips unknown keys and the account comes from `context`, so an argument cannot shadow it.
+      const result = await tool.execute(args as Record<string, unknown>, context);
 
       return successResponse(request.id, toolSuccess(result));
     } catch (error) {

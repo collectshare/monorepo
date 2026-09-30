@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 import { Controller } from '@application/contracts/Controller';
-import { OAuthError } from '@application/oauth/OAuthError';
-import { oauthNoStoreHeaders, withOAuthErrors } from '@application/oauth/oauthResponse';
+import { OAuthError, OAuthErrorBody } from '@application/oauth/OAuthError';
+import { NO_STORE_HEADERS, withOAuthErrors } from '@application/oauth/oauthResponse';
 import { ExchangeAuthorizationCodeUseCase } from '@application/usecases/oauth/ExchangeAuthorizationCodeUseCase';
 import { RefreshMcpTokenUseCase } from '@application/usecases/oauth/RefreshMcpTokenUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -21,7 +21,7 @@ const tokenRequestSchema = z.object({
 @Injectable()
 export class OAuthTokenController extends Controller<
   'public',
-  OAuthTokenController.Response | OAuthTokenController.ErrorResponse
+  OAuthTokenController.Response | OAuthErrorBody
 > {
   constructor(
     private readonly exchangeAuthorizationCodeUseCase: ExchangeAuthorizationCodeUseCase,
@@ -81,7 +81,7 @@ export class OAuthTokenController extends Controller<
   ): Controller.Response<OAuthTokenController.Response> {
     return {
       statusCode: 200,
-      headers: oauthNoStoreHeaders(),
+      headers: NO_STORE_HEADERS,
       body: {
         access_token: tokens.accessToken,
         token_type: 'Bearer',
@@ -98,10 +98,5 @@ export namespace OAuthTokenController {
     token_type: 'Bearer';
     expires_in: number;
     refresh_token: string;
-  };
-
-  export type ErrorResponse = {
-    error: string;
-    error_description?: string;
   };
 }

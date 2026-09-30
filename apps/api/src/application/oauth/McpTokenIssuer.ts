@@ -4,7 +4,9 @@ import { McpTokenRepository } from '@infra/database/dynamo/repositories/McpToken
 import { Injectable } from '@kernel/decorators/Injectable';
 
 import {
+  MCP_ACCESS_TOKEN_PREFIX,
   MCP_ACCESS_TOKEN_TTL_SECONDS,
+  MCP_REFRESH_TOKEN_PREFIX,
   MCP_REFRESH_TOKEN_TTL_SECONDS,
   McpTokenService,
 } from './McpTokenService';
@@ -18,8 +20,8 @@ export class McpTokenIssuer {
   ) {}
 
   async issue({ accountId, grantId }: McpTokenIssuer.Input): Promise<McpTokenIssuer.Output> {
-    const accessToken = this.mcpTokenService.generateAccessToken();
-    const refreshToken = this.mcpTokenService.generateRefreshToken();
+    const accessToken = this.mcpTokenService.generate(MCP_ACCESS_TOKEN_PREFIX);
+    const refreshToken = this.mcpTokenService.generate(MCP_REFRESH_TOKEN_PREFIX);
 
     const now = Date.now();
     const createdAt = new Date(now).toISOString();

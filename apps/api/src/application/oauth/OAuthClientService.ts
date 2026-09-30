@@ -14,7 +14,6 @@ type ClientPayload = {
   v: number;
   ru: string[];
   cn: string;
-  iat: number;
 };
 
 /**
@@ -30,7 +29,7 @@ export class OAuthClientService {
       throw new OAuthError('invalid_redirect_uri', `Provide between 1 and ${MAX_REDIRECT_URIS} redirect_uris.`);
     }
 
-    const allowList = this.getRedirectAllowList();
+    const allowList = [...BUILT_IN_REDIRECT_URIS, ...this.appConfig.oauth.extraRedirectUris];
 
     for (const uri of redirectUris) {
       if (!isRedirectUriAllowed(uri, allowList)) {
@@ -44,7 +43,6 @@ export class OAuthClientService {
       v: CLIENT_ID_VERSION,
       ru: redirectUris,
       cn: name,
-      iat: Math.floor(Date.now() / 1000),
     };
 
     const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
@@ -78,10 +76,6 @@ export class OAuthClientService {
     } catch {
       throw new OAuthError('invalid_client', 'Unknown client_id.');
     }
-  }
-
-  getRedirectAllowList(): string[] {
-    return [...BUILT_IN_REDIRECT_URIS, ...this.appConfig.oauth.extraRedirectUris];
   }
 
   private sign(encodedPayload: string): string {

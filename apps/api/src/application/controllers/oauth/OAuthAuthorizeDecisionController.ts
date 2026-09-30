@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { Controller } from '@application/contracts/Controller';
-import { OAuthError } from '@application/oauth/OAuthError';
+import { OAuthError, OAuthErrorBody } from '@application/oauth/OAuthError';
 import { withOAuthErrors } from '@application/oauth/oauthResponse';
 import { DecideAuthorizationUseCase } from '@application/usecases/oauth/DecideAuthorizationUseCase';
 import { Injectable } from '@kernel/decorators/Injectable';
@@ -21,7 +21,7 @@ const decisionSchema = z.object({
 @Injectable()
 export class OAuthAuthorizeDecisionController extends Controller<
   'private',
-  OAuthAuthorizeDecisionController.Response | OAuthAuthorizeDecisionController.ErrorResponse
+  OAuthAuthorizeDecisionController.Response | OAuthErrorBody
 > {
   constructor(private readonly decideAuthorizationUseCase: DecideAuthorizationUseCase) {
     super();
@@ -62,10 +62,5 @@ export class OAuthAuthorizeDecisionController extends Controller<
 export namespace OAuthAuthorizeDecisionController {
   export type Response = {
     redirectTo: string;
-  };
-
-  export type ErrorResponse = {
-    error: string;
-    error_description?: string;
   };
 }

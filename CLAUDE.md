@@ -11,6 +11,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `apps/portal` — React 19 + Vite + TailwindCSS v4 + TanStack Query, TypeScript — **public, unauthenticated** open-data portal: search published datasets and browse their paginated raw data. No route requires login.
 - `packages/shared` — Entities, types, and enums shared between api, web, and portal
 - `packages/ui` — Shared design-system components (`Button`, `Card`, `Badge`, `Input`, `Table`, `DataTable`, theme tokens) consumed by both `apps/web` and `apps/portal` via `@monorepo/ui`. Add or change a component here rather than duplicating it in one app.
+- `infra/` — Terraform stacks for the portal's hosting (`portal-spa`: S3 + CloudFront + Route53) and CI/CD (`portal-codebuild`). See Deployment below.
+- `docs/` — design notes and PRDs; `openspec/` — OpenSpec change proposals (`openspec/changes/archive/` holds shipped ones).
+
+`README.md` (pt-BR) and `README.en.md` are the human-facing overview; keep them in sync with this file when features change.
 
 ## Commands
 
@@ -28,9 +32,15 @@ pnpm clean      # Clean all build artifacts and node_modules
 ```bash
 pnpm typecheck          # TypeScript check (no emit)
 pnpm test               # Vitest (uses SWC so decorator metadata / DI wiring is real)
+pnpm test:watch         # Vitest in watch mode
 pnpm dev:email          # Preview email templates (react-email dev server)
 pnpm deploy             # Deploy to AWS (sls deploy --stage dev)
+pnpm backfill:form-published   # One-off: set isPublished on legacy Form items
+pnpm verify:mcp-oauth          # E2E check of the MCP OAuth flow against a deployed stack
+pnpm verify:mcp-server         # E2E check of POST /mcp against a deployed stack
 ```
+
+`apps/api/http/` has ready-made requests for the `/v1` API (`external.http` for REST Client, `external.curls.sh`); `apps/api/docs/API_DOCS.md` documents the Cognito routes.
 
 The API has no local dev server — it's deployed to AWS. Use `pnpm typecheck` during development.
 
@@ -93,7 +103,7 @@ Four adapters exist in `main/adapters/`: `lambdaHttpAdapter` (API GW), `lambdaDy
 
 ### Controller Pattern
 
-Controllers extend `Controller<'public' | 'private', ResponseBody>`. Use `@Schema(zodSchema)` for automatic Zod body validation. Private controllers receive `accountId` (extracted from the Cognito JWT claim `internalId` by the HTTP adapter).
+Controllers extend `Controller<'public' | 'private' | 'apiKey', ResponseBody>`. Use `@Schema(zodSchema)` for automatic Zod body validation. Private controllers receive `accountId` (extracted from the Cognito JWT claim `internalId` by the HTTP adapter). `apiKey` controllers receive `accountId`, `apiKeyId` and `scopes` from the `ApiKeyAuthorizer` context and must check the scope themselves (see External API below).
 
 ```ts
 @Injectable()
@@ -115,7 +125,18 @@ export class MyController extends Controller<'private', MyController.Response> {
 
 ### Serverless Config
 
-Functions are declared in `sls/functions/{domain}.yml` and resources in `sls/resources/`. The main `serverless.yml` composes them. Auth uses API Gateway JWT authorizer backed by Cognito.
+Functions are declared in `sls/functions/{domain}.yml` and resources in `sls/resources/`. The main `serverless.yml` composes them. Two API Gateway authorizers: `CognitoAuthorizer` (JWT, product routes) and `ApiKeyAuthorizer` (Lambda request authorizer on `x-api-key`, `/v1` routes only). `/mcp` has no authorizer (see MCP Server).
+
+Function names must be unique across all `sls/functions/*.yml` files — a duplicate key silently overwrites the other function (this has broken `/forms` and `/portal/search` before). Prefix `/v1` handlers with `external…`.
+
+Deploy-time env comes from `sls/config/env.yml` / `apps/api/.env`: `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_API_KEY`, `ALGOLIA_INDEX_NAME`, `MASTER_SECRET` (HMAC for API keys and OAuth tokens), `EXPORT_SECRET` (per-form pseudonymization key), `GEMINI_API_KEY`, `WEB_APP_URL`, optional `API_DOMAIN_NAME`/`ROUTE53_HOSTED_ZONE_ID` (custom domain), `COGNITO_EMAILS_*`/`SES_ARN` (emails). Changing `MASTER_SECRET` invalidates every API key and MCP token; changing `EXPORT_SECRET` changes every pseudonymized value.
+
+### Form stream consumers
+
+DynamoDB Streams on the main table (declared in `sls/functions/form.yml`):
+
+- `onFormSubmitted` (`FormSubmission` INSERT) — increments the form's `submissionCount`.
+- `onFormChanged` (`Form` INSERT/MODIFY) — `OnFormChangedUseCase` keeps the Algolia index in sync with `isPublished`.
 
 ### Public Portal Endpoints
 
@@ -123,9 +144,28 @@ Functions are declared in `sls/functions/{domain}.yml` and resources in `sls/res
 
 - `GET /portal/search` — proxies to Algolia (via `infra/gateways/AlgoliaGateway.ts`); the browser never calls Algolia directly.
 - `GET /portal/datasets/{formId}` — published form metadata.
-- `GET /portal/datasets/{formId}/data` — cursor-paginated raw submission data.
+- `GET /portal/datasets/{formId}/data` — cursor-paginated submission data (anonymized, see LGPD below).
+- `GET /portal/datasets/{formId}/export` — the same data as a CSV download.
 
-These only serve forms with `isPublished === true` (`Form` entity field, opt-out default). A DynamoDB stream consumer (`OnFormChangedUseCase` → `main/functions/form/onFormChanged.ts`) keeps the Algolia index in sync with `isPublished` changes.
+These only serve forms with `isPublished === true` (`Form` entity field, opt-out default). `pnpm backfill:form-published` sets the field on items created before it existed.
+
+### LGPD / Anonymization
+
+Personal data is never served raw outside the owner's own views. Each `Question` carries:
+
+- `anonymizationSuggestion` — computed when questions are saved (`InsertQuestionsInFormUseCase`): first `PiiHeuristics` (regex/keywords), then a cache (`QuestionClassificationCacheRepository`, keyed by question hash), then Gemini (`QuestionAnonymizationClassifier`, 8s timeout). Failures leave it `null`; they never block saving.
+- `piiStrategy` — the owner's explicit choice in the form builder: `pseudonymize` (HMAC keyed by `EXPORT_SECRET` + formId, stable per form), `generalize` (with `generalizationConfig`: `date_truncate`, `numeric_range`, `text_prefix`, `cep_region` → UF or DDD prefix; falls back to pseudonymize without a config), or `suppress`. `null` = no choice.
+
+`AnonymizationEngine.resolve()` applies `piiStrategy` if set, otherwise pseudonymizes when the suggestion says `needsAnonymization`, otherwise returns the value. It is used by every public/third-party read of submission data (`GetPublishedFormDataQuery`, `ExportPublishedFormDataQuery`, `/v1/portal/...`). The owner's own dashboard, CSV export (`GET /forms/{formId}/submissions/export`) and `/v1/submissions/{formId}` return raw values.
+
+### External API (`/v1`) and API keys
+
+Programmatic access for integrators, declared in `sls/functions/external.yml` + `apiKeys.yml`.
+
+- Keys are managed in `apps/web` (`/api-keys` page) via Cognito routes `POST/GET /api-keys`, `DELETE /api-keys/{keyId}`. Format `cs_sk_…`; shown once, only the HMAC (`MASTER_SECRET`) is stored and looked up via GSI1 (`ApiKeyItem.getGSI1PK(keyHash)`).
+- Scopes (`ApiKeyScope` in `packages/shared`): `portal:read`, `forms:read`, `forms:write`. The authorizer passes them in the context; each `External*Controller` checks the one it needs.
+- Routes (header `x-api-key`): `GET /v1/forms`, `POST /v1/forms`, `PUT /v1/forms/{formId}`, `PUT /v1/forms/{formId}/questions`, `GET /v1/submissions/{formId}` (own data), `GET /v1/portal/search`, `GET /v1/portal/datasets/{formId}/data`.
+- Public reference docs live in the portal at `/api-docs` (`apps/portal/src/views/pages/ApiDocs`) — update them when a `/v1` contract changes.
 
 ### MCP OAuth (authorization server)
 
@@ -188,11 +228,17 @@ src/
 
 ### Data Fetching
 
-Services in `app/services/` (`authService`, `accountsService`, `formsService`) are plain functions using the shared `httpClient` (axios, auto-attaches Bearer token from localStorage). Queries and mutations are wired with TanStack Query in page components or dedicated hooks.
+Services in `app/services/` (`authService`, `accountsService`, `formsService`, `apiKeysService`, `oauthService`) are plain functions using the shared `httpClient` (axios, auto-attaches Bearer token from localStorage). Queries and mutations are wired with TanStack Query in page components or dedicated hooks.
 
 ### Auth Flow
 
-`AuthContext` checks localStorage for an access token, then fetches `/accounts/me` to validate the session. Tokens are stored as `ACCESS_TOKEN` / `REFRESH_TOKEN` in localStorage (keys in `app/config/localStorageKeys`). `AuthGuard` in the router redirects unauthenticated users.
+`AuthContext` checks localStorage for an access token, then fetches `/me` to validate the session. Tokens are stored as `ACCESS_TOKEN` / `REFRESH_TOKEN` in localStorage (keys in `app/config/localStorageKeys`). `AuthGuard` in the router redirects unauthenticated users.
+
+### Routes (Web)
+
+- Public: `/forms/response/:id` (respondent view, `FormRenderer`).
+- Guest-only (`AuthGuard isPrivate={false}`): `/sign-in`, `/sign-up`, `/forgot-password[/confirm]`. After sign-in, redirects to a sanitized `?returnTo` (`app/utils/safeReturnTo`).
+- Private: `/` (home), `/my-forms`, `/forms/builder[/:id]` (builder, incl. per-question `piiStrategy`), `/forms/dashboard/:formId` (submissions table with the filter builder in `FormDashboard/filters/`, CSV export), `/api-keys`, `/oauth/authorize` (MCP consent).
 
 ### Path Alias (Web)
 
@@ -205,18 +251,20 @@ Services in `app/services/` (`authService`, `accountsService`, `formsService`) a
 ```
 src/
   app/
-    router/     # Routes: "/" (search) and "/dataset/:formId"
+    router/     # Routes: "/" (search), "/dataset/:formId", "/api-docs"
     services/
       portalService/  # Calls the public /portal/* endpoints on apps/api
   views/
     pages/
       Home/     # Semantic dataset search (GET /portal/search)
-      Dataset/  # Dataset metadata + paginated raw-data table (GET /portal/datasets/{formId}, GET /portal/datasets/{formId}/data)
+      Dataset/  # Dataset metadata + paginated (anonymized) data table + CSV download link (GET /portal/datasets/{formId}[/data|/export])
+      ApiDocs/  # Public reference for the /v1 external API
 ```
 
 - No `AuthContext`/`AuthGuard`, no localStorage token handling — every route is public by design.
 - Uses the same `@monorepo/ui` components and Tailwind theme as `apps/web` for visual consistency, but is a fully independent Vite app/deployment.
 - Path alias: `@/ → src/` (same convention as `apps/web`).
+- Env: `VITE_API_URL`, `VITE_WEB_APP_URL` (link back to the product app).
 
 ## Shared UI Package (`packages/ui`)
 
@@ -236,3 +284,12 @@ When a component is needed in both `apps/web` and `apps/portal`, add/edit it her
 ## Shared Package (`packages/shared`)
 
 Exposes domain entities (`entities/`), TypeScript interfaces (`types/`), and enums (`enums/`). `apps/api`, `apps/web`, and `apps/portal` all depend on it as `@monorepo/shared`.
+
+## Deployment & CI
+
+- **GitHub Actions** (`.github/workflows/ci.yml`): `pnpm install --frozen-lockfile` + `pnpm build` on pushes/PRs to `main`. Tests and lint are not run in CI — run them locally.
+- **AWS CodeBuild**, triggered by GitHub releases: a **pre-release** deploys **dev**, a **release** deploys **prod**. Each app has its own `buildspec.yml`:
+  - `apps/api` → `sls deploy --stage $STAGE` (AWS profile `pessoal` is set in `serverless.yml`).
+  - `apps/web`, `apps/portal` → `vite build`, `aws s3 sync` to the bucket, CloudFront invalidation of `/index.html`. Install is always from scratch with pnpm's isolated layout (hoisting hits `EMFILE` on CodeBuild's Lambda compute; `react` resolution is handled by an alias in `vite.config.ts`).
+- **Domains:** web `app.collectshare.com.br` / `dev.collectshare.com.br`, portal `portal.collectshare.com.br` / `portal-dev.collectshare.com.br`, API `dev-api.collectshare.com.br` (dev). CORS origins are listed in `apps/api/serverless.yml` — add new frontends there.
+- **Terraform** (`infra/`): only the portal's CodeBuild projects and S3/CloudFront/Route53 are managed here (imported from resources created by hand). Every stack uses the AWS CLI profile `pessoal` via `variable "aws_profile"` wired into every `provider "aws"` (including the `us_east_1` alias). The web app's CloudFront and CodeBuild are not in this repo.

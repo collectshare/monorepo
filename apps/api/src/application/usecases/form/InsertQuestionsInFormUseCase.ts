@@ -5,6 +5,7 @@ import { FormRepository } from '@infra/database/dynamo/repositories/FormReposito
 import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
 import { QuestionClassificationCacheRepository } from '@infra/database/dynamo/repositories/QuestionClassificationCacheRepository';
 import { QuestionAnonymizationClassifier } from '@infra/services/QuestionAnonymizationClassifier';
+import { JevQuestionClassifier } from '@infra/services/JevQuestionClassifier';
 import { PiiHeuristics } from '@infra/services/PiiHeuristics';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
@@ -20,6 +21,7 @@ export class InsertQuestionsInFormUseCase {
     private readonly questionRepository: QuestionRepository,
     private readonly questionClassificationCacheRepository: QuestionClassificationCacheRepository,
     private readonly questionAnonymizationClassifier: QuestionAnonymizationClassifier,
+    private readonly jevQuestionClassifier: JevQuestionClassifier,
   ) { }
 
   async execute({
@@ -139,13 +141,38 @@ export class InsertQuestionsInFormUseCase {
     );
 
     if (remaining.length > 0) {
-      const results = await this.questionAnonymizationClassifier.classify(
-        remaining.map((question) => ({
-          id: question.id,
-          text: question.text,
-          questionType: question.questionType,
-        })),
-      );
+      const items = remaining.map((question) => ({
+        id: question.id,
+        text: question.text,
+        questionType: question.questionType,
+      }));
+
+      // Gemini is authoritative; Jev runs in parallel as a shadow and is only logged.
+      const [results, jevResults] = await Promise.all([
+        this.questionAnonymizationClassifier.classify(items),
+        this.jevQuestionClassifier.classify(items),
+      ]);
+
+      if (this.jevQuestionClassifier.enabled) {
+        for (const question of remaining) {
+          const gemini = results.get(question.id) ?? null;
+          const jev = jevResults.get(question.id) ?? null;
+          const jevNeeds = jev && 'needsAnonymization' in jev ? jev.needsAnonymization : null;
+
+          // Single JSON line so CloudWatch Logs Insights can query the fields.
+          console.info(JSON.stringify({
+            msg: 'QuestionClassificationShadow',
+            formId,
+            questionId: question.id,
+            hash: hashByQuestionId.get(question.id) ?? null,
+            gemini: gemini
+              ? { needsAnonymization: gemini.needsAnonymization, confidence: gemini.confidence }
+              : null,
+            jev,
+            agree: gemini && jevNeeds !== null ? gemini.needsAnonymization === jevNeeds : null,
+          }));
+        }
+      }
 
       await Promise.all(
         remaining.map(async (question) => {

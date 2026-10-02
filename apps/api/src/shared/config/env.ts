@@ -25,6 +25,9 @@ const schema = z.object({
   // Gemini
   GEMINI_API_KEY: z.string().min(1),
 
+  // TypeSafe Jev (shadow classifier; empty = disabled)
+  TYPESAFE_API_KEY: z.string().optional(),
+
   // OAuth (MCP)
   OAUTH_ISSUER_URL: z.string().url(),
   WEB_APP_URL: z.string().url(),

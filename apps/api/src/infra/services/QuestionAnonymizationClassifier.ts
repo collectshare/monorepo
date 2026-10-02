@@ -30,6 +30,7 @@ export class QuestionAnonymizationClassifier {
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const startedAt = Date.now();
 
     try {
       const model = this.client.getGenerativeModel({
@@ -65,6 +66,18 @@ export class QuestionAnonymizationClassifier {
         },
         { signal: controller.signal },
       );
+
+      const usage = result.response.usageMetadata;
+      console.info(JSON.stringify({
+        msg: 'QuestionAnonymizationClassifier usage',
+        model: MODEL_NAME,
+        count: items.length,
+        ms: Date.now() - startedAt,
+        promptTokenCount: usage?.promptTokenCount ?? null,
+        candidatesTokenCount: usage?.candidatesTokenCount ?? null,
+        // Not in @google/generative-ai's UsageMetadata type, but returned by thinking models.
+        thoughtsTokenCount: (usage as { thoughtsTokenCount?: number } | undefined)?.thoughtsTokenCount ?? null,
+      }));
 
       const parsed = JSON.parse(result.response.text());
 

@@ -83,7 +83,7 @@ Each app has its own `.env` (the frontends ship a `.env-exemple` template).
 |---|---|
 | `apps/web` | `VITE_API_URL`, `VITE_APP_CLARITY_ID`, `VITE_APP_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
 | `apps/portal` | `VITE_API_URL`, `VITE_WEB_APP_URL` |
-| `apps/api` | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_API_KEY`, `ALGOLIA_INDEX_NAME`, `MASTER_SECRET`, `EXPORT_SECRET`, `GEMINI_API_KEY`, `WEB_APP_URL`, `API_DOMAIN_NAME`, `ROUTE53_HOSTED_ZONE_ID`, `COGNITO_EMAILS_FROM`, `COGNITO_EMAILS_REPLY_TO`, `SES_ARN` |
+| `apps/api` | `ALGOLIA_APP_ID`, `ALGOLIA_ADMIN_API_KEY`, `ALGOLIA_INDEX_NAME`, `MASTER_SECRET`, `EXPORT_SECRET`, `GEMINI_API_KEY`, `TYPESAFE_API_KEY`, `WEB_APP_URL`, `API_DOMAIN_NAME`, `ROUTE53_HOSTED_ZONE_ID`, `COGNITO_EMAILS_FROM`, `COGNITO_EMAILS_REPLY_TO`, `SES_ARN` |
 
 > Changing `MASTER_SECRET` invalidates every API key and MCP token. Changing `EXPORT_SECRET` changes every pseudonymized value already published.
 
@@ -105,7 +105,7 @@ Each app has its own `.env` (the frontends ship a `.env-exemple` template).
 
 No personal data leaves the form owner's own views unprotected.
 
-1. When questions are saved, each one is classified for personal data: heuristics (regex/keywords) → cache → Gemini.
+1. When questions are saved, each one is classified for personal data: heuristics (regex/keywords) → cache → Gemini. With `TYPESAFE_API_KEY` set, TypeSafe Jev runs in parallel in shadow mode (audit logs only; Gemini stays authoritative).
 2. In the builder, the owner picks a strategy per question: **pseudonymize** (stable per-form hash), **generalize** (date → year/month, number → range, text prefix, CEP → state/area code) or **suppress**.
 3. Every public or third-party read (portal, public CSV, `/v1/portal/*`) goes through the anonymization engine. With no strategy set, questions flagged as personal data are pseudonymized by default.
 

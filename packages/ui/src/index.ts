@@ -2,6 +2,7 @@
 
 export * from './lib/utils';
 
+export * from './components/Logo';
 export * from './components/ui/Badge';
 export * from './components/ui/Button';
 export * from './components/ui/Card';

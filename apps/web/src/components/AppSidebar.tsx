@@ -1,6 +1,5 @@
-import { Separator } from '@monorepo/ui';
+import { Logo, Separator } from '@monorepo/ui';
 import {
-  CopyrightIcon,
   FilePenIcon,
   HomeIcon,
   KeyRoundIcon,
@@ -39,10 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="p-4">
-        <div className="flex gap-1 items-center">
-          <CopyrightIcon size={20} />
-          <span className="font-bold text-lg">CollectShare</span>
-        </div>
+        <Logo textClassName="group-data-[collapsible=icon]:hidden" />
       </SidebarHeader>
       <Separator orientation='horizontal' />
       <SidebarContent>

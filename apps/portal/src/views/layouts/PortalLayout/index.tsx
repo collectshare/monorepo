@@ -1,4 +1,4 @@
-import { buttonVariants } from '@monorepo/ui';
+import { buttonVariants, Logo } from '@monorepo/ui';
 import { Link, Outlet } from 'react-router-dom';
 
 import { ThemeSwitcher } from './ThemeSwitcher';
@@ -9,7 +9,10 @@ export function PortalLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b flex items-center justify-between px-6 py-3">
-        <span className="font-semibold text-lg">CollectShare Portal</span>
+        <Link to="/" className="flex items-center gap-2">
+          <Logo />
+          <span className="text-muted-foreground text-lg">portal</span>
+        </Link>
 
         <div className="flex items-center gap-2">
           {WEB_APP_URL && (

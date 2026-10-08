@@ -129,7 +129,7 @@ curl https://<api>/v1/forms -H "x-api-key: cs_sk_..."
 | `GET` | `/v1/portal/search` | `portal:read` |
 | `GET` | `/v1/portal/datasets/{formId}/data` | `portal:read` |
 
-A referência completa fica no portal, em `/api-docs`. Exemplos prontos em `apps/api/http/`.
+O contrato é uma especificação OpenAPI 3.1 em `apps/portal/public/openapi.yaml`, publicada como `/openapi.yaml` no portal e renderizada com Scalar em `/api-docs` (com cliente para testar as requisições e tema claro/escuro do portal). Exemplos prontos em `apps/api/http/`.
 
 ## Servidor MCP
 

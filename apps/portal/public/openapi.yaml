@@ -1,0 +1,511 @@
+openapi: 3.1.0
+info:
+  title: CollectShare API
+  version: v1
+  description: |
+    API externa do CollectShare (`/v1/*`): buscar datasets, ler dados publicados (anonimizados), ler os próprios
+    formulários e respostas de uma conta, e criar ou manter formulários e perguntas.
+
+    ## Autenticação
+
+    Toda rota `/v1/*` exige uma chave de API no header `x-api-key`. A chave sempre começa com `cs_sk_` e é
+    criada na página **Chaves de API** do app. Use o botão **Authorize** abaixo para testar as rotas.
+
+    - Header ausente → `401 Unauthorized`.
+    - Chave mal formatada, desconhecida, revogada ou expirada → `403 Forbidden`.
+
+    ## Scopes
+
+    Cada chave carrega um ou mais scopes, que liberam rotas de forma independente — ter um scope não implica no outro.
+
+    | Scope | Libera |
+    |---|---|
+    | `portal:read` | `GET /v1/portal/search`, `GET /v1/portal/datasets/{formId}/data` |
+    | `forms:read` | `GET /v1/forms`, `GET /v1/submissions/{formId}` |
+    | `forms:write` | `POST /v1/forms`, `PUT /v1/forms/{formId}`, `PUT /v1/forms/{formId}/questions` |
+
+    Uma chave válida sem o scope exigido recebe `405 Not Allowed`.
+
+    ## Paginação
+
+    `GET /v1/portal/datasets/{formId}/data` e `GET /v1/submissions/{formId}` usam paginação por cursor:
+
+    - `limit` define o tamanho da página (padrão 20). Valores acima de 1000 são reduzidos para 1000, sem erro.
+    - `cursor` retoma de onde a página anterior parou: use o `nextCursor` da resposta anterior.
+    - Quando a resposta não inclui `nextCursor`, não há mais páginas.
+
+    ## Erros
+
+    Erros da aplicação têm o formato `{ "error": { "code": "...", "message": ... } }`. Em `400`, `message` é a
+    lista de campos inválidos.
+servers:
+  - url: https://api.collectshare.com.br
+security:
+  - apiKey: []
+tags:
+  - name: Portal
+    description: Datasets publicados (scope `portal:read`)
+  - name: Formulários
+    description: Formulários e respostas da própria conta (scopes `forms:read` / `forms:write`)
+
+paths:
+  /v1/portal/search:
+    get:
+      tags: [Portal]
+      operationId: searchDatasets
+      summary: Buscar datasets publicados
+      description: |
+        **Scope:** `portal:read`
+
+        Usa o mesmo índice da busca pública do portal.
+      parameters:
+        - name: q
+          in: query
+          description: Termo de busca. Quando omitido, retorna os resultados padrão sem filtro de texto.
+          schema: { type: string }
+        - name: sort
+          in: query
+          description: Ordenação dos resultados.
+          schema: { type: string, enum: [relevance, trending], default: relevance }
+      responses:
+        '200':
+          description: Datasets encontrados.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results]
+                properties:
+                  results:
+                    type: array
+                    items: { $ref: '#/components/schemas/DatasetRecord' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '405': { $ref: '#/components/responses/NotAllowed' }
+
+  /v1/portal/datasets/{formId}/data:
+    get:
+      tags: [Portal]
+      operationId: getDatasetData
+      summary: Ler dados de um dataset publicado
+      description: |
+        **Scope:** `portal:read`
+
+        Retorna as respostas de um formulário publicado, paginadas. Os valores são anonimizados conforme a
+        estratégia de PII de cada pergunta.
+      parameters:
+        - $ref: '#/components/parameters/FormId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Página de dados.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [questions, rows]
+                properties:
+                  questions:
+                    type: array
+                    items: { $ref: '#/components/schemas/Question' }
+                  rows:
+                    type: array
+                    items: { $ref: '#/components/schemas/DatasetRow' }
+                  nextCursor:
+                    type: string
+                    description: Presente quando há mais páginas.
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404':
+          description: O `formId` não existe, ou existe mas não está publicado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '405': { $ref: '#/components/responses/NotAllowed' }
+
+  /v1/forms:
+    get:
+      tags: [Formulários]
+      operationId: listForms
+      summary: Listar formulários da conta
+      description: |
+        **Scope:** `forms:read`
+
+        Lista todos os formulários da conta dona da chave, publicados ou não.
+      responses:
+        '200':
+          description: Formulários da conta (lista vazia se não houver nenhum).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [forms]
+                properties:
+                  forms:
+                    type: array
+                    items: { $ref: '#/components/schemas/Form' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '405': { $ref: '#/components/responses/NotAllowed' }
+    post:
+      tags: [Formulários]
+      operationId: createForm
+      summary: Criar formulário
+      description: |
+        **Scope:** `forms:write`
+
+        Cria um formulário na conta dona da chave.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FormInput' }
+      responses:
+        '201':
+          description: Formulário criado.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [formId]
+                properties:
+                  formId: { type: string }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '405': { $ref: '#/components/responses/NotAllowed' }
+
+  /v1/forms/{formId}:
+    put:
+      tags: [Formulários]
+      operationId: updateForm
+      summary: Substituir detalhes de um formulário
+      description: |
+        **Scope:** `forms:write`
+
+        Substitui título, descrição, tags e flags de um formulário da própria conta. Todos os campos são
+        reenviados a cada chamada; campos omitidos voltam ao valor padrão.
+      parameters:
+        - $ref: '#/components/parameters/FormId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FormInput' }
+      responses:
+        '204': { description: Formulário atualizado. }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '405': { $ref: '#/components/responses/NotAllowedOrForeign' }
+
+  /v1/forms/{formId}/questions:
+    put:
+      tags: [Formulários]
+      operationId: replaceQuestions
+      summary: Substituir perguntas de um formulário
+      description: |
+        **Scope:** `forms:write`
+
+        Substitui o conjunto de perguntas de um formulário da própria conta. Perguntas enviadas com `id`
+        existente são atualizadas; sem `id` (ou com `id` novo) são criadas; **perguntas existentes omitidas do
+        corpo são removidas**.
+      parameters:
+        - $ref: '#/components/parameters/FormId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [questions]
+              properties:
+                questions:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/QuestionInput' }
+      responses:
+        '204': { description: Perguntas substituídas. }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '405': { $ref: '#/components/responses/NotAllowedOrForeign' }
+
+  /v1/submissions/{formId}:
+    get:
+      tags: [Formulários]
+      operationId: getOwnSubmissions
+      summary: Ler respostas de um formulário da conta
+      description: |
+        **Scope:** `forms:read`
+
+        Retorna as respostas de um formulário da própria conta, publicado ou não, paginadas e **sem
+        anonimização**.
+      parameters:
+        - $ref: '#/components/parameters/FormId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Cursor'
+      responses:
+        '200':
+          description: Página de respostas.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [submissions, questions]
+                properties:
+                  submissions:
+                    type: array
+                    items: { $ref: '#/components/schemas/Submission' }
+                  questions:
+                    type: array
+                    items: { $ref: '#/components/schemas/Question' }
+                  nextCursor:
+                    type: string
+                    description: Presente quando há mais páginas.
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '405': { $ref: '#/components/responses/NotAllowedOrForeign' }
+
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Chave de API com prefixo `cs_sk_`.
+
+  parameters:
+    FormId:
+      name: formId
+      in: path
+      required: true
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      description: Linhas por página. Padrão 20; acima de 1000 é reduzido para 1000.
+      schema: { type: integer, minimum: 1, maximum: 1000, default: 20 }
+    Cursor:
+      name: cursor
+      in: query
+      description: '`nextCursor` da página anterior.'
+      schema: { type: string }
+
+  responses:
+    Unauthorized:
+      description: Header `x-api-key` ausente.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/GatewayMessage' }
+    Forbidden:
+      description: Chave mal formatada, desconhecida, revogada ou expirada.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/GatewayMessage' }
+    NotAllowed:
+      description: A chave é válida, mas não possui o scope exigido.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotAllowedOrForeign:
+      description: A chave não possui o scope exigido, ou o formulário pertence a outra conta.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: O `formId` não existe.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ValidationError:
+      description: O corpo da requisição não passa na validação.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example:
+            error:
+              code: VALIDATION
+              message:
+                - { field: title, error: Required }
+
+  schemas:
+    GatewayMessage:
+      type: object
+      properties:
+        message: { type: string }
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              examples: [VALIDATION, RESOURCE_NOT_FOUND, NOT_ALLOWED]
+            message:
+              oneOf:
+                - type: string
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      field: { type: string }
+                      error: { type: string }
+
+    DatasetRecord:
+      type: object
+      required: [formId, title, accountName, createdAt]
+      properties:
+        formId: { type: string }
+        title: { type: string }
+        description: { type: string }
+        tags: { type: array, items: { type: string } }
+        submissionCount: { type: integer }
+        clickCount: { type: integer }
+        downloadCount: { type: integer }
+        accountName: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    FormInput:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string }
+        tags: { type: array, items: { type: string } }
+        isAnonymous: { type: boolean, default: true }
+        onePage: { type: boolean, default: false }
+        isPublished: { type: boolean, default: true }
+
+    Form:
+      type: object
+      required: [id, accountId, createdAt, title, isAnonymous, onePage, isPublished]
+      properties:
+        id: { type: string }
+        accountId: { type: string }
+        createdAt: { type: string, format: date-time }
+        title: { type: string }
+        description: { type: string }
+        tags: { type: array, items: { type: string } }
+        isAnonymous: { type: boolean }
+        onePage: { type: boolean }
+        isPublished: { type: boolean }
+        submissionCount: { type: integer }
+        clickCount: { type: integer }
+        downloadCount: { type: integer }
+
+    QuestionType:
+      type: string
+      enum: [TEXT, MULTIPLE_CHOICE, CHECKBOX, DROPDOWN, STARS, FILE]
+
+    PiiStrategy:
+      type: [string, 'null']
+      enum: [pseudonymize, generalize, suppress, null]
+      description: |
+        Como o valor é exposto em leituras públicas: `pseudonymize` (hash estável por formulário),
+        `generalize` (exige `generalizationConfig`) ou `suppress`. `null` = sem escolha explícita.
+
+    GeneralizationConfig:
+      oneOf:
+        - type: object
+          required: [type, precision]
+          properties:
+            type: { const: date_truncate }
+            precision: { type: string, enum: [year, month] }
+        - type: object
+          required: [type, step]
+          properties:
+            type: { const: numeric_range }
+            step: { type: number, exclusiveMinimum: 0 }
+        - type: object
+          required: [type, chars]
+          properties:
+            type: { const: text_prefix }
+            chars: { type: integer, minimum: 1 }
+        - type: object
+          required: [type, precision]
+          properties:
+            type: { const: cep_region }
+            precision: { type: string, enum: [state, ddd] }
+      discriminator:
+        propertyName: type
+
+    QuestionInput:
+      type: object
+      required: [text, questionType, order]
+      description: '`generalizationConfig` é obrigatório quando `piiStrategy` é `generalize`.'
+      properties:
+        id:
+          type: string
+          description: Id de uma pergunta existente para atualizá-la; omita para criar.
+        text: { type: string, minLength: 1 }
+        questionType: { $ref: '#/components/schemas/QuestionType' }
+        order: { type: integer, minimum: 1 }
+        options: { type: array, items: { type: string } }
+        max: { type: integer, minimum: 1 }
+        isRequired: { type: boolean }
+        piiStrategy: { $ref: '#/components/schemas/PiiStrategy' }
+        generalizationConfig: { $ref: '#/components/schemas/GeneralizationConfig' }
+
+    Question:
+      type: object
+      required: [id, formId, text, questionType, order, createdAt]
+      properties:
+        id: { type: string }
+        formId: { type: string }
+        text: { type: string }
+        questionType: { $ref: '#/components/schemas/QuestionType' }
+        options: { type: array, items: { type: string } }
+        order: { type: integer }
+        isRequired: { type: boolean }
+        max: { type: integer }
+        piiStrategy: { $ref: '#/components/schemas/PiiStrategy' }
+        generalizationConfig: { $ref: '#/components/schemas/GeneralizationConfig' }
+        createdAt: { type: string, format: date-time }
+
+    AnswerValue:
+      type: [string, array, 'null']
+      items: { type: string }
+
+    DatasetRow:
+      type: object
+      required: [submissionId, submittedAt, answers]
+      properties:
+        submissionId: { type: string }
+        submittedAt: { type: string, format: date-time }
+        answers:
+          type: array
+          items:
+            type: object
+            required: [questionId, value]
+            properties:
+              questionId: { type: string }
+              value: { $ref: '#/components/schemas/AnswerValue' }
+
+    Submission:
+      type: object
+      required: [id, formId, submittedAt, answers]
+      properties:
+        id: { type: string }
+        formId: { type: string }
+        submittedAt: { type: string, format: date-time }
+        ip: { type: [string, 'null'] }
+        userAgent: { type: [string, 'null'] }
+        answers:
+          type: array
+          items:
+            type: object
+            required: [id, submissionId, questionId, value, createdAt]
+            properties:
+              id: { type: string }
+              submissionId: { type: string }
+              questionId: { type: string }
+              value: { $ref: '#/components/schemas/AnswerValue' }
+              createdAt: { type: string, format: date-time }

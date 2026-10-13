@@ -165,7 +165,7 @@ Programmatic access for integrators, declared in `sls/functions/external.yml` + 
 - Keys are managed in `apps/web` (`/api-keys` page) via Cognito routes `POST/GET /api-keys`, `DELETE /api-keys/{keyId}`. Format `cs_sk_…`; shown once, only the HMAC (`MASTER_SECRET`) is stored and looked up via GSI1 (`ApiKeyItem.getGSI1PK(keyHash)`).
 - Scopes (`ApiKeyScope` in `packages/shared`): `portal:read`, `forms:read`, `forms:write`. The authorizer passes them in the context; each `External*Controller` checks the one it needs.
 - Routes (header `x-api-key`): `GET /v1/forms`, `POST /v1/forms`, `PUT /v1/forms/{formId}`, `PUT /v1/forms/{formId}/questions`, `GET /v1/submissions/{formId}` (own data), `GET /v1/portal/search`, `GET /v1/portal/datasets/{formId}/data`.
-- Public reference docs live in the portal at `/api-docs` (`apps/portal/src/views/pages/ApiDocs`) — update them when a `/v1` contract changes.
+- The contract is the OpenAPI 3.1 spec `apps/portal/public/openapi.yaml`, served by the portal at `/openapi.yaml` and rendered with Scalar (`@scalar/api-reference-react`) at `/api-docs` (lazy-loaded; its API client targets `VITE_API_URL`; colors follow the portal theme tokens and `.dark` class). Update it when a `/v1` contract changes. `src/main/functions/external/openapiSpec.test.ts` fails when a route in `external.yml` and the spec diverge (it only checks method + path, not schemas).
 
 ### MCP OAuth (authorization server)
 
@@ -258,7 +258,7 @@ src/
     pages/
       Home/     # Semantic dataset search (GET /portal/search)
       Dataset/  # Dataset metadata + paginated (anonymized) data table + CSV download link (GET /portal/datasets/{formId}[/data|/export])
-      ApiDocs/  # Public reference for the /v1 external API
+      ApiDocs/  # Scalar API reference over public/openapi.yaml (/v1 external API spec)
 ```
 
 - No `AuthContext`/`AuthGuard`, no localStorage token handling — every route is public by design.

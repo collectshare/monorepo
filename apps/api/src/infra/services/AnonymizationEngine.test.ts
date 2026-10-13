@@ -65,6 +65,33 @@ describe('AnonymizationEngine', () => {
       expect(engine.generalize('1990-05-20', { type: 'date_truncate', precision: 'month' })).toBe('1990-05');
     });
 
+    it('reads Brazilian DD/MM/YYYY dates instead of taking the day as the year', () => {
+      const engine = createEngine();
+
+      expect(engine.generalize('22/03/2001', { type: 'date_truncate', precision: 'year' })).toBe('2001');
+      expect(engine.generalize('22/03/2001', { type: 'date_truncate', precision: 'month' })).toBe('2001-03');
+      expect(engine.generalize('5-7-1999', { type: 'date_truncate', precision: 'month' })).toBe('1999-07');
+      expect(engine.generalize(' 22.03.2001 ', { type: 'date_truncate', precision: 'year' })).toBe('2001');
+    });
+
+    it('accepts ISO dates with a time part, MM/YYYY and a bare year', () => {
+      const engine = createEngine();
+
+      expect(engine.generalize('1990-05-20T13:45:00Z', { type: 'date_truncate', precision: 'month' })).toBe('1990-05');
+      expect(engine.generalize('03/2001', { type: 'date_truncate', precision: 'month' })).toBe('2001-03');
+      expect(engine.generalize('2001', { type: 'date_truncate', precision: 'month' })).toBe('2001');
+    });
+
+    it('never publishes the raw value of an unrecognized or invalid date', () => {
+      const engine = createEngine();
+      const year = { type: 'date_truncate', precision: 'year' } as const;
+
+      expect(engine.generalize('22 de março de 2001', year)).toBe('');
+      expect(engine.generalize('22/03/01', year)).toBe('');
+      expect(engine.generalize('2001-13-01', year)).toBe('');
+      expect(engine.generalize('', year)).toBe('');
+    });
+
     it('buckets numeric values into a range using the configured step', () => {
       const engine = createEngine();
 

@@ -32,6 +32,29 @@ const STATE_BY_CEP_PREFIX: Record<string, string> = {
   '97': 'RS', '98': 'RS', '99': 'RS',
 };
 
+// Answers to date questions are free text, so both ISO (1990-05-20, also with a
+// time part) and Brazilian (20/05/1990) orders are accepted, plus MM/YYYY and a
+// bare year. Separators: "-", "/" or ".". Two-digit years are ambiguous and rejected.
+function parseDate(raw: string): { year: string; month?: string } | null {
+  const value = raw.trim();
+  const twoDigits = (month: string) => month.padStart(2, '0');
+  const validMonth = (month: string) => Number(month) >= 1 && Number(month) <= 12;
+
+  const iso = value.match(/^(\d{4})[-/.](\d{1,2})(?:[-/.]\d{1,2})?(?:[T\s].*)?$/);
+  if (iso) { return validMonth(iso[2]) ? { year: iso[1], month: twoDigits(iso[2]) } : null; }
+
+  const brazilian = value.match(/^\d{1,2}[-/.](\d{1,2})[-/.](\d{4})$/);
+  if (brazilian) { return validMonth(brazilian[1]) ? { year: brazilian[2], month: twoDigits(brazilian[1]) } : null; }
+
+  const monthYear = value.match(/^(\d{1,2})[-/.](\d{4})$/);
+  if (monthYear) { return validMonth(monthYear[1]) ? { year: monthYear[2], month: twoDigits(monthYear[1]) } : null; }
+
+  const yearOnly = value.match(/^(\d{4})$/);
+  if (yearOnly) { return { year: yearOnly[1] }; }
+
+  return null;
+}
+
 @Injectable()
 export class AnonymizationEngine {
   constructor(private readonly appConfig: AppConfig) { }
@@ -44,11 +67,12 @@ export class AnonymizationEngine {
   generalize(value: string, config: GeneralizationConfig): string {
     switch (config.type) {
       case 'date_truncate': {
-        const parts = value.split(/[-/]/);
-        if (parts.length < 1) { return value; }
-        if (config.precision === 'year') { return parts[0]; }
-        if (config.precision === 'month') { return `${parts[0]}-${parts[1] ?? ''}`; }
-        return value;
+        const date = parseDate(value);
+        // Unrecognized format: fail closed. Returning the raw value would publish
+        // the full date, which is exactly what this strategy exists to prevent.
+        if (!date) { return ''; }
+        if (config.precision === 'month' && date.month) { return `${date.year}-${date.month}`; }
+        return date.year;
       }
       case 'numeric_range': {
         const num = parseFloat(value);

@@ -136,7 +136,7 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
             />
           </div>
           <p className="text-xs text-muted-foreground">
-            As respostas deste formulário ficarão públicas e pesquisáveis, sem nenhuma anonimização nesta fase — cuidado com dados pessoais em perguntas de texto livre.
+            As respostas ficarão públicas e pesquisáveis no portal. Dados pessoais são tratados conforme a anonimização de cada pergunta.
           </p>
         </div>
          <div className="flex items-center justify-between">

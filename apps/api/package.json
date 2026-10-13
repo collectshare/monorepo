@@ -10,6 +10,7 @@
     "dev:email": "email dev --dir src/infra/emails/templates",
     "deploy": "sls deploy --stage dev",
     "backfill:form-published": "tsx scripts/backfillFormIsPublished.ts",
+    "algolia:configure-replicas": "tsx scripts/configureAlgoliaReplicas.ts",
     "verify:mcp-oauth": "tsx scripts/verifyMcpOAuth.ts",
     "verify:mcp-server": "tsx scripts/verifyMcpServer.ts"
   },

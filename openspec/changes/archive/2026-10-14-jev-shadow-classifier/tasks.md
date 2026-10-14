@@ -25,4 +25,4 @@
 ## 6. Docs & rollout
 
 - [x] 6.1 Document `TYPESAFE_API_KEY` and the shadow audit log/query in `CLAUDE.md` (LGPD section + env list) and both READMEs
-- [ ] 6.2 Deploy to dev with the key set, save a form with new questions, verify the shadow log lines in CloudWatch
+- [x] 6.2 Deploy to dev with the key set, save a form with new questions, verify the shadow log lines in CloudWatch — superseded: shadow mode was removed when Jev became the primary classifier (364739e). Verified instead on dev on 2026-10-14: `JevQuestionClassifier usage` logs for 28 questions, 0 errors, median 140 ms

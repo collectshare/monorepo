@@ -8,7 +8,7 @@ provider:
   architecture: arm64
   runtime: nodejs24.x
   profile: pessoal
-  memorySize: 128
+  memorySize: 1024
   stage: ${opt:stage, 'dev'}
   environment: ${file(./sls/config/env.yml)}
   iam:

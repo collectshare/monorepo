@@ -43,7 +43,6 @@ getFormSubmissions:
   handler: src/main/functions/form/getFormSubmissions.handler
   # Reads every submission and runs one answers query per submission (N+1):
   # at 128 MB / 6 s, forms with ~50+ responses hit the timeout.
-  memorySize: 1024
   timeout: 29
   events:
     - httpApi:
@@ -54,9 +53,6 @@ getFormSubmissions:
 
 exportFormSubmissions:
   handler: src/main/functions/form/exportFormSubmissions.handler
-  # Reads every submission and runs one answers query per submission (N+1):
-  # at 128 MB / 6 s, forms with ~50+ responses hit the timeout.
-  memorySize: 1024
   timeout: 29
   events:
     - httpApi:

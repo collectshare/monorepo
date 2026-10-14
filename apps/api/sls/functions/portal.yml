@@ -14,9 +14,6 @@ getPublishedFormData:
 
 exportPublishedFormData:
   handler: src/main/functions/portal/exportPublishedFormData.handler
-  # Reads every submission and runs one answers query per submission (N+1):
-  # at 128 MB / 6 s, forms with ~50+ responses hit the timeout.
-  memorySize: 1024
   timeout: 29
   events:
     - httpApi:

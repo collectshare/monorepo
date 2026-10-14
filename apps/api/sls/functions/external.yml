@@ -1,5 +1,6 @@
 apiKeyAuthorizer:
   handler: src/main/functions/external/apiKeyAuthorizer.handler
+  memorySize: 512
 
 externalCreateForm:
   handler: src/main/functions/external/createForm.handler

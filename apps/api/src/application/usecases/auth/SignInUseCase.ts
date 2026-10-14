@@ -1,4 +1,5 @@
 import { InvalidCredentials } from '@application/errors/application/InvalidCredentials';
+import { TooManyRequests } from '@application/errors/application/TooManyRequests';
 import { AuthGateway } from '@infra/gateways/AuthGateway';
 import { Injectable } from '@kernel/decorators/Injectable';
 
@@ -22,10 +23,28 @@ export class SignInUseCase {
         accessToken,
         refreshToken,
       };
-    } catch {
+    } catch (error) {
+      if (isThrottlingError(error)) {
+        throw new TooManyRequests();
+      }
+
       throw new InvalidCredentials();
     }
   }
+}
+
+// Cognito rate limits and the per-user lockout are not wrong credentials:
+// reporting them as 401 makes a throttled login look like a bad password.
+function isThrottlingError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.name === 'TooManyRequestsException' ||
+    error.name === 'LimitExceededException' ||
+    (error.name === 'NotAuthorizedException' && error.message.includes('Password attempts exceeded'))
+  );
 }
 
 export namespace SignInUseCase {

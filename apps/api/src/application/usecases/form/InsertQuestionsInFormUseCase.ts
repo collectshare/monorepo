@@ -5,13 +5,24 @@ import { FormRepository } from '@infra/database/dynamo/repositories/FormReposito
 import { QuestionRepository } from '@infra/database/dynamo/repositories/QuestionRepository';
 import { QuestionClassificationCacheRepository } from '@infra/database/dynamo/repositories/QuestionClassificationCacheRepository';
 import { QuestionAnonymizationClassifier } from '@infra/services/QuestionAnonymizationClassifier';
+import { JevQuestionClassifier } from '@infra/services/JevQuestionClassifier';
 import { PiiHeuristics } from '@infra/services/PiiHeuristics';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { GeneralizationConfig } from '@monorepo/shared/types/GeneralizationConfig';
+import { AnonymizationSuggestion } from '@monorepo/shared/types/AnonymizationSuggestion';
 import { hashQuestionContent } from '@shared/utils/hashQuestionContent';
 
-type ClassificationSource = 'heuristic' | 'cache' | 'llm';
+type ClassificationSource = 'heuristic' | 'cache' | 'jev' | 'gemini';
+
+// Jev verdicts below this confidence go to Gemini instead.
+const JEV_MIN_CONFIDENCE = 0.6;
+
+// Jev and Gemini run one after the other, so they share one deadline that keeps
+// classification well inside the 15s timeout of the insertQuestionsInForm Lambdas.
+const CLASSIFICATION_BUDGET_MS = 10_000;
+const JEV_TIMEOUT_MS = 4_000;
+const MIN_GEMINI_TIMEOUT_MS = 1_000;
 
 @Injectable()
 export class InsertQuestionsInFormUseCase {
@@ -20,6 +31,7 @@ export class InsertQuestionsInFormUseCase {
     private readonly questionRepository: QuestionRepository,
     private readonly questionClassificationCacheRepository: QuestionClassificationCacheRepository,
     private readonly questionAnonymizationClassifier: QuestionAnonymizationClassifier,
+    private readonly jevQuestionClassifier: JevQuestionClassifier,
   ) { }
 
   async execute({
@@ -109,6 +121,7 @@ export class InsertQuestionsInFormUseCase {
   }
 
   private async classifyQuestions(questions: Question[], formId: string): Promise<void> {
+    const deadline = Date.now() + CLASSIFICATION_BUDGET_MS;
     const sources = new Map<string, ClassificationSource>();
     const hashByQuestionId = new Map<string, string>();
     const remaining: Question[] = [];
@@ -139,19 +152,49 @@ export class InsertQuestionsInFormUseCase {
     );
 
     if (remaining.length > 0) {
-      const results = await this.questionAnonymizationClassifier.classify(
-        remaining.map((question) => ({
-          id: question.id,
-          text: question.text,
-          questionType: question.questionType,
-        })),
+      const items = remaining.map((question) => ({
+        id: question.id,
+        text: question.text,
+        questionType: question.questionType,
+      }));
+
+      // Jev is primary; Gemini only classifies what Jev failed on or was unsure about.
+      const jevResults = await this.jevQuestionClassifier.classify(
+        items,
+        Math.min(JEV_TIMEOUT_MS, deadline - Date.now()),
       );
+      const suggestions = new Map<string, AnonymizationSuggestion | null>();
+
+      for (const question of remaining) {
+        const suggestion = toJevSuggestion(jevResults.get(question.id));
+
+        if (suggestion) {
+          suggestions.set(question.id, suggestion);
+          sources.set(question.id, 'jev');
+        }
+      }
+
+      const fallbackItems = items.filter((item) => !suggestions.has(item.id));
+
+      const geminiTimeoutMs = deadline - Date.now();
+
+      // Without enough time left, these questions stay unclassified (null) instead of risking the Lambda timeout.
+      if (fallbackItems.length > 0 && geminiTimeoutMs >= MIN_GEMINI_TIMEOUT_MS) {
+        const geminiResults = await this.questionAnonymizationClassifier.classify(
+          fallbackItems,
+          geminiTimeoutMs,
+        );
+
+        for (const item of fallbackItems) {
+          suggestions.set(item.id, geminiResults.get(item.id) ?? null);
+          sources.set(item.id, 'gemini');
+        }
+      }
 
       await Promise.all(
         remaining.map(async (question) => {
-          const suggestion = results.get(question.id) ?? null;
+          const suggestion = suggestions.get(question.id) ?? null;
           question.anonymizationSuggestion = suggestion;
-          sources.set(question.id, 'llm');
 
           if (!suggestion) {
             return;
@@ -172,9 +215,34 @@ export class InsertQuestionsInFormUseCase {
         formId,
         source: sources.get(question.id) ?? null,
         needsAnonymization: question.anonymizationSuggestion?.needsAnonymization ?? null,
+        confidence: question.anonymizationSuggestion?.confidence ?? null,
       });
     }
   }
+}
+
+function toJevSuggestion(
+  verdict: JevQuestionClassifier.Verdict | undefined,
+): AnonymizationSuggestion | null {
+  if (!verdict || !('needsAnonymization' in verdict)) {
+    return null;
+  }
+
+  // Jev's probability is P(true); confidence is that of the chosen answer.
+  const confidence = verdict.needsAnonymization ? verdict.probability : 1 - verdict.probability;
+
+  if (confidence < JEV_MIN_CONFIDENCE) {
+    return null;
+  }
+
+  return {
+    needsAnonymization: verdict.needsAnonymization,
+    confidence,
+    reason: verdict.needsAnonymization
+      ? `Classificação automática: ${Math.round(confidence * 100)}% de chance de coletar dado pessoal.`
+      : `Classificação automática: ${Math.round(confidence * 100)}% de chance de não coletar dado pessoal.`,
+    classifiedAt: new Date().toISOString(),
+  };
 }
 
 export namespace InsertQuestionsInFormUseCase {

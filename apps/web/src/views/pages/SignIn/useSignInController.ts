@@ -57,6 +57,10 @@ export function useSignInController() {
         if (error.status === 401) {
           toast.error('Credenciais inválidas');
         }
+
+        if (error.status === 429) {
+          toast.error('Muitas tentativas de login. Aguarde um instante e tente novamente.');
+        }
       }
     }
   });

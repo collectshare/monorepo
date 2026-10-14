@@ -15,6 +15,8 @@ export class AppConfig {
 
   readonly gemini: AppConfig.Gemini;
 
+  readonly typesafe: AppConfig.Typesafe;
+
   readonly oauth: AppConfig.OAuth;
 
   constructor() {
@@ -54,6 +56,10 @@ export class AppConfig {
 
     this.gemini = {
       apiKey: env.GEMINI_API_KEY,
+    };
+
+    this.typesafe = {
+      apiKey: env.TYPESAFE_API_KEY ?? '',
     };
 
     this.oauth = {
@@ -103,6 +109,10 @@ export namespace AppConfig {
   };
 
   export type Gemini = {
+    apiKey: string;
+  };
+
+  export type Typesafe = {
     apiKey: string;
   };
 

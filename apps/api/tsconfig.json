@@ -2,7 +2,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "target": "es2016",
-    "module": "commonjs",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

@@ -19,6 +19,7 @@ export class QuestionAnonymizationClassifier {
 
   async classify(
     items: QuestionAnonymizationClassifier.Item[],
+    timeoutMs = TIMEOUT_MS,
   ): Promise<Map<string, AnonymizationSuggestion | null>> {
     const results = new Map<string, AnonymizationSuggestion | null>(
       items.map((item) => [item.id, null]),
@@ -29,7 +30,7 @@ export class QuestionAnonymizationClassifier {
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     const startedAt = Date.now();
 
     try {

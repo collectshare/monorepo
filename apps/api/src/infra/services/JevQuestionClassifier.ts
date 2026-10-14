@@ -30,6 +30,7 @@ export class JevQuestionClassifier {
 
   async classify(
     items: JevQuestionClassifier.Item[],
+    timeoutMs = TIMEOUT_MS,
   ): Promise<Map<string, JevQuestionClassifier.Verdict>> {
     const results = new Map<string, JevQuestionClassifier.Verdict>();
     const adapter = this.adapter;
@@ -39,7 +40,7 @@ export class JevQuestionClassifier {
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
       await Promise.all(

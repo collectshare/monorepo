@@ -58,4 +58,39 @@ describe('InsertQuestionsInFormUseCase classification', () => {
     expect(saved.get('failed')?.anonymizationSuggestion?.reason).toBe('gemini');
     expect(put).toHaveBeenCalledTimes(3);
   });
+
+  it('shares one deadline between Jev and Gemini and skips Gemini when it runs out', async () => {
+    vi.useFakeTimers();
+
+    try {
+      const saveMany = vi.fn();
+      const jevClassify = vi.fn(async (items: JevQuestionClassifier.Item[], _timeoutMs: number) => {
+        vi.advanceTimersByTime(9_500);
+        return new Map<string, JevQuestionClassifier.Verdict>(
+          items.map((item) => [item.id, { error: 'aborted', ms: 9_500 }]),
+        );
+      });
+      const geminiClassify = vi.fn();
+
+      const useCase = new InsertQuestionsInFormUseCase(
+        { findById: async () => ({ id: 'form', accountId: 'acc' }) } as unknown as FormRepository,
+        { findByFormId: async () => [], deleteMany: vi.fn(), saveMany } as unknown as QuestionRepository,
+        { get: async () => null, put: vi.fn() } as unknown as QuestionClassificationCacheRepository,
+        { classify: geminiClassify } as unknown as QuestionAnonymizationClassifier,
+        { classify: jevClassify } as unknown as JevQuestionClassifier,
+      );
+
+      await useCase.execute({
+        accountId: 'acc',
+        formId: 'form',
+        questions: [{ id: 'q', text: 'Qual sua cor favorita?', questionType: QuestionType.TEXT, order: 1 }],
+      });
+
+      expect(jevClassify.mock.calls[0][1]).toBe(4_000);
+      expect(geminiClassify).not.toHaveBeenCalled();
+      expect((saveMany.mock.calls[0][0] as Question[])[0].anonymizationSuggestion).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

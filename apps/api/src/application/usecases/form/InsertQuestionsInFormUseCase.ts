@@ -18,6 +18,12 @@ type ClassificationSource = 'heuristic' | 'cache' | 'jev' | 'gemini';
 // Jev verdicts below this confidence go to Gemini instead.
 const JEV_MIN_CONFIDENCE = 0.6;
 
+// Jev and Gemini run one after the other, so they share one deadline that keeps
+// classification well inside the 15s timeout of the insertQuestionsInForm Lambdas.
+const CLASSIFICATION_BUDGET_MS = 10_000;
+const JEV_TIMEOUT_MS = 4_000;
+const MIN_GEMINI_TIMEOUT_MS = 1_000;
+
 @Injectable()
 export class InsertQuestionsInFormUseCase {
   constructor(
@@ -115,6 +121,7 @@ export class InsertQuestionsInFormUseCase {
   }
 
   private async classifyQuestions(questions: Question[], formId: string): Promise<void> {
+    const deadline = Date.now() + CLASSIFICATION_BUDGET_MS;
     const sources = new Map<string, ClassificationSource>();
     const hashByQuestionId = new Map<string, string>();
     const remaining: Question[] = [];
@@ -152,7 +159,10 @@ export class InsertQuestionsInFormUseCase {
       }));
 
       // Jev is primary; Gemini only classifies what Jev failed on or was unsure about.
-      const jevResults = await this.jevQuestionClassifier.classify(items);
+      const jevResults = await this.jevQuestionClassifier.classify(
+        items,
+        Math.min(JEV_TIMEOUT_MS, deadline - Date.now()),
+      );
       const suggestions = new Map<string, AnonymizationSuggestion | null>();
 
       for (const question of remaining) {
@@ -166,8 +176,14 @@ export class InsertQuestionsInFormUseCase {
 
       const fallbackItems = items.filter((item) => !suggestions.has(item.id));
 
-      if (fallbackItems.length > 0) {
-        const geminiResults = await this.questionAnonymizationClassifier.classify(fallbackItems);
+      const geminiTimeoutMs = deadline - Date.now();
+
+      // Without enough time left, these questions stay unclassified (null) instead of risking the Lambda timeout.
+      if (fallbackItems.length > 0 && geminiTimeoutMs >= MIN_GEMINI_TIMEOUT_MS) {
+        const geminiResults = await this.questionAnonymizationClassifier.classify(
+          fallbackItems,
+          geminiTimeoutMs,
+        );
 
         for (const item of fallbackItems) {
           suggestions.set(item.id, geminiResults.get(item.id) ?? null);

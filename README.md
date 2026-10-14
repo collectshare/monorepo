@@ -105,7 +105,7 @@ Cada app tem um `.env` (os frontends têm `.env-exemple` como modelo).
 
 Nenhum dado pessoal sai cru para fora da visão do dono do formulário.
 
-1. Ao salvar as perguntas, cada uma é classificada quanto a dado pessoal: heurísticas (regex/palavras-chave) → cache → Gemini. Com `TYPESAFE_API_KEY` definida, o TypeSafe Jev roda em paralelo em modo sombra (só gera logs de auditoria; o Gemini continua decidindo).
+1. Ao salvar as perguntas, cada uma é classificada quanto a dado pessoal: heurísticas (regex/palavras-chave) → cache → TypeSafe Jev → Gemini (fallback quando o Jev falha ou tem confiança < 0,6; sem `TYPESAFE_API_KEY`, tudo vai para o Gemini).
 2. No editor, o dono escolhe uma estratégia por pergunta: **pseudonimizar** (hash estável por formulário), **generalizar** (data → ano/mês, número → faixa, prefixo de texto, CEP → UF/DDD) ou **suprimir**.
 3. Toda leitura pública ou de terceiros (portal, CSV público, `/v1/portal/*`) passa pelo motor de anonimização. Sem estratégia definida, perguntas sinalizadas como dado pessoal são pseudonimizadas por padrão.
 

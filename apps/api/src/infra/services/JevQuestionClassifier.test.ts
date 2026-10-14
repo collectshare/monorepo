@@ -23,10 +23,8 @@ describe('JevQuestionClassifier', () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
-    const classifier = makeClassifier('');
-    const results = await classifier.classify(items);
+    const results = await makeClassifier('').classify(items);
 
-    expect(classifier.enabled).toBe(false);
     expect(results.size).toBe(0);
     expect(fetchMock).not.toHaveBeenCalled();
   });

@@ -105,7 +105,7 @@ Each app has its own `.env` (the frontends ship a `.env-exemple` template).
 
 No personal data leaves the form owner's own views unprotected.
 
-1. When questions are saved, each one is classified for personal data: heuristics (regex/keywords) → cache → Gemini. With `TYPESAFE_API_KEY` set, TypeSafe Jev runs in parallel in shadow mode (audit logs only; Gemini stays authoritative).
+1. When questions are saved, each one is classified for personal data: heuristics (regex/keywords) → cache → TypeSafe Jev → Gemini (fallback when Jev fails or its confidence is < 0.6; without `TYPESAFE_API_KEY`, everything goes to Gemini).
 2. In the builder, the owner picks a strategy per question: **pseudonymize** (stable per-form hash), **generalize** (date → year/month, number → range, text prefix, CEP → state/area code) or **suppress**.
 3. Every public or third-party read (portal, public CSV, `/v1/portal/*`) goes through the anonymization engine. With no strategy set, questions flagged as personal data are pseudonymized by default.
 

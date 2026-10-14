@@ -16,8 +16,8 @@ const PII_QUESTION = boolean({
 });
 
 /**
- * Shadow classifier (audit only): its result is logged next to Gemini's and never persisted.
- * Disabled (no calls) when TYPESAFE_API_KEY is empty.
+ * Primary LLM classifier; InsertQuestionsInFormUseCase falls back to Gemini on errors or low confidence.
+ * Disabled (no calls, everything goes to Gemini) when TYPESAFE_API_KEY is empty.
  */
 @Injectable()
 export class JevQuestionClassifier {
@@ -26,10 +26,6 @@ export class JevQuestionClassifier {
   constructor(appConfig: AppConfig) {
     const { apiKey } = appConfig.typesafe;
     this.adapter = apiKey ? createTypesafeDecider(MODEL_NAME, apiKey) : null;
-  }
-
-  get enabled(): boolean {
-    return this.adapter !== null;
   }
 
   async classify(
@@ -73,6 +69,13 @@ export class JevQuestionClassifier {
           }
         }),
       );
+
+      // Single JSON line so CloudWatch Logs Insights can query the fields.
+      console.info(JSON.stringify({
+        msg: 'JevQuestionClassifier usage',
+        model: MODEL_NAME,
+        verdicts: [...results].map(([id, verdict]) => ({ id, ...verdict })),
+      }));
 
       return results;
     } finally {

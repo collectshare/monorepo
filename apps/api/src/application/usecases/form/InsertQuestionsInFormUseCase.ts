@@ -10,9 +10,13 @@ import { PiiHeuristics } from '@infra/services/PiiHeuristics';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { QuestionType } from '@monorepo/shared/enums/QuestionType';
 import { GeneralizationConfig } from '@monorepo/shared/types/GeneralizationConfig';
+import { AnonymizationSuggestion } from '@monorepo/shared/types/AnonymizationSuggestion';
 import { hashQuestionContent } from '@shared/utils/hashQuestionContent';
 
-type ClassificationSource = 'heuristic' | 'cache' | 'llm';
+type ClassificationSource = 'heuristic' | 'cache' | 'jev' | 'gemini';
+
+// Jev verdicts below this confidence go to Gemini instead.
+const JEV_MIN_CONFIDENCE = 0.6;
 
 @Injectable()
 export class InsertQuestionsInFormUseCase {
@@ -147,38 +151,34 @@ export class InsertQuestionsInFormUseCase {
         questionType: question.questionType,
       }));
 
-      // Gemini is authoritative; Jev runs in parallel as a shadow and is only logged.
-      const [results, jevResults] = await Promise.all([
-        this.questionAnonymizationClassifier.classify(items),
-        this.jevQuestionClassifier.classify(items),
-      ]);
+      // Jev is primary; Gemini only classifies what Jev failed on or was unsure about.
+      const jevResults = await this.jevQuestionClassifier.classify(items);
+      const suggestions = new Map<string, AnonymizationSuggestion | null>();
 
-      if (this.jevQuestionClassifier.enabled) {
-        for (const question of remaining) {
-          const gemini = results.get(question.id) ?? null;
-          const jev = jevResults.get(question.id) ?? null;
-          const jevNeeds = jev && 'needsAnonymization' in jev ? jev.needsAnonymization : null;
+      for (const question of remaining) {
+        const suggestion = toJevSuggestion(jevResults.get(question.id));
 
-          // Single JSON line so CloudWatch Logs Insights can query the fields.
-          console.info(JSON.stringify({
-            msg: 'QuestionClassificationShadow',
-            formId,
-            questionId: question.id,
-            hash: hashByQuestionId.get(question.id) ?? null,
-            gemini: gemini
-              ? { needsAnonymization: gemini.needsAnonymization, confidence: gemini.confidence }
-              : null,
-            jev,
-            agree: gemini && jevNeeds !== null ? gemini.needsAnonymization === jevNeeds : null,
-          }));
+        if (suggestion) {
+          suggestions.set(question.id, suggestion);
+          sources.set(question.id, 'jev');
+        }
+      }
+
+      const fallbackItems = items.filter((item) => !suggestions.has(item.id));
+
+      if (fallbackItems.length > 0) {
+        const geminiResults = await this.questionAnonymizationClassifier.classify(fallbackItems);
+
+        for (const item of fallbackItems) {
+          suggestions.set(item.id, geminiResults.get(item.id) ?? null);
+          sources.set(item.id, 'gemini');
         }
       }
 
       await Promise.all(
         remaining.map(async (question) => {
-          const suggestion = results.get(question.id) ?? null;
+          const suggestion = suggestions.get(question.id) ?? null;
           question.anonymizationSuggestion = suggestion;
-          sources.set(question.id, 'llm');
 
           if (!suggestion) {
             return;
@@ -199,9 +199,34 @@ export class InsertQuestionsInFormUseCase {
         formId,
         source: sources.get(question.id) ?? null,
         needsAnonymization: question.anonymizationSuggestion?.needsAnonymization ?? null,
+        confidence: question.anonymizationSuggestion?.confidence ?? null,
       });
     }
   }
+}
+
+function toJevSuggestion(
+  verdict: JevQuestionClassifier.Verdict | undefined,
+): AnonymizationSuggestion | null {
+  if (!verdict || !('needsAnonymization' in verdict)) {
+    return null;
+  }
+
+  // Jev's probability is P(true); confidence is that of the chosen answer.
+  const confidence = verdict.needsAnonymization ? verdict.probability : 1 - verdict.probability;
+
+  if (confidence < JEV_MIN_CONFIDENCE) {
+    return null;
+  }
+
+  return {
+    needsAnonymization: verdict.needsAnonymization,
+    confidence,
+    reason: verdict.needsAnonymization
+      ? `Classificação automática: ${Math.round(confidence * 100)}% de chance de coletar dado pessoal.`
+      : `Classificação automática: ${Math.round(confidence * 100)}% de chance de não coletar dado pessoal.`,
+    classifiedAt: new Date().toISOString(),
+  };
 }
 
 export namespace InsertQuestionsInFormUseCase {

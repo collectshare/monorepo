@@ -93,4 +93,30 @@ describe('InsertQuestionsInFormUseCase classification', () => {
       vi.useRealTimers();
     }
   });
+
+  it('saves reordered options in the order sent', async () => {
+    const saveMany = vi.fn();
+    const existing = {
+      id: 'q1', formId: 'form', text: 'Cor favorita?', questionType: QuestionType.MULTIPLE_CHOICE, order: 1,
+      options: ['Azul', 'Verde', 'Amarelo'],
+    } as Question;
+
+    const useCase = new InsertQuestionsInFormUseCase(
+      { findById: async () => ({ id: 'form', accountId: 'acc' }) } as unknown as FormRepository,
+      { findByFormId: async () => [existing], deleteMany: vi.fn(), saveMany } as unknown as QuestionRepository,
+      {} as QuestionClassificationCacheRepository,
+      {} as QuestionAnonymizationClassifier,
+      {} as JevQuestionClassifier,
+    );
+
+    await useCase.execute({
+      accountId: 'acc',
+      formId: 'form',
+      questions: [{ ...existing, options: ['Verde', 'Amarelo', 'Azul'] }],
+    });
+
+    expect(saveMany).toHaveBeenCalledTimes(1);
+    expect((saveMany.mock.calls[0][0] as Question[])[0].options).toEqual(['Verde', 'Amarelo', 'Azul']);
+    expect(existing.options).toEqual(['Azul', 'Verde', 'Amarelo']);
+  });
 });

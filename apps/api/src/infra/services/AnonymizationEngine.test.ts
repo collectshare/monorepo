@@ -92,16 +92,20 @@ describe('AnonymizationEngine', () => {
       expect(engine.generalize('', year)).toBe('');
     });
 
+    it('numeric_range returns an empty string for non-numeric values instead of leaking them', () => {
+      const engine = createEngine();
+      const range = { type: 'numeric_range', step: 10 } as const;
+
+      expect(engine.generalize('42', range)).toBe('40-49');
+      expect(engine.generalize('quarenta e dois', range)).toBe('');
+      expect(engine.generalize('', range)).toBe('');
+      expect(engine.generalize('Infinity', range)).toBe('');
+    });
+
     it('buckets numeric values into a range using the configured step', () => {
       const engine = createEngine();
 
       expect(engine.generalize('27', { type: 'numeric_range', step: 10 })).toBe('20-29');
-    });
-
-    it('returns the raw value when a numeric_range value is not a number', () => {
-      const engine = createEngine();
-
-      expect(engine.generalize('not-a-number', { type: 'numeric_range', step: 10 })).toBe('not-a-number');
     });
 
     it('keeps only the configured prefix length for text_prefix', () => {

@@ -76,7 +76,8 @@ export class AnonymizationEngine {
       }
       case 'numeric_range': {
         const num = parseFloat(value);
-        if (isNaN(num)) { return value; }
+        // Not a number: fail closed, same as date_truncate.
+        if (!Number.isFinite(num)) { return ''; }
         const lower = Math.floor(num / config.step) * config.step;
         const upper = lower + config.step - 1;
         return `${lower}-${upper}`;

@@ -34,16 +34,17 @@ export class GetPublishedFormDataQuery {
           submissionId: submission.id,
           submittedAt: submission.submittedAt,
           answers: answers
-            .filter(answer => questionById.get(answer.questionId)?.questionType !== QuestionType.FILE)
-            .map(answer => {
+            .flatMap(answer => {
               const question = questionById.get(answer.questionId);
 
-              return {
+              // An answer whose question was deleted has no piiStrategy to apply:
+              // drop it instead of publishing the raw value.
+              if (!question || question.questionType === QuestionType.FILE) { return []; }
+
+              return [{
                 questionId: answer.questionId,
-                value: question
-                  ? this.anonymizationEngine.resolve(question, answer.value)
-                  : answer.value,
-              };
+                value: this.anonymizationEngine.resolve(question, answer.value),
+              }];
             }),
         };
       }),

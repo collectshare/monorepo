@@ -94,8 +94,8 @@ export class InsertQuestionsInFormUseCase {
         (existingQuestion.piiStrategy ?? null) !== (question.piiStrategy ?? null) ||
         JSON.stringify(existingQuestion.generalizationConfig ?? null) !==
         JSON.stringify(question.generalizationConfig ?? null) ||
-        JSON.stringify(existingQuestion.options?.sort((a, b) => a.localeCompare(b)) ?? []) !==
-        JSON.stringify(question.options?.sort((a, b) => a.localeCompare(b)) ?? []);
+        // Options are shown in the order given, so a reorder is a change.
+        JSON.stringify(existingQuestion.options ?? []) !== JSON.stringify(question.options ?? []);
 
       if (!hasChanged) {
         continue;

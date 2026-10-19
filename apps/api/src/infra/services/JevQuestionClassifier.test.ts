@@ -81,4 +81,22 @@ describe('JevQuestionClassifier', () => {
 
     expect(results.get('q1')).toMatchObject({ error: expect.any(String) });
   });
+
+  it('sends only the question text and type to the provider, never answers or options', async () => {
+    const fetchMock = vi.fn(async () => jsonResponse({
+      model: 'jev-1.13.0',
+      answers: { pii: { type: 'noul', noul: 0.5 } },
+      usage: { input_tokens: 1, output_tokens: 1 },
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+    const leaky = { ...items[0], options: ['opção secreta'], answers: ['resposta secreta 123.456.789-00'] };
+
+    await makeClassifier('ts-key').classify([leaky as JevQuestionClassifier.Item]);
+
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(body.state).toEqual({ pergunta: 'Qual o nome da sua mãe?', tipo: QuestionType.TEXT });
+    expect(String(init.body)).not.toMatch(/secret/);
+  });
 });
+

@@ -8,7 +8,7 @@ const WEB_APP_URL = import.meta.env.VITE_WEB_APP_URL;
 export function PortalLayout() {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b flex items-center justify-between px-6 py-3">
+      <header className="border-b flex flex-wrap items-center justify-between gap-2 px-4 sm:px-6 py-3">
         <Link to="/" className="flex items-center gap-2">
           <Logo />
           <span className="text-muted-foreground text-lg">portal</span>
@@ -25,7 +25,13 @@ export function PortalLayout() {
               Entrar
             </a>
           )}
-          <Link to="/api-docs" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+          <Link to="/sobre" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+            Como funciona
+          </Link>
+          <Link to="/mcp" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+            Conectar IA
+          </Link>
+          <Link to="/api-docs"className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
             API Docs
           </Link>
           <ThemeSwitcher />

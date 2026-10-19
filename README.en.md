@@ -5,7 +5,7 @@
 A platform to build forms, collect responses and publish them as **open data**, with personal data anonymized (LGPD, Brazil's data protection law) before anything is published.
 
 - **App** (`apps/web`): build forms, track responses in a filterable dashboard, export CSV and manage API keys.
-- **Open-data portal** (`apps/portal`): public search over published datasets, paginated browsing and CSV download, no login required.
+- **Open-data portal** (`apps/portal`): public search over published datasets, paginated browsing and CSV download, no login required. The `/sobre` page walks through how a response travels to each way it can be read (see also [`docs/visao-geral.md`](./docs/visao-geral.md)). The `/mcp` page shows how to connect the MCP server in claude.ai, Claude Desktop, Claude Code and Cursor.
 - **External `/v1` API**: programmatic access with scoped API keys.
 - **MCP server**: connect Claude, Claude Code or Cursor to your account over OAuth and manage forms in natural language.
 
@@ -157,4 +157,5 @@ cd infra/portal-spa && terraform init && terraform plan
 
 - [`CLAUDE.md`](./CLAUDE.md): detailed technical architecture guide
 - [`apps/api/docs/API_DOCS.md`](./apps/api/docs/API_DOCS.md): Cognito-authenticated routes
+- [`docs/visao-geral.md`](./docs/visao-geral.md): system overview (actors, data journey, MCP flow) in Mermaid, pt-BR
 - [`docs/`](./docs): design notes (open-data portal, anonymization, dashboard)

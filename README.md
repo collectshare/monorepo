@@ -5,7 +5,7 @@
 Plataforma para criar formulários, coletar respostas e publicá-las como **dados abertos** — com anonimização de dados pessoais (LGPD) antes de qualquer publicação.
 
 - **App** (`apps/web`): crie formulários, acompanhe respostas em um dashboard com filtros, exporte CSV e gerencie chaves de API.
-- **Portal de dados abertos** (`apps/portal`): busca pública nos datasets publicados, visualização paginada e download em CSV, sem login.
+- **Portal de dados abertos** (`apps/portal`): busca pública nos datasets publicados, visualização paginada e download em CSV, sem login. A página `/sobre` mostra, passo a passo, o caminho de uma resposta até cada forma de leitura (ver também [`docs/visao-geral.md`](./docs/visao-geral.md)). A página `/mcp` ensina a conectar o servidor MCP no claude.ai, Claude Desktop, Claude Code e Cursor.
 - **API externa `/v1`**: acesso programático com chaves de API e escopos.
 - **Servidor MCP**: conecte o Claude, Claude Code ou Cursor à sua conta via OAuth e gerencie formulários por linguagem natural.
 
@@ -157,4 +157,5 @@ cd infra/portal-spa && terraform init && terraform plan
 
 - [`CLAUDE.md`](./CLAUDE.md): guia técnico detalhado da arquitetura (em inglês)
 - [`apps/api/docs/API_DOCS.md`](./apps/api/docs/API_DOCS.md): rotas autenticadas por Cognito
+- [`docs/visao-geral.md`](./docs/visao-geral.md): visão geral do sistema (atores, percurso do dado, fluxo MCP) em Mermaid
 - [`docs/`](./docs): notas de design (portal de dados abertos, anonimização, dashboard)

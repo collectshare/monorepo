@@ -201,7 +201,7 @@ A stateless [Model Context Protocol](https://modelcontextprotocol.io) server (St
 | `search_datasets` | `SearchDatasetsController` | read-only |
 | `get_dataset_data` | `GetPublishedFormDataController` | `limit` default 20, max 100, paginate with `nextCursor` |
 
-- **Adding a tool:** subclass `McpTool` (Zod `argsSchema` → JSON Schema input + validation), decorate with `@Injectable()`, register it in `ToolRegistry`. Set annotations (`readOnlyHint`/`destructiveHint`/`idempotentHint`) honestly.
+- **Adding a tool:** also list it in `apps/portal/src/views/pages/McpGuide/content.ts`. Subclass `McpTool` (Zod `argsSchema` → JSON Schema input + validation), decorate with `@Injectable()`, register it in `ToolRegistry`. Set annotations (`readOnlyHint`/`destructiveHint`/`idempotentHint`) honestly.
 - **Errors:** tool failures (validation, not-found, not-allowed, unexpected) are returned as `result.isError = true` via the shared `toErrorPayload` (`application/errors/`), also used by `lambdaHttpAdapter`; only protocol problems are JSON-RPC errors.
 - **Security — prompt injection:** dataset rows and form submissions are text written by other people and are returned next to write tools. Tool descriptions and server `instructions` tell the model to treat them as data, and the write tools carry destructive annotations so clients can ask for confirmation, but a grant still means full access to the user's account: connect only clients you trust (a connection UI to list and revoke grants does not exist yet; grants are revocable in the data model).
 - Verify a deployed stack with `API_URL=… EMAIL=… PASSWORD=… pnpm --filter @monorepo/api verify:mcp-server` (optionally `FOREIGN_FORM_ID` to check ownership isolation and `API_KEY` to check PAT rejection).
@@ -251,13 +251,15 @@ Services in `app/services/` (`authService`, `accountsService`, `formsService`, `
 ```
 src/
   app/
-    router/     # Routes: "/" (search), "/dataset/:formId", "/api-docs"
+    router/     # Routes: "/" (search), "/dataset/:formId", "/sobre", "/mcp", "/api-docs"
     services/
       portalService/  # Calls the public /portal/* endpoints on apps/api
   views/
     pages/
       Home/     # Semantic dataset search (GET /portal/search)
       Dataset/  # Dataset metadata + paginated (anonymized) data table + CSV download link (GET /portal/datasets/{formId}[/data|/export])
+      About/    # "/sobre": "siga um dado" walkthrough (5 steps + 4 read doors); content.ts mirrors docs/visao-geral.md node IDs, keep both in sync
+      McpGuide/ # "/mcp": how to connect the MCP server in claude.ai/Desktop, Claude Code and Cursor; content.ts lists the tools, keep it in sync with ToolRegistry
       ApiDocs/  # Scalar API reference over public/openapi.yaml (/v1 external API spec)
 ```
 

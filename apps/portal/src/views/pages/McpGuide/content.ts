@@ -58,7 +58,7 @@ export const TOOLS: Tool[] = [
   { name: 'search_datasets', description: 'Busca datasets publicados no portal.', kind: 'read' },
   { name: 'get_dataset_data', description: 'Lê as linhas (anonimizadas) de um dataset publicado, página a página.', kind: 'read' },
   { name: 'create_form', description: 'Cria um formulário novo na sua conta.', kind: 'write' },
-  { name: 'update_form', description: 'Substitui os detalhes de um formulário (título, descrição, tags). Campos omitidos voltam ao padrão.', kind: 'destructive' },
+  { name: 'update_form', description: 'Substitui título, descrição e tags de um formulário. Flags omitidas (publicado, anônimo, página única) mantêm o valor atual.', kind: 'destructive' },
   { name: 'insert_questions', description: 'Substitui todas as perguntas de um formulário. Perguntas que ficarem de fora são apagadas.', kind: 'destructive' },
 ];
 

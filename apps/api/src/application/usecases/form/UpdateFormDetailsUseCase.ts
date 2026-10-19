@@ -8,10 +8,10 @@ export type UpdateFormDetailsUseCaseRequest = {
   accountId: string;
   title: string;
   description?: string;
-  onePage: boolean;
+  onePage?: boolean;
   tags?: string[];
-  isAnonymous: boolean;
-  isPublished: boolean;
+  isAnonymous?: boolean;
+  isPublished?: boolean;
 };
 
 @Injectable()
@@ -31,10 +31,10 @@ export class UpdateFormDetailsUseCase {
 
     form.title = title;
     form.description = description;
-    form.onePage = onePage;
+    form.onePage = onePage ?? form.onePage;
     form.tags = tags;
-    form.isAnonymous = isAnonymous;
-    form.isPublished = isPublished;
+    form.isAnonymous = isAnonymous ?? form.isAnonymous;
+    form.isPublished = isPublished ?? form.isPublished;
 
     await this.formRepository.update(form);
   }

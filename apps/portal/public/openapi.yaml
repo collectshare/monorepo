@@ -184,15 +184,15 @@ paths:
       description: |
         **Scope:** `forms:write`
 
-        Substitui título, descrição, tags e flags de um formulário da própria conta. Todos os campos são
-        reenviados a cada chamada; campos omitidos voltam ao valor padrão.
+        Substitui título, descrição e tags de um formulário da própria conta (descrição e tags omitidas
+        são apagadas). Flags omitidas (`isAnonymous`, `onePage`, `isPublished`) mantêm o valor atual.
       parameters:
         - $ref: '#/components/parameters/FormId'
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/FormInput' }
+            schema: { $ref: '#/components/schemas/FormUpdateInput' }
       responses:
         '204': { description: Formulário atualizado. }
         '400': { $ref: '#/components/responses/ValidationError' }
@@ -383,6 +383,17 @@ components:
         isAnonymous: { type: boolean, default: true }
         onePage: { type: boolean, default: false }
         isPublished: { type: boolean, default: true }
+
+    FormUpdateInput:
+      type: object
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string }
+        tags: { type: array, items: { type: string } }
+        isAnonymous: { type: boolean, description: Omitido = mantém o valor atual. }
+        onePage: { type: boolean, description: Omitido = mantém o valor atual. }
+        isPublished: { type: boolean, description: Omitido = mantém o valor atual. }
 
     Form:
       type: object

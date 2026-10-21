@@ -177,13 +177,12 @@ async function main() {
 
   const created = await callTool(token, 'create_form', {
     title: `MCP verify ${new Date().toISOString()}`,
-    isPublished: false,
   });
   const formId = created.data?.formId as string | undefined;
   check('create_form returns a formId', !created.isError && !!formId, created.text);
 
   if (formId) {
-    const updated = await callTool(token, 'update_form', { formId, title: 'MCP verify (updated)', isPublished: false });
+    const updated = await callTool(token, 'update_form', { formId, title: 'MCP verify (updated)' });
     check('update_form acknowledges', !updated.isError && updated.data?.ok === true, updated.text);
 
     const inserted = await callTool(token, 'insert_questions', {

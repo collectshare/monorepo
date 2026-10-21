@@ -1,6 +1,8 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 
+// Every form is now anonymous and published. Removes the legacy isAnonymous/isPublished
+// attributes; the resulting MODIFY makes onFormChanged (re)index the form in Algolia.
 const tableName = process.env.MAIN_TABLE_NAME;
 
 if (!tableName) {
@@ -9,31 +11,27 @@ if (!tableName) {
 
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient());
 
-async function backfillFormIsPublished(): Promise<void> {
+async function cleanupFormFlags(): Promise<void> {
   let exclusiveStartKey: Record<string, unknown> | undefined;
-  let scanned = 0;
   let updated = 0;
 
   do {
     const { Items = [], LastEvaluatedKey } = await dynamoClient.send(
       new ScanCommand({
         TableName: tableName,
-        FilterExpression: '#type = :type AND attribute_not_exists(isPublished)',
+        FilterExpression: '#type = :type AND (attribute_exists(isPublished) OR attribute_exists(isAnonymous))',
         ExpressionAttributeNames: { '#type': 'type' },
         ExpressionAttributeValues: { ':type': 'Form' },
         ExclusiveStartKey: exclusiveStartKey,
       }),
     );
 
-    scanned += Items.length;
-
     for (const item of Items) {
       await dynamoClient.send(
         new UpdateCommand({
           TableName: tableName,
           Key: { PK: item.PK, SK: item.SK },
-          UpdateExpression: 'SET isPublished = :isPublished',
-          ExpressionAttributeValues: { ':isPublished': true },
+          UpdateExpression: 'REMOVE isPublished, isAnonymous',
         }),
       );
       updated += 1;
@@ -42,10 +40,10 @@ async function backfillFormIsPublished(): Promise<void> {
     exclusiveStartKey = LastEvaluatedKey;
   } while (exclusiveStartKey);
 
-  console.log(`Backfill complete. Forms missing isPublished found: ${scanned}. Updated: ${updated}.`);
+  console.log(`Cleanup complete. Forms updated: ${updated}.`);
 }
 
-backfillFormIsPublished().catch((error) => {
-  console.error('Backfill failed', error);
+cleanupFormFlags().catch((error) => {
+  console.error('Cleanup failed', error);
   process.exit(1);
 });

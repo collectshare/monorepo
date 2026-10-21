@@ -185,7 +185,8 @@ paths:
         **Scope:** `forms:write`
 
         Substitui título, descrição e tags de um formulário da própria conta (descrição e tags omitidas
-        são apagadas). Flags omitidas (`isAnonymous`, `onePage`, `isPublished`) mantêm o valor atual.
+        são apagadas). `onePage` e `descriptionAlign` omitidos mantêm o valor atual. Todo formulário é anônimo
+        e publicado no portal; não há flags para isso.
       parameters:
         - $ref: '#/components/parameters/FormId'
       requestBody:
@@ -365,7 +366,7 @@ components:
       properties:
         formId: { type: string }
         title: { type: string }
-        description: { type: string }
+        description: { type: string, description: "Markdown: parágrafos, quebras de linha, **negrito**, *itálico*, [links](https://…) e listas. HTML é ignorado." }
         tags: { type: array, items: { type: string } }
         submissionCount: { type: integer }
         clickCount: { type: integer }
@@ -378,36 +379,33 @@ components:
       required: [title]
       properties:
         title: { type: string, minLength: 1 }
-        description: { type: string }
+        description: { type: string, description: "Markdown: parágrafos, quebras de linha, **negrito**, *itálico*, [links](https://…) e listas. HTML é ignorado." }
+        descriptionAlign: { type: string, enum: [left, center, right], description: Alinhamento da descrição inteira na tela de resposta. Omitido = centro. }
         tags: { type: array, items: { type: string } }
-        isAnonymous: { type: boolean, default: true }
         onePage: { type: boolean, default: false }
-        isPublished: { type: boolean, default: true }
 
     FormUpdateInput:
       type: object
       required: [title]
       properties:
         title: { type: string, minLength: 1 }
-        description: { type: string }
+        description: { type: string, description: "Markdown: parágrafos, quebras de linha, **negrito**, *itálico*, [links](https://…) e listas. HTML é ignorado." }
+        descriptionAlign: { type: string, enum: [left, center, right], description: Omitido = mantém o valor atual. }
         tags: { type: array, items: { type: string } }
-        isAnonymous: { type: boolean, description: Omitido = mantém o valor atual. }
         onePage: { type: boolean, description: Omitido = mantém o valor atual. }
-        isPublished: { type: boolean, description: Omitido = mantém o valor atual. }
 
     Form:
       type: object
-      required: [id, accountId, createdAt, title, isAnonymous, onePage, isPublished]
+      required: [id, accountId, createdAt, title, onePage]
       properties:
         id: { type: string }
         accountId: { type: string }
         createdAt: { type: string, format: date-time }
         title: { type: string }
-        description: { type: string }
+        description: { type: string, description: "Markdown: parágrafos, quebras de linha, **negrito**, *itálico*, [links](https://…) e listas. HTML é ignorado." }
+        descriptionAlign: { type: string, enum: [left, center, right], description: Alinhamento da descrição inteira na tela de resposta. Omitido = centro. }
         tags: { type: array, items: { type: string } }
-        isAnonymous: { type: boolean }
         onePage: { type: boolean }
-        isPublished: { type: boolean }
         submissionCount: { type: integer }
         clickCount: { type: integer }
         downloadCount: { type: integer }

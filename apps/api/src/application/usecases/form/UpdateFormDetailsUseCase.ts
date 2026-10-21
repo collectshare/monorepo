@@ -1,3 +1,4 @@
+import { Form } from '@monorepo/shared/entities/Form';
 import { FormRepository } from '@infra/database/dynamo/repositories/FormRepository';
 import { Injectable } from '@kernel/decorators/Injectable';
 import { NotAllowedError } from '@application/errors/application/NotAllowedError';
@@ -8,17 +9,16 @@ export type UpdateFormDetailsUseCaseRequest = {
   accountId: string;
   title: string;
   description?: string;
+  descriptionAlign?: Form.DescriptionAlign;
   onePage?: boolean;
   tags?: string[];
-  isAnonymous?: boolean;
-  isPublished?: boolean;
 };
 
 @Injectable()
 export class UpdateFormDetailsUseCase {
   constructor(private readonly formRepository: FormRepository) { }
 
-  async execute({ formId, accountId, title, description, onePage, tags, isAnonymous, isPublished }: UpdateFormDetailsUseCaseRequest): Promise<void> {
+  async execute({ formId, accountId, title, description, descriptionAlign, onePage, tags }: UpdateFormDetailsUseCaseRequest): Promise<void> {
     const form = await this.formRepository.findById(formId);
 
     if (!form) {
@@ -31,10 +31,9 @@ export class UpdateFormDetailsUseCase {
 
     form.title = title;
     form.description = description;
+    form.descriptionAlign = descriptionAlign ?? form.descriptionAlign;
     form.onePage = onePage ?? form.onePage;
     form.tags = tags;
-    form.isAnonymous = isAnonymous ?? form.isAnonymous;
-    form.isPublished = isPublished ?? form.isPublished;
 
     await this.formRepository.update(form);
   }

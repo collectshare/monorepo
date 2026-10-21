@@ -29,11 +29,6 @@ export class OnFormChangedUseCase implements IDynamoStreamConsumer {
       return;
     }
 
-    if (!form.isPublished) {
-      await this.algoliaGateway.deleteRecord(form.id);
-      return;
-    }
-
     const profile = await this.profileRepository.findByAccountId(form.accountId);
 
     await this.algoliaGateway.upsertRecord({

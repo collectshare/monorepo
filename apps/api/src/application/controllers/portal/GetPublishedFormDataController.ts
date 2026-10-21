@@ -26,7 +26,7 @@ export class GetPublishedFormDataController extends Controller<'public', GetPubl
   ): Promise<Controller.Response<GetPublishedFormDataController.Response>> {
     const form = await this.formRepository.findById(params.formId);
 
-    if (!form || !form.isPublished) {
+    if (!form) {
       throw new ResourceNotFound('Dataset not found');
     }
 

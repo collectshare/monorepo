@@ -17,21 +17,23 @@ function setup(attrs: Partial<Form.Attributes>) {
 }
 
 describe('UpdateFormDetailsUseCase', () => {
-  it('keeps the current flags when the body omits them (no republish of an unpublished form)', async () => {
-    const { form, useCase } = setup({ isPublished: false, isAnonymous: false, onePage: true });
+  it('keeps onePage and descriptionAlign when the body omits them', async () => {
+    const { form, useCase } = setup({ onePage: true, descriptionAlign: 'left' });
     const body = updateFormSchema.parse({ title: 'New' });
 
     await useCase.execute({ formId: 'form-1', accountId: 'account-1', ...body });
 
-    expect(form).toMatchObject({ title: 'New', isPublished: false, isAnonymous: false, onePage: true });
+    expect(form).toMatchObject({ title: 'New', onePage: true, descriptionAlign: 'left' });
   });
 
-  it('applies flags that are sent explicitly', async () => {
-    const { form, useCase } = setup({ isPublished: false, isAnonymous: false, onePage: true });
-    const body = updateFormSchema.parse({ title: 'New', isPublished: true, isAnonymous: true, onePage: false });
+  it('applies values that are sent explicitly and ignores the removed isAnonymous/isPublished flags', async () => {
+    const { form, useCase } = setup({ onePage: true });
+    const body = updateFormSchema.parse({ title: 'New', isPublished: false, isAnonymous: false, onePage: false, descriptionAlign: 'right' });
 
     await useCase.execute({ formId: 'form-1', accountId: 'account-1', ...body });
 
-    expect(form).toMatchObject({ isPublished: true, isAnonymous: true, onePage: false });
+    expect(body).not.toHaveProperty('isPublished');
+    expect(body).not.toHaveProperty('isAnonymous');
+    expect(form).toMatchObject({ onePage: false, descriptionAlign: 'right' });
   });
 });

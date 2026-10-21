@@ -23,8 +23,6 @@ export class SubmitFormUseCase {
   async execute({
     formId,
     answers: answersData,
-    ip,
-    userAgent,
   }: SubmitFormUseCase.Input): Promise<SubmitFormUseCase.Output> {
     const [form, questions] = await Promise.all([
       this.formRepository.findById(formId),
@@ -50,8 +48,9 @@ export class SubmitFormUseCase {
 
     const submission = new FormSubmission({
       formId,
-      ip: form.isAnonymous ? null : ip,
-      userAgent: form.isAnonymous ? null : userAgent,
+      // Every form is anonymous: never store the respondent's IP or user agent.
+      ip: null,
+      userAgent: null,
     });
 
     const answers = await Promise.all(answersData.map(async answerData => {
@@ -101,8 +100,6 @@ export namespace SubmitFormUseCase {
       questionId: string;
       value: string | string[] | number | { name: string; type: string; content: string };
     }>;
-    ip: string | null;
-    userAgent: string | null;
   };
 
   export type Output = {

@@ -35,14 +35,13 @@ export class FormItem {
       accountId: formItem.accountId,
       title: formItem.title,
       description: formItem.description,
+      descriptionAlign: formItem.descriptionAlign,
       tags: formItem.tags,
       onePage: formItem.onePage,
-      isAnonymous: formItem.isAnonymous,
       submissionCount: formItem.submissionCount,
       clickCount: formItem.clickCount,
       downloadCount: formItem.downloadCount,
       createdAt: new Date(formItem.createdAt),
-      isPublished: formItem.isPublished ?? true,
     });
   }
 
@@ -76,14 +75,13 @@ export namespace FormItem {
     accountId: string;
     title: string;
     description: string | undefined;
+    descriptionAlign?: Form.DescriptionAlign;
     tags?: string[];
     onePage: boolean;
-    isAnonymous: boolean;
     submissionCount?: number;
     clickCount?: number;
     downloadCount?: number;
     createdAt: string;
-    isPublished?: boolean;
   };
 
   export type ItemType = Keys & Attributes & {

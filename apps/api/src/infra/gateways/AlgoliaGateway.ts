@@ -28,10 +28,6 @@ export class AlgoliaGateway {
     });
   }
 
-  async deleteRecord(formId: string): Promise<void> {
-    await this.index.deleteObject(formId);
-  }
-
   async search(query: string, sort?: AlgoliaGateway.Sort): Promise<AlgoliaGateway.DatasetRecord[]> {
     const index = sort === 'trending' ? this.trendingIndex : this.index;
 

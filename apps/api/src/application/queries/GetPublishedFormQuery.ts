@@ -16,7 +16,7 @@ export class GetPublishedFormQuery {
   async execute(formId: string): Promise<GetPublishedFormQuery.Output> {
     const form = await this.formRepository.findById(formId);
 
-    if (!form || !form.isPublished) {
+    if (!form) {
       throw new ResourceNotFound('Dataset not found');
     }
 

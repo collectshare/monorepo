@@ -26,9 +26,7 @@ function request(
   return {
     body: {
       title: 'Minha pesquisa',
-      isAnonymous: true,
       onePage: false,
-      isPublished: true,
     },
     params: {},
     queryParams: {},
@@ -60,9 +58,7 @@ describe('ExternalCreateFormController', () => {
     expect(response).toEqual({ statusCode: 201, body: { formId: 'form-1' } });
     expect(createFormUseCase.execute).toHaveBeenCalledWith({
       title: 'Minha pesquisa',
-      isAnonymous: true,
       onePage: false,
-      isPublished: true,
       accountId: 'account-1',
     });
   });
@@ -71,7 +67,7 @@ describe('ExternalCreateFormController', () => {
     const { controller } = createController({});
 
     expect(() =>
-      controller.execute(request({ body: { isAnonymous: true, onePage: false, isPublished: true } as CreateFormBody })),
+      controller.execute(request({ body: { onePage: false } as CreateFormBody })),
     ).toThrow();
   });
 });

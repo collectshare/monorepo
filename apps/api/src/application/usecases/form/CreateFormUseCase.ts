@@ -10,19 +10,17 @@ export class CreateFormUseCase {
     accountId,
     title,
     description,
+    descriptionAlign,
     onePage,
     tags,
-    isAnonymous,
-    isPublished,
   }: CreateFormUseCase.Input): Promise<CreateFormUseCase.Output> {
     const form = new Form({
       accountId,
       title,
       description,
+      descriptionAlign,
       onePage,
       tags,
-      isAnonymous,
-      isPublished,
     });
 
     await this.formRepository.create(form);
@@ -38,10 +36,9 @@ export namespace CreateFormUseCase {
     accountId: string;
     title: string;
     description?: string;
+    descriptionAlign?: Form.DescriptionAlign;
     onePage: boolean;
     tags?: string[];
-    isAnonymous: boolean;
-    isPublished?: boolean;
   };
 
   export type Output = {

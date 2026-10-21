@@ -12,13 +12,11 @@ export class SubmitFormController extends Controller<'public', SubmitFormControl
   }
 
   protected override async handle(
-    { params, body, ip, userAgent }: Controller.Request<'public', SubmitFormBody, { formId: string }>,
+    { params, body }: Controller.Request<'public', SubmitFormBody, { formId: string }>,
   ): Promise<Controller.Response<SubmitFormController.Response>> {
     const { submissionId } = await this.submitFormUseCase.execute({
       formId: params.formId,
       answers: body.answers,
-      ip,
-      userAgent,
     });
 
     return {

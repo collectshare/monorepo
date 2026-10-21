@@ -111,7 +111,7 @@ describe('tool catalog', () => {
     const schemas = Object.fromEntries(registry.list().map(tool => [tool.name, tool.inputSchema as any]));
 
     expect(schemas.create_form.required).toEqual(['title']);
-    expect(schemas.create_form.properties).toHaveProperty('isPublished');
+    expect(schemas.create_form.properties).not.toHaveProperty('isPublished');
     expect(schemas.update_form.required).toEqual(expect.arrayContaining(['formId', 'title']));
     expect(schemas.insert_questions.required).toEqual(expect.arrayContaining(['formId', 'questions']));
     expect(schemas.insert_questions.properties.questions.type).toBe('array');
@@ -148,7 +148,7 @@ describe('account-owned tools', () => {
 
     const request = controllers.create.execute.mock.calls[0][0];
     expect(request.accountId).toBe('account-1');
-    expect(request.body).toMatchObject({ title: 'Pesquisa', isPublished: true });
+    expect(request.body).toMatchObject({ title: 'Pesquisa', onePage: false });
     expect(request.body).not.toHaveProperty('accountId');
   });
 

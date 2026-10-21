@@ -17,7 +17,6 @@ function createForm(attrs: Partial<Form.Attributes> = {}): Form {
   return new Form({
     accountId: 'account-1',
     title: 'Form',
-    isPublished: true,
     ...attrs,
   } as Form.Attributes);
 }
@@ -73,12 +72,6 @@ describe('ExternalGetPublishedFormDataController', () => {
 
   it('returns not found when the form does not exist', async () => {
     const { controller } = createController({ form: null });
-
-    await expect(controller.execute(request())).rejects.toBeInstanceOf(ResourceNotFound);
-  });
-
-  it('returns not found when the form is not published', async () => {
-    const { controller } = createController({ form: createForm({ isPublished: false }) });
 
     await expect(controller.execute(request())).rejects.toBeInstanceOf(ResourceNotFound);
   });

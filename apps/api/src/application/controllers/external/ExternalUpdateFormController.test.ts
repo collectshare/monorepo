@@ -27,9 +27,7 @@ function request(
   return {
     body: {
       title: 'Minha pesquisa atualizada',
-      isAnonymous: true,
       onePage: false,
-      isPublished: true,
     },
     params: { formId: 'form-1' },
     queryParams: {},
@@ -61,9 +59,7 @@ describe('ExternalUpdateFormController', () => {
       formId: 'form-1',
       accountId: 'account-1',
       title: 'Minha pesquisa atualizada',
-      isAnonymous: true,
       onePage: false,
-      isPublished: true,
     });
   });
 

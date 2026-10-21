@@ -16,7 +16,7 @@ export class UpdateFormTool extends McpTool<typeof argsSchema> {
 
   readonly title = 'Update form details';
 
-  readonly description = 'Replaces the details of one of your forms (title, description, tags, flags). Title, description and tags are replaced (omitted description/tags are cleared); omitted flags (isAnonymous, onePage, isPublished) keep their current value.';
+  readonly description = 'Replaces the details of one of your forms (title, description, tags, flags). Title, description and tags are replaced (omitted description/tags are cleared); omitted onePage and descriptionAlign keep their current value.';
 
   readonly annotations = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false };
 

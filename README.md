@@ -4,7 +4,7 @@
 
 Plataforma para criar formulários, coletar respostas e publicá-las como **dados abertos** — com anonimização de dados pessoais (LGPD) antes de qualquer publicação.
 
-- **App** (`apps/web`): crie formulários, acompanhe respostas em um dashboard com filtros, exporte CSV e gerencie chaves de API.
+- **App** (`apps/web`): crie formulários (descrição com texto rico: negrito, itálico, links, listas), acompanhe respostas em um dashboard com filtros, exporte CSV e gerencie chaves de API.
 - **Portal de dados abertos** (`apps/portal`): busca pública nos datasets publicados, visualização paginada e download em CSV, sem login. A página `/sobre` mostra, passo a passo, o caminho de uma resposta até cada forma de leitura (ver também [`docs/visao-geral.md`](./docs/visao-geral.md)). A página `/mcp` ensina a conectar o servidor MCP no claude.ai, Claude Desktop, Claude Code e Cursor.
 - **API externa `/v1`**: acesso programático com chaves de API e escopos.
 - **Servidor MCP**: conecte o Claude, Claude Code ou Cursor à sua conta via OAuth e gerencie formulários por linguagem natural.
@@ -109,7 +109,7 @@ Nenhum dado pessoal sai cru para fora da visão do dono do formulário.
 2. No editor, o dono escolhe uma estratégia por pergunta: **pseudonimizar** (hash estável por formulário), **generalizar** (data → ano/mês, número → faixa, prefixo de texto, CEP → UF/DDD) ou **suprimir**.
 3. Toda leitura pública ou de terceiros (portal, CSV público, `/v1/portal/*`) passa pelo motor de anonimização. Sem estratégia definida, perguntas sinalizadas como dado pessoal são pseudonimizadas por padrão.
 
-Formulários são publicados no portal por padrão (`isPublished`), e o dono pode despublicar a qualquer momento.
+Todo formulário é anônimo (as respostas não guardam IP nem user agent) e publicado no portal. Não há opção para mudar isso: os dados pessoais são tratados pela anonimização de cada pergunta.
 
 ## API externa (`/v1`)
 

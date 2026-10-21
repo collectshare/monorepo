@@ -35,7 +35,7 @@ pnpm test               # Vitest (uses SWC so decorator metadata / DI wiring is 
 pnpm test:watch         # Vitest in watch mode
 pnpm dev:email          # Preview email templates (react-email dev server)
 pnpm deploy             # Deploy to AWS (sls deploy --stage dev)
-pnpm backfill:form-published   # One-off: set isPublished on legacy Form items
+pnpm cleanup:form-flags        # One-off: remove legacy isAnonymous/isPublished from Form items (reindexes them in Algolia)
 pnpm verify:mcp-oauth          # E2E check of the MCP OAuth flow against a deployed stack
 pnpm verify:mcp-server         # E2E check of POST /mcp against a deployed stack
 ```
@@ -53,6 +53,7 @@ pnpm lint               # ESLint
 pnpm typecheck          # TypeScript check (no emit)
 pnpm preview            # Preview production build
 pnpm validate:env       # Validate environment variables
+pnpm test               # Vitest (rich-text description: editor round trip, renderer safety)
 ```
 
 ### Portal (`apps/portal`)
@@ -136,7 +137,7 @@ Deploy-time env comes from `sls/config/env.yml` / `apps/api/.env`: `ALGOLIA_APP_
 DynamoDB Streams on the main table (declared in `sls/functions/form.yml`):
 
 - `onFormSubmitted` (`FormSubmission` INSERT) — increments the form's `submissionCount`.
-- `onFormChanged` (`Form` INSERT/MODIFY) — `OnFormChangedUseCase` keeps the Algolia index in sync with `isPublished`.
+- `onFormChanged` (`Form` INSERT/MODIFY) — `OnFormChangedUseCase` upserts the form into the Algolia index.
 
 ### Public Portal Endpoints
 
@@ -147,7 +148,7 @@ DynamoDB Streams on the main table (declared in `sls/functions/form.yml`):
 - `GET /portal/datasets/{formId}/data` — cursor-paginated submission data (anonymized, see LGPD below).
 - `GET /portal/datasets/{formId}/export` — the same data as a CSV download.
 
-These only serve forms with `isPublished === true` (`Form` entity field, opt-out default). `pnpm backfill:form-published` sets the field on items created before it existed.
+Every form is published and anonymous by design. There is no flag, so these serve any existing form, and submissions never store the respondent's `ip`/`userAgent`. `pnpm cleanup:form-flags` removes the legacy `isAnonymous`/`isPublished` attributes from old items.
 
 ### LGPD / Anonymization
 
@@ -240,6 +241,10 @@ Services in `app/services/` (`authService`, `accountsService`, `formsService`, `
 - Guest-only (`AuthGuard isPrivate={false}`): `/sign-in`, `/sign-up`, `/forgot-password[/confirm]`. After sign-in, redirects to a sanitized `?returnTo` (`app/utils/safeReturnTo`).
 - Private: `/` (home), `/my-forms`, `/forms/builder[/:id]` (builder, incl. per-question `piiStrategy`), `/forms/dashboard/:formId` (submissions table with the filter builder in `FormDashboard/filters/`, CSV export), `/api-keys`, `/oauth/authorize` (MCP consent).
 
+### Form description (rich text)
+
+`Form.description` is a plain `string` holding **Markdown** (paragraphs, line breaks, bold, italic, links, lists) — no schema change, so legacy plain-text descriptions still work. `apps/web` edits it with `components/RichTextEditor` (Tiptap 3 + `@tiptap/markdown`, pinned `3.31.4`; StarterKit trimmed to what `RichText` renders; `markedOptions.breaks` so a single `\n` is a line break, matching `remark-breaks`). Toolbar: bold, italic, link (popover), lists, and alignment. Alignment applies to the whole description and is stored in `Form.descriptionAlign` (`left`/`center`/`right`, absent = center; omitted on update = unchanged). Respondent pages render it with `<RichText align>`; the portal dataset page with `<RichText>`; compact lists (My forms table, builder header, portal search cards) with `<RichText plain>` (same parser, so entities/escapes the editor writes such as `&amp;` and `\_` come out clean). `pnpm --filter @monorepo/web test` checks the editor round trip and the renderer's safety.
+
 ### Path Alias (Web)
 
 ```
@@ -276,6 +281,7 @@ Design-system components shared between `apps/web` and `apps/portal`, imported a
 src/
   components/
     ui/         # Button, Card, Badge, Input, Table, Select, Popover, Command, DropdownMenu, Separator
+    RichText.tsx  # Renders the form description (Markdown via react-markdown; raw HTML ignored, links only http(s)/mailto; `align`, `plain` for one-line lists)
     DataTable/  # DataTable and its sub-components (header, pagination, faceted filters, etc.)
   lib/utils.ts
   styles.css    # Shared theme tokens, imported as "@monorepo/ui/styles.css"

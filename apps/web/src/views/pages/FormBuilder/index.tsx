@@ -1,5 +1,5 @@
 
-import { Button, buttonVariants, Card, Separator } from '@monorepo/ui';
+import { Button, buttonVariants, Card, RichText, Separator } from '@monorepo/ui';
 import { Reorder } from 'framer-motion';
 import { ChartPieIcon, ChevronLeftIcon, CopyIcon, Edit2Icon, SaveIcon, SettingsIcon } from 'lucide-react';
 import { FormProvider } from 'react-hook-form';
@@ -74,7 +74,7 @@ export default function FormBuilder() {
                   </Button>
                 </h1>
                 <p className="truncate text-sm text-muted-foreground max-w-[30em] lg:max-w-[50em] text-ellipsis overflow-hidden mt-1">
-                  {formEntity?.description ?? '-'}
+                  {formEntity?.description ? <RichText plain>{formEntity.description}</RichText> : '-'}
                 </p>
               </>
             )}

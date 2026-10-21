@@ -19,8 +19,6 @@ export default function Home() {
     isEmpty,
     totalForms,
     totalResponses,
-    publishedCount,
-    draftCount,
     recentForms,
     topRespondedForms,
     topAccessedForms,
@@ -54,8 +52,6 @@ export default function Home() {
           <HomeStats
             totalForms={totalForms}
             totalResponses={totalResponses}
-            publishedCount={publishedCount}
-            draftCount={draftCount}
           />
 
           {!!noResponseForms.length && <NoResponsesCallout forms={noResponseForms} />}

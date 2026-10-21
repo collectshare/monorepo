@@ -1,4 +1,4 @@
-import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from '@monorepo/ui';
+import { Badge, buttonVariants, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, RichText } from '@monorepo/ui';
 import { SearchIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -53,7 +53,7 @@ export function Home() {
             <Card className="h-full hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle>{result.title}</CardTitle>
-                {result.description && <CardDescription>{result.description}</CardDescription>}
+                {result.description && <CardDescription><RichText plain className="line-clamp-3">{result.description}</RichText></CardDescription>}
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
                 <div className="flex flex-wrap gap-1">

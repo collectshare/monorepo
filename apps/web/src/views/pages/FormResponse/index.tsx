@@ -1,4 +1,4 @@
-import { Button } from '@monorepo/ui';
+import { Button, RichText } from '@monorepo/ui';
 import { ChevronLeft, ChevronRight, Moon, Sun } from 'lucide-react';
 import { FormProvider } from 'react-hook-form';
 
@@ -57,9 +57,7 @@ export default function FormResponse({ formEntity }: FormResponseProps) {
                 {formEntity?.form.title}
               </h1>
               {formEntity?.form.description && (
-                <p className="text-center text-muted-foreground mt-2">
-                  {formEntity?.form.description}
-                </p>
+                <RichText align={formEntity.form.descriptionAlign ?? 'center'} className="text-muted-foreground mt-2">{formEntity.form.description}</RichText>
               )}
               <div className="flex items-center gap-4 mt-6">
                 <Progress value={progress} className="w-full" />

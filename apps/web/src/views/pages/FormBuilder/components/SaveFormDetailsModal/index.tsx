@@ -5,11 +5,11 @@ import { CircleAlertIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 
 import { useModal } from '@/app/hooks/useModal';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { Label } from '@/components/ui/Label';
 import { Switch } from '@/components/ui/Switch';
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputList } from '@/components/ui/TagsInput';
-import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 
 import { useSaveFormDetailsModalController } from './useSaveFormDetailsModalController';
@@ -57,13 +57,27 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
           <Label htmlFor="description">
             Descrição
           </Label>
-          <Textarea
-            id="description"
-            placeholder="ex: Uma breve descrição sobre o objetivo deste formulário."
-            disabled={isLoading}
-            tabIndex={2}
-            {...register('description')}
-            />
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => (
+              <Controller
+                control={control}
+                name="descriptionAlign"
+                render={({ field: alignField }) => (
+                  <RichTextEditor
+                    id="description"
+                    placeholder="Descrição do formulário"
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                    align={alignField.value}
+                    onAlignChange={alignField.onChange}
+                    disabled={isLoading}
+                  />
+                )}
+              />
+            )}
+          />
           {errors.description?.message && (
             <div className="flex gap-2 items-center text-red-700 mt-1">
               <CrossCircledIcon />
@@ -99,47 +113,6 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
           />
         </div>
         <div className="flex items-center justify-between">
-          <Label htmlFor="isAnonymous" className="flex items-center gap-1">
-            Anonimizar as respostas
-          </Label>
-          <Controller
-            control={control}
-            name="isAnonymous"
-            render={({ field }) => (
-              <Switch
-                id="isAnonymous"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                disabled={isLoading}
-                tabIndex={4}
-              />
-            )}
-          />
-        </div>
-        <div className="grid gap-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="isPublished" className="flex items-center gap-1">
-              Publicar no portal de dados abertos
-            </Label>
-            <Controller
-              control={control}
-              name="isPublished"
-              render={({ field }) => (
-                <Switch
-                  id="isPublished"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={isLoading}
-                  tabIndex={6}
-                />
-              )}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            As respostas ficarão públicas e pesquisáveis no portal. Dados pessoais são tratados conforme a anonimização de cada pergunta.
-          </p>
-        </div>
-         <div className="flex items-center justify-between">
           <Label htmlFor="onePage" className="flex items-center gap-1">
             <TooltipProvider delayDuration={100}>
               <Tooltip>
@@ -162,7 +135,7 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
                 checked={field.value}
                 onCheckedChange={field.onChange}
                 disabled={isLoading}
-                tabIndex={5}
+                tabIndex={4}
               />
             )}
           />

@@ -8,6 +8,7 @@ import {
   CardTitle,
   DataTable,
   DataTableContent,
+  RichText,
 } from '@monorepo/ui';
 import { DownloadIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -50,7 +51,7 @@ export function Dataset() {
           </a>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          {dataset.form.description && <p className="text-muted-foreground">{dataset.form.description}</p>}
+          {dataset.form.description && <RichText className="text-muted-foreground">{dataset.form.description}</RichText>}
           <div className="flex flex-wrap gap-1">
             {dataset.form.tags?.map((tag) => (
               <Badge key={tag} variant="secondary">{tag}</Badge>

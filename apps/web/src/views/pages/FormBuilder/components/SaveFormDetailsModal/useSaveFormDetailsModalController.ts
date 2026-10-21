@@ -14,10 +14,9 @@ const schema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, 'O título é obrigatório').trim(),
   description: z.string().trim().optional(),
+  descriptionAlign: z.enum(['left', 'center', 'right']).default('center'),
   tags: z.array(z.string()).optional(),
-  isAnonymous: z.boolean().optional().default(true),
   onePage: z.boolean().optional().default(false),
-  isPublished: z.boolean().optional().default(true),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -42,10 +41,9 @@ export function useSaveFormDetailsModalController({ form }: UseSaveFormDetailsMo
       id: form?.id ?? '',
       title: form?.title ?? '',
       description: form?.description ?? '',
+      descriptionAlign: form?.descriptionAlign ?? 'center',
       onePage: form?.onePage ?? false,
       tags: form?.tags ?? [],
-      isAnonymous: form?.isAnonymous ?? true,
-      isPublished: form?.isPublished ?? true,
     },
   });
 

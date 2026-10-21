@@ -1,13 +1,14 @@
+import type { Form } from '@monorepo/shared/entities/Form';
+
 import { httpClient } from '../httpClient';
 
 export type SaveFormRequest = {
   id?: string;
   title: string;
   description?: string | undefined;
+  descriptionAlign?: Form.DescriptionAlign;
   tags?: string[];
-  isAnonymous: boolean;
   onePage: boolean;
-  isPublished: boolean;
 }
 
 export async function save({ id, ...params }: SaveFormRequest): Promise<{ formId?: string }> {

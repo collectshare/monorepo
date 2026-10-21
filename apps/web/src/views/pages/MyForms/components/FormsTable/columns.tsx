@@ -1,5 +1,5 @@
 import { IForm } from '@monorepo/shared/types/IForm';
-import { Button, DataTableColumnHeader, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@monorepo/ui';
+import { Button, DataTableColumnHeader, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, RichText } from '@monorepo/ui';
 import type { ColumnDef } from '@tanstack/react-table';
 import { CalendarIcon, ChartPieIcon, CopyIcon, Edit2, Ellipsis, SettingsIcon, SigmaIcon, TextIcon, TypeIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -46,6 +46,7 @@ export const columns: ColumnDef<IForm>[] = [
   {
     accessorKey: 'description',
     header: ({ column }) => <DataTableColumnHeader column={column} title={descriptionHeader()} />,
+    cell: ({ row }) => (row.original.description ? <RichText plain className="line-clamp-2">{row.original.description}</RichText> : '-'),
     enableResizing: false,
     enableHiding: false,
     meta: {

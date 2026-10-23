@@ -52,7 +52,7 @@ interface RichTextProps {
 export function RichText({ children, className, align = 'left', plain }: RichTextProps) {
   if (plain) {
     return (
-      <span className={className}>
+      <span className={cn('[overflow-wrap:anywhere]', className)}>
         <Markdown allowedElements={ALLOWED_ELEMENTS} unwrapDisallowed skipHtml components={plainComponents}>
           {children}
         </Markdown>

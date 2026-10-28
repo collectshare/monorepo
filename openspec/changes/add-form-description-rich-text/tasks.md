@@ -35,4 +35,5 @@
 ## 6. Verificação
 
 - [x] 6.1 `pnpm typecheck` e `pnpm lint` em web, portal e ui; `pnpm build` na raiz
+- [ ] 6.3 Corrigir o helper `plain` em `RichTextEditor.test.tsx` para remover `<span>` com atributos (`/<\/?span[^>]*>/g`); o `cn` do commit 0abfd99 quebrou `pnpm --filter @monorepo/web test` (Relatório Frontend 1.1)
 - [ ] 6.2 Manual: criar form pelo editor com quebras, negrito, link e listas; editar um form antigo de texto puro; colar `<script>`; conferir resposta, builder, portal e listagens

@@ -41,3 +41,10 @@
 
 - [ ] 6.1 Deploy the API to dev, run `cleanup:form-flags`, and check that the portal and Algolia list the forms that were unpublished
 - [ ] 6.2 Repeat for prod after release
+
+## 7. Resíduos encontrados na auditoria (Relatório Backend 3.4)
+
+- [ ] 7.1 `apps/portal/src/views/pages/McpGuide/content.ts`: descrição de `update_form` sem "publicado, anônimo" (só `onePage`/`descriptionAlign`)
+- [ ] 7.2 `apps/api/scripts/verifyMcpServer.ts`: trocar o check "get_dataset_data on an unpublished form -> not found" por "form novo é legível" e checar not found com `formId` inexistente
+- [ ] 7.3 `apps/portal/public/openapi.yaml`: tirar "ou existe mas não está publicado" (404) e "publicados ou não"/"publicado ou não" das descrições de `/v1/forms` e `/v1/submissions/{formId}`
+- [ ] 7.4 `apps/api/docs/API_DOCS.md`: `questionType` atuais (TEXT, MULTIPLE_CHOICE, CHECKBOX, DROPDOWN, STARS, FILE) e formato atual de submissions

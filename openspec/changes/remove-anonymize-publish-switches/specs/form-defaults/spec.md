@@ -36,3 +36,14 @@ The web form details modal SHALL NOT show anonymity or publication controls. The
 #### Scenario: Form returned by the API
 - **WHEN** any API returns a form
 - **THEN** the payload has no `isAnonymous` or `isPublished` field
+
+### Requirement: Respondents are told the answers are public
+The respondent pages SHALL tell the respondent, before any answer is sent, that the answers will be published on the open-data portal, that questions collecting personal data are protected, that IP and user agent are not stored, and that personal information should not be written in free-text answers.
+
+#### Scenario: Single-page form
+- **WHEN** a respondent opens a form with `onePage = true`
+- **THEN** the notice is shown below the title and description, above the questions
+
+#### Scenario: One question per step
+- **WHEN** a respondent opens a form with `onePage = false`
+- **THEN** the notice is shown below the title and description on the first question

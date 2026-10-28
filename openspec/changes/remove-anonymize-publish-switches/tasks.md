@@ -28,6 +28,7 @@
   - Remove the "Publicados / Rascunho" card from `HomeStats`.
   - Make the "sem respostas" filter `submissionCount === 0`.
 - [x] 4.4 Run `pnpm --filter @monorepo/web typecheck` and `lint`
+- [x] 4.5 Add `components/PublicDataNotice` to `SinglePageForm` (below the header) and `FormResponse` (first question only), telling respondents the answers are public (LGPD art. 9)
 
 ## 5. Contract + docs
 

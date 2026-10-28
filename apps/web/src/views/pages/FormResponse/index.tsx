@@ -4,6 +4,7 @@ import { FormProvider } from 'react-hook-form';
 
 import { useTheme } from '@/app/hooks/useTheme';
 import { GetByIdResponse } from '@/app/services/formsService/getForm';
+import { PublicDataNotice } from '@/components/PublicDataNotice';
 import { Progress } from '@/components/ui/Progress';
 
 import { FormField } from './components/FormField';
@@ -59,6 +60,7 @@ export default function FormResponse({ formEntity }: FormResponseProps) {
               {formEntity?.form.description && (
                 <RichText align={formEntity.form.descriptionAlign ?? 'center'} className="text-muted-foreground mt-2">{formEntity.form.description}</RichText>
               )}
+              {isFirstQuestion && <PublicDataNotice />}
               <div className="flex items-center gap-4 mt-6">
                 <Progress value={progress} className="w-full" />
                 <span className="text-sm font-medium text-muted-foreground">

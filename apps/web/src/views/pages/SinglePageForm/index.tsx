@@ -4,6 +4,7 @@ import { FormProvider } from 'react-hook-form';
 
 import { useTheme } from '@/app/hooks/useTheme';
 import { GetByIdResponse } from '@/app/services/formsService/getForm';
+import { PublicDataNotice } from '@/components/PublicDataNotice';
 
 import { FormField } from './components/FormField';
 import { FormFinished } from './components/FormFinished';
@@ -51,6 +52,7 @@ export default function SinglePageForm({ formEntity }: SinglePageFormProps) {
               {formEntity?.form.description && (
                 <RichText align={formEntity.form.descriptionAlign ?? 'center'} className="text-muted-foreground mt-2">{formEntity.form.description}</RichText>
               )}
+              <PublicDataNotice />
             </header>
 
             <main className="flex-grow w-full">

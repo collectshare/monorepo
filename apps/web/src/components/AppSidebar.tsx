@@ -1,6 +1,7 @@
 import { Logo, Separator } from '@monorepo/ui';
 import {
   FilePenIcon,
+  GlobeIcon,
   HomeIcon,
   KeyRoundIcon,
 } from 'lucide-react';
@@ -31,6 +32,12 @@ const menu = [
     name: 'API Keys',
     url: '/api-keys',
     icon: KeyRoundIcon,
+  },
+  {
+    name: 'Portal de dados',
+    url: import.meta.env.VITE_PORTAL_URL ?? 'https://portal.collectshare.com.br',
+    icon: GlobeIcon,
+    external: true,
   },
 ];
 

@@ -17,6 +17,7 @@ export function NavMenus({
     name: string
     url: string
     icon: LucideIcon
+    external?: boolean
   }[]
 }) {
   const location = useLocation();
@@ -26,10 +27,17 @@ export function NavMenus({
         {menus.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-              <Link to={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
-              </Link>
+              {item.external ? (
+                <a href={item.url} target="_blank" rel="noopener noreferrer">
+                  <item.icon />
+                  <span>{item.name}</span>
+                </a>
+              ) : (
+                <Link to={item.url}>
+                  <item.icon />
+                  <span>{item.name}</span>
+                </Link>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

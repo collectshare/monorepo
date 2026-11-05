@@ -48,7 +48,6 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
             type="text"
             placeholder="ex: Pesquisa de Satisfação"
             disabled={isLoading}
-            tabIndex={1}
             {...register('title')}
             error={errors.title?.message}
           />
@@ -98,7 +97,6 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
                 onValueChange={field.onChange}
                 editable
                 addOnPaste
-                tabIndex={3}
               >
                 <TagsInputList>
                   {(field.value ?? []).map((tag: string) => (
@@ -135,7 +133,6 @@ export function SaveFormDetailsModal({ form }: SaveFormDetailsModalProps) {
                 checked={field.value}
                 onCheckedChange={field.onChange}
                 disabled={isLoading}
-                tabIndex={4}
               />
             )}
           />
